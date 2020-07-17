@@ -1,4 +1,4 @@
-Package: chipseq
+Package: chip_seq
 Type: Package
 Title: ChIPseq with Bioconductor
 Version: 0.1.0

@@ -139,7 +139,7 @@ jobs:
       - name: Query dependencies
         run: |
           install.packages('remotes')
-          saveRDS(remotes::dev_package_deps("chipseq/",dependencies = TRUE), ".github/depends.Rds", version = 2)
+          saveRDS(remotes::dev_package_deps("chip_seq/",dependencies = TRUE), ".github/depends.Rds", version = 2)
           message(paste('****', Sys.time(), 'installing BiocManager ****'))
           remotes::install_cran("BiocManager")
         shell: Rscript {0}
@@ -186,12 +186,12 @@ jobs:
           ## Ideally, all dependencies should get installed in the first pass.
           ## Pass #1 at installing dependencies
           message(paste('****', Sys.time(), 'pass number 1 at installing dependencies: local dependencies ****'))
-          local_deps <- remotes::local_package_deps("chipseq/",dependencies = TRUE)
-          deps <- remotes::dev_package_deps("chipseq/",dependencies = TRUE, repos = BiocManager::repositories())
+          local_deps <- remotes::local_package_deps("chip_seq/",dependencies = TRUE)
+          deps <- remotes::dev_package_deps("chip_seq/",dependencies = TRUE, repos = BiocManager::repositories())
           BiocManager::install(local_deps[local_deps %in% deps$package[deps$diff != 0]])
           ## Pass #2 at installing dependencies
           message(paste('****', Sys.time(), 'pass number 2 at installing dependencies: any remaining dependencies ****'))
-          deps <- remotes::dev_package_deps("chipseq/",dependencies = TRUE, repos = BiocManager::repositories())
+          deps <- remotes::dev_package_deps("chip_seq/",dependencies = TRUE, repos = BiocManager::repositories())
           BiocManager::install(deps$package[deps$diff != 0])
           ## For running the checks
           message(paste('****', Sys.time(), 'installing rcmdcheck and BiocCheck ****'))
@@ -213,12 +213,12 @@ jobs:
 
       - name: Install package
         if: github.ref == 'refs/heads/master'
-        run: R CMD INSTALL ./chipseq/
+        run: R CMD INSTALL ./chip_seq/
 
       - name: Session info
         run: |
           require(compileCourses)
-          compileCourses::compileSingleCourseMaterial(repo="RockefellerUniversity",subdir="chipseq",branch="master")
+          compileCourses::compileSingleCourseMaterial(repo="RockefellerUniversity",subdir="chip_seq",branch="master")
         shell: Rscript {0}
 
       - name: Move to docs

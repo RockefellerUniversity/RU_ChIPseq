@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1595010042245.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3464147018",
+    "id" : "EF34CCEF",
+    "lastKnownWriteTime" : 1595011490,
+    "last_content_update" : 1595011490138,
+    "path" : "~/Documents/Box Sync/RU/Teaching/RU_side/RU_ChIPseq/chipseq/inst/extdata/_course.yml",
+    "project_path" : "chipseq/inst/extdata/_course.yml",
+    "properties" : {
+        "cursorPosition" : "6,42",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "yaml"
+}

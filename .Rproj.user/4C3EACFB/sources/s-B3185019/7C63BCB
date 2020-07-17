@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1594930506001.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "7C63BCB",
+    "lastKnownWriteTime" : 1595013038,
+    "last_content_update" : 1595013038339,
+    "path" : "~/Documents/Box Sync/RU/Teaching/RU_side/RU_ChIPseq/chipseq/inst/extdata/presRaw/ChIPseq_In_Bioconductor2.Rmd",
+    "project_path" : "chipseq/inst/extdata/presRaw/ChIPseq_In_Bioconductor2.Rmd",
+    "properties" : {
+        "cursorPosition" : "556,124",
+        "scrollLine" : "546"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

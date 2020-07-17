@@ -1,4 +1,4 @@
-Package: chip_seq
+Package: chip.seq
 Type: Package
 Title: ChIPseq with Bioconductor
 Version: 0.1.0
@@ -11,7 +11,7 @@ biocViews: Training
 Depends: methods, ggplot2, rmarkdown, ashr, ChIPQC, DiffBind, ShortRead, 
     BSgenome.Mmusculus.UCSC.mm10, Rsubread, Rbowtie2, R.utils, Rsamtools, 
     rtracklayer, GenomicRanges, TxDb.Mmusculus.UCSC.mm10.knownGene,
-    org.Mm.eg.db, GenomeInfoDb, ChIPseeker, ggupset,TxDb.Hsapiens.UCSC.hg38.knownGene
+    org.Mm.eg.db, GenomeInfoDb, ChIPseeker, ggupset, TxDb.Hsapiens.UCSC.hg38.knownGene
 Suggests: knitr,
     rmarkdown,
     testthat,

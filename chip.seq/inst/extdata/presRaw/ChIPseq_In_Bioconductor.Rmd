@@ -162,7 +162,7 @@ writeFastq(fastq,file = "~/Documents/Box Sync/RU/Teaching/RU_side/RU_ChIPseq/chi
 ```
 
 ```{r eval=T, echo=F}
-fastq <- readFastq(dirPath = "data/sampled_ENCFF001NQP.fastq")
+fastq <- readFastq(dirPath = "data/sampled_ENCFF001NQP.fastq.gz")
 ```
 
 ```{r mycRep1Reads,echo=T,eval=F}

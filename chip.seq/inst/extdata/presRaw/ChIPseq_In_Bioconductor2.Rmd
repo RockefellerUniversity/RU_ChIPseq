@@ -159,6 +159,8 @@ class(chipqc_MycMel_rep1)
 
 ```
 
+
+
 ```{r mycQCsecret,eval=FALSE,echo=F}
 library(ChIPQC)
 toBlkList<-"~/Documents/Box Sync/RU/Teaching/Compilation/Genomes_And_Datasets/mm10/ENCFF547MET.bed.gz"
@@ -170,6 +172,7 @@ save(chipqc_MycMel_rep1,file='~/Documents/Box Sync/RU/Teaching/RU_side/RU_ChIPse
 ```
 
 ```{r mycQCshowLa,echo=FALSE,eval=TRUE}
+toBlkList<-"data/ENCFF547MET.bed.gz"
 library(ChIPQC)
 load(file='data/rep1.RData')
 class(chipqc_MycMel_rep1)

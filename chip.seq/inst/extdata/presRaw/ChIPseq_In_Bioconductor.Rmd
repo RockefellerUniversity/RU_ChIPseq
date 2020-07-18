@@ -632,6 +632,12 @@ if(params$isSlides == "yes"){
 
 Now we have the index for the BAM file, we can retrieve and plot the number of mapped reads using [the **idxstatsBam()** function.](https://rockefelleruniversity.github.io/Bioconductor_Introduction//presentations/slides/AlignedDataInBioconductor.html#16)
 
+```{R, eval=F, echo=F}
+mappedReads <- idxstatsBam("SR_Myc_Mel_1.bam")
+save(mappedReads, file="data/idxstatsBam_MycMel.RData")
+```
+
+
 ```{r mapped1, echo=TRUE,eval=FALSE}
 mappedReads <- idxstatsBam("SR_Myc_Mel_rep1.bam")
 TotalMapped <- sum(mappedReads[,"mapped"])
@@ -640,7 +646,7 @@ ggplot(mappedReads,aes(x=seqnames,y=mapped))+
 ```
 
 ```{r mapped, echo=FALSE,eval=TRUE,fig.width=4,fig.height=4}
-mappedReads <- idxstatsBam("SR_Myc_Mel_rep1.bam")
+load("data/idxstatsBam_MycMel.RData")
 TotalMapped <- sum(mappedReads[,"mapped"])
 suppressPackageStartupMessages(library(ggplot2))
 ggplot(mappedReads,aes(x=seqnames,y=mapped))+geom_bar(stat="identity")+coord_flip()

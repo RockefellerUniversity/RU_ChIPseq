@@ -292,7 +292,7 @@ The use of cross-correlation or cross-coverage allows for an assessment of reads
 ## Assessing fragment length
 
 <div align="center">
-<img src="imgs/ChIPseq_biology_slides.png" alt="offset" height="400" width="600">
+<img src="imgs/ChIP-seq_biology_slides.png" alt="offset" height="400" width="600">
 </div>
 
 ---

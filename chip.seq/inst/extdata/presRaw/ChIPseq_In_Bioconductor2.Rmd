@@ -171,7 +171,7 @@ save(chipqc_MycMel_rep1,file='~/Documents/Box Sync/RU/Teaching/RU_side/RU_ChIPse
 
 ```{r mycQCshowLa,echo=FALSE,eval=TRUE}
 library(ChIPQC)
-load(file='~/Documents/Box Sync/RU/Teaching/RU_side/RU_ChIPseq/chipseq/inst/extdata/data/rep1.RData')
+load(file='data/rep1.RData')
 class(chipqc_MycMel_rep1)
 ```
 

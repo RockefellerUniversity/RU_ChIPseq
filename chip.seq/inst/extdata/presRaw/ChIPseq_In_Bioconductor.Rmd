@@ -392,7 +392,7 @@ TotalReads<-25555179
 TotalReadsFilt<-22864597
 
 ```
-```{r out1,eval=T,echo=T}
+```{r out11,eval=T,echo=T}
 TotalReads
 TotalReadsFilt
 ```

@@ -625,6 +625,10 @@ MACS peaks come as a tab seperated file thinly disguised as a ".xls".
 In addition to the genomic coordinates of peaks, these files contain useful information on the samples, parameters and version used for peak calling at the top.
 
 ```{r,eval=T,echo=F,  warning=FALSE,collapse=T}
+macsPeaks <- "data/Mel1_peaks.xls"
+```
+
+```{r,eval=T,echo=F,  warning=FALSE,collapse=T}
 macsPeaks_DF <- read.delim(macsPeaks)
 macsPeaks_DF[1:8,]
 ```
@@ -632,10 +636,9 @@ macsPeaks_DF[1:8,]
 ---
 ## Importing MACS peaks
 
-
 We can import peak files therefore using read.delim function. Note we have set *comment.char* argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
 
-```{r,eval=T,echo=F,  warning=FALSE,collapse=T}
+```{r,eval=F,echo=T,  warning=FALSE,collapse=T}
 macsPeaks <- "data/Mel1_peaks.xls"
 ```
 

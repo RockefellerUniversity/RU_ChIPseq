@@ -1,9 +1,10 @@
 ---
-title: "ChIPseq In Bioconductor part2"
+title: "ChIPseq In Bioconductor <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
   xaringan::moon_reader:
+    css: ["default", "metropolisCustom.css", "metropolis-fontsCustom.css"]
     lib_dir: libs
     nature:
       highlightStyle: github
@@ -19,6 +20,7 @@ output:
 params:
   isSlides: "no"
 ---
+
 
 ```{r,include=FALSE}
 suppressPackageStartupMessages(require(knitr))

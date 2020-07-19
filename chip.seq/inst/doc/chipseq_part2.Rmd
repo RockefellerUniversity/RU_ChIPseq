@@ -16,10 +16,6 @@ toMessage <- ifelse(!is.null(params$toMessage),params$toMessage,FALSE)
 message(toMessage)
 ```
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F,eval=T)
-```
-
 
 ## ChIPseq data processing
 
@@ -124,7 +120,7 @@ library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(org.Hs.eg.db)
 ```
 
-```{r instalssdcsscfsqlBSss2w,eval=TRUE,echo=toMessage}
+```{r instalssdcsscfsqlaBSss2w,eval=TRUE,echo=toMessage}
 library(ChIPseeker)
 library(TxDb.Hsapiens.UCSC.hg38.knownGene)
 library(org.Hs.eg.db)
@@ -142,7 +138,7 @@ plotAnnoPie(peakAnno)
 
 0. Export annotated peaks to a tab separated file.
 
-```{r instalsscsccdfsqlBSsls2w,eval=TRUE,echo=toMessage}
+```{r instalsscsccdfsqlBSsls2wa,eval=TRUE,echo=toMessage}
 toWrite <- as.data.frame(peakAnno)
 write.table(toWrite,file="annotatedPeaks",row.names = FALSE,sep="\t")
 ```
@@ -150,7 +146,7 @@ write.table(toWrite,file="annotatedPeaks",row.names = FALSE,sep="\t")
 
 10. Download the blacklist for [hg38](https://www.encodeproject.org/annotations/ENCSR636HFF/) and QC our newly downloaded BAM file in ChIPQC. To save time only run ChIPQC on chromosomes (chr10, chr11,chr12). Create cross-coverage plot using ChIPQC.
 
-```{r instalssdfsqlBSdwdwss2w,eval=TRUE,cache=TRUE,warning=FALSE,message=FALSE}
+```{r instalssdfsqlBSdwdwss2waa,eval=TRUE,cache=TRUE,warning=FALSE,message=FALSE}
 library(rtracklayer)
 blkList <- import.bed("~/Downloads/ENCFF356LFX.bed.gz")
 library(Rsamtools)

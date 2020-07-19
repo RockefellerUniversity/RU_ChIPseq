@@ -138,7 +138,7 @@ write.table(toWrite,file="annotatedPeaks",row.names = FALSE,sep="\t")
 
 10. Download the blacklist for [hg38](https://www.encodeproject.org/annotations/ENCSR636HFF/) and QC our newly downloaded BAM file in ChIPQC. To save time only run ChIPQC on chromosomes (chr10, chr11,chr12). Create cross-coverage plot using ChIPQC.
 
-```{r instalssdfsqlBSdwdwss2waa,eval=FALSE,cache=TRUE,warning=FALSE,message=FALSE}
+```{r instalssdfsqlBSdwdwss2waa,warning=FALSE,eval=TRUE,echo=toMessage}
 library(rtracklayer)
 if(!file.exists("ENCFF789ZHS.bam")){
   download.file("https://www.encodeproject.org/files/ENCFF789ZHS/@@download/ENCFF789ZHS.bam","ENCFF789ZHS.bam")

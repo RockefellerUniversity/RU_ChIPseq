@@ -92,18 +92,10 @@ plotSSD(myQClist)+xlim(0,10)+theme_minimal()
 
 6. With the downloaded peak calls in ENCFF627LTJ.bed.gz, import into R, filter to chromosomes chr1 to chr21 and plot the number of peaks these chromosomes.
 
-```{r instalsscscsdfsqlBSss2wsssssss,eval=F}
-myPeaks <-read.delim("data/ENCFF627LTJ.bed.gz",header=FALSE,sep="\t")
-myPeakGR <- GRanges(myPeaks[,1],IRanges(myPeaks[,2],myPeaks[,3]))
-myPeakGR <- myPeakGR[seqnames(myPeakGR) %in% paste0("chr",1:21)]
-freqs <- table(as.vector(seqnames(myPeakGR)))
-toPlot <- data.frame(Chromosome=names(freqs),Total=as.vector(freqs))
-ggplot(toPlot,aes(x=Chromosome,y=Total))+
-  geom_bar(stat="identity")+coord_flip()+theme_minimal()
-```
-
 ```{r instalsscscsdfsqlBSss2w,eval=F,echo=toMessage}
-myPeaks <-read.delim("~/Downloads/ENCFF627LTJ.bed.gz",header=FALSE,sep="\t")
+require(rtracklayer)
+download.file("https://www.encodeproject.org/files/ENCFF627LTJ/@@download/ENCFF627LTJ.bed.gz","ENCFF627LTJ.bed.gz")
+myPeaks <- read.delim("ENCFF627LTJ.bed.gz",header = FALSE)
 myPeakGR <- GRanges(myPeaks[,1],IRanges(myPeaks[,2],myPeaks[,3]))
 myPeakGR <- myPeakGR[seqnames(myPeakGR) %in% paste0("chr",1:21)]
 freqs <- table(as.vector(seqnames(myPeakGR)))
@@ -146,28 +138,17 @@ write.table(toWrite,file="annotatedPeaks",row.names = FALSE,sep="\t")
 
 10. Download the blacklist for [hg38](https://www.encodeproject.org/annotations/ENCSR636HFF/) and QC our newly downloaded BAM file in ChIPQC. To save time only run ChIPQC on chromosomes (chr10, chr11,chr12). Create cross-coverage plot using ChIPQC.
 
-```{r instalssdfsqlBSdwdwss2waa,eval=TRUE,cache=TRUE,warning=FALSE,message=FALSE}
+```{r instalssdfsqlBSdwdwss2waa,eval=FALSE,cache=TRUE,warning=FALSE,message=FALSE}
 library(rtracklayer)
-blkList <- import.bed("~/Downloads/ENCFF356LFX.bed.gz")
+blkList <- import.bed("ENCFF356LFX.bed.gz")
 library(Rsamtools)
 # Always check or index 
 # indexBam("~/Downloads/ENCFF789ZHS.bam")
-myQCCTCF <- ChIPQCsample("~/Downloads/ENCFF789ZHS.bam",blacklist = blkList,annotation = "hg38",
+myQCCTCF <- ChIPQCsample("ENCFF789ZHS.bam",blacklist = blkList,annotation = "hg38",
        chromosomes = c("chr10","chr11","chr12"),verboseT = FALSE)
 
 QCmetrics(myQCCTCF)
 plotCC(myQCCTCF)
 ```
 
-
-```{r instalssdfsqlBSdwdwss2w,eval=F,cache=TRUE,warning=FALSE,message=FALSE}
-library(rtracklayer)
-blkList <- import.bed("data/ENCFF356LFX.bed.gz")
-library(Rsamtools)
-# Always check or index 
-indexBam("~/Documents/Box Sync/RU/Teaching/Compilation/Genomes_And_Datasets/ChIPseq_course/ENCFF789ZHS.bam")
-myQCCTCF <- ChIPQCsample("~/Documents/Box Sync/RU/Teaching/Compilation/Genomes_And_Datasets/ChIPseq_course/ENCFF789ZHS.bam", blacklist = blkList, annotation = "hg38",
-       chromosomes = c("chr10","chr11","chr12"), verboseT = T)
-plotCC(myQCCTCF)
-```
 

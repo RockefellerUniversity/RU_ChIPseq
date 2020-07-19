@@ -97,7 +97,7 @@ require(rtracklayer)
 download.file("https://www.encodeproject.org/files/ENCFF627LTJ/@@download/ENCFF627LTJ.bed.gz","ENCFF627LTJ.bed.gz")
 myPeaks <- read.delim("ENCFF627LTJ.bed.gz",header = FALSE)
 myPeakGR <- GRanges(myPeaks[,1],IRanges(myPeaks[,2],myPeaks[,3]))
-myPeakGR <- myPeakGR[seqnames(myPeakGR) %in% paste0("chr",1:21)]
+myPeakGR <- myPeakGR[as.vector(seqnames(myPeakGR)) %in% paste0("chr",1:21)]
 freqs <- table(as.vector(seqnames(myPeakGR)))
 toPlot <- data.frame(Chromosome=names(freqs),Total=as.vector(freqs))
 ggplot(toPlot,aes(x=Chromosome,y=Total))+
@@ -140,10 +140,14 @@ write.table(toWrite,file="annotatedPeaks",row.names = FALSE,sep="\t")
 
 ```{r instalssdfsqlBSdwdwss2waa,eval=FALSE,cache=TRUE,warning=FALSE,message=FALSE}
 library(rtracklayer)
+if(!file.exists("ENCFF789ZHS.bam")){
+  download.file("https://www.encodeproject.org/files/ENCFF789ZHS/@@download/ENCFF789ZHS.bam","ENCFF789ZHS.bam")
+}
+download.file("https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz","ENCFF356LFX.bed.gz")
 blkList <- import.bed("ENCFF356LFX.bed.gz")
 library(Rsamtools)
 # Always check or index 
-# indexBam("~/Downloads/ENCFF789ZHS.bam")
+indexBam("ENCFF789ZHS.bam")
 myQCCTCF <- ChIPQCsample("ENCFF789ZHS.bam",blacklist = blkList,annotation = "hg38",
        chromosomes = c("chr10","chr11","chr12"),verboseT = FALSE)
 

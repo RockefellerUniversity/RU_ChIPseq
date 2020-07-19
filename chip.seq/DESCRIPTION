@@ -12,7 +12,7 @@ Depends: methods, ggplot2, rmarkdown, ashr, ChIPQC, DiffBind, ShortRead,
     BSgenome.Mmusculus.UCSC.mm10, Rsubread, Rbowtie2, R.utils, Rsamtools, 
     rtracklayer, GenomicRanges, TxDb.Mmusculus.UCSC.mm10.knownGene,
     org.Mm.eg.db, GenomeInfoDb, ChIPseeker, ggupset, TxDb.Hsapiens.UCSC.hg38.knownGene,
-    TxDb.Hsapiens.UCSC.hg19.knownGene, org.Hs.eg.db
+    TxDb.Hsapiens.UCSC.hg19.knownGene, org.Hs.eg.db, ChIPQC
 Suggests: knitr,
     rmarkdown,
     testthat,

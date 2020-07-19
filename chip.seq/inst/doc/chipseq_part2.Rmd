@@ -92,7 +92,7 @@ plotSSD(myQClist)+xlim(0,10)+theme_minimal()
 
 6. With the downloaded peak calls in ENCFF627LTJ.bed.gz, import into R, filter to chromosomes chr1 to chr21 and plot the number of peaks these chromosomes.
 
-```{r instalsscscsdfsqlBSss2w,eval=F}
+```{r instalsscscsdfsqlBSss2wsssssss,eval=F}
 myPeaks <-read.delim("data/ENCFF627LTJ.bed.gz",header=FALSE,sep="\t")
 myPeakGR <- GRanges(myPeaks[,1],IRanges(myPeaks[,2],myPeaks[,3]))
 myPeakGR <- myPeakGR[seqnames(myPeakGR) %in% paste0("chr",1:21)]

@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ChIPseq In Bioconductor part2</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ChIPseq In Bioconductor part2
+### Rockefeller University, Bioinformatics Resource Centre
+### <a href="http://rockefelleruniversity.github.io/RU_ChIPseq/" class="uri">http://rockefelleruniversity.github.io/RU_ChIPseq/</a>
+
+---
+
+
+
+
+
+
+## Data
+
+In todays session we will continue to review the Myc ChIPseq we were working on in our last session.
+
+This include Myc ChIPseq for MEL and Ch12 celllines as well as their input controls.
+
+Information and files for the [Myc ChIPseq in MEL cell line can be found here](https://www.encodeproject.org/experiments/ENCSR000EUA/)
+
+Information and files for the [Myc ChIPseq in Ch12 cell line can be found here](https://www.encodeproject.org/experiments/ENCSR000ERN/)
+
+Input control can be found for [MEL cell line can be found here](https://www.encodeproject.org/experiments/ENCSR000ADN/)
+
+Input control can be found for [Ch12 cell line can be found here.](https://www.encodeproject.org/experiments/ENCSR000ERS/)
+
+
+---
+class: inverse, center, middle
+
+# Quality Control
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+## Quality Control
+
+
+ChIPseq has many sources of potential noise including 
+* Varying efficiency of antibodies
+* Non-specific binding
+* Library complexity
+* ChIP artefacts and background
+
+Many of these sources of noise can be assessed using some well established methodology.
+
+---
+
+# Quality Control References 
+
+For some discussions:
+
+* Encode quality metrics.
+
+[Large-scale quality analysis of published ChIPseq data. Marinov GK, Kundaje A, Park PJ, Wold BJ. G3 (Bethesda). 2014 Feb 19;4(2)](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3931556/)
+
+* Overestimation of artefact duplicates in ChIPseq.
+
+[Systematic evaluation of factors influencing ChIPseq fidelity.Nat Methods. Chen Y, Negre N, Li Q, Mieczkowska JO, Slattery M, Liu T, Zhang Y, Kim TK, He HH, Zieba J, Ruan Y, Bickel PJ, Myers RM, Wold BJ, White KP, Lieb JD, Liu XS. 2012 Jun;9(6)](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3477507/)
+
+
+* When and what QC is useful.
+
+[Impact of artifact removal on ChIP quality metrics in ChIPseq and ChIP-exo data.Front Genet. 2014 Apr 10;5:75.Carroll TS, Liang Z, Salama R, Stark R, de Santiago I](http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3989762/)
+
+---
+## Always have an appropriate input
+
+
+* Input samples are typically made from fragmented DNA prior to IP enrichment.
+
+* Allows for control of artefact regions which occur across samples.
+
+* NEVER run ChIPseq without considering which input to use.
+
+e.g. When using tumour samples for ChIPseq, it is important to have matched input samples. 
+Differing conditions of same tissue may share common input. 
+
+---
+## Quality metrics for ChIPseq
+
+
+The [**ChIPQC package**](https://bioconductor.org/packages/release/bioc/html/ChIPQC.html) wraps some of the metrics into a Bioconductor package and takes care to measure these metrics under the appropriate condition. 
+
+To run a single sample we can use the **ChIPQCsample()** function, the relevant **unfiltered** BAM file and we are recommended to supply a **blacklist** as a BED file or GRanges and Genome name.
+
+You can find a Blacklist for most genomes at [Anshul Kundaje's site](https://sites.google.com/site/anshulkundaje/projects/blacklists) or directly from the [Encode websites](https://www.encodeproject.org/annotations/ENCSR636HFF/)
+
+
+
+
+
+```r
+QCresult &lt;- ChIPQCsample(reads = "/pathTo/myChIPreads.bam", genome = "mm10", blacklist = "/pathTo/mm10_Blacklist.bed")
+```
+
+---
+## Quality control with ChIPQC
+
+We download the blacklist for mm10 from [Encode ](https://www.encodeproject.org/files/ENCFF547MET/@@download/ENCFF547MET.bed.gz)
+
+We can then provide an initial analysis of our ChIPseq samples quality using the **ChIPQCsample()** function from the [**ChIPQC** package.](http://bioconductor.org/packages/stats/bioc/ChIPQC/).
+
+Here we evalute the quality of samples we aligned with Rsubread last week. The returned object is a **ChIPQCsample** object.
+
+
+```r
+library(ChIPQC)
+toBlkList &lt;- "~/Downloads/ENCFF547MET.bed.gz"
+chipqc_MycMel_rep1 &lt;- ChIPQCsample("SR_Myc_Mel_rep1.bam", annotation = "mm10", blacklist = toBlkList, 
+    chromosomes = paste0("chr", 1:10))
+class(chipqc_MycMel_rep1)
+```
+
+
+
+
+
+
+```
+## [1] "ChIPQCsample"
+## attr(,"package")
+## [1] "ChIPQC"
+```
+
+---
+## Quality control with ChIPQC
+
+We can display our **ChIPQCsample** object which will show a basic summary of our ChIPseq quality.
+
+
+```r
+chipqc_MycMel_rep1
+```
+
+```
+## 					ChIPQCsample
+```
+
+```
+## Number of Mapped reads: 10355431
+```
+
+```
+## Number of Mapped reads passing MapQ filter: 8445736
+```
+
+```
+## Percentage Of Reads as Non-Duplicates (NRF): 100(0)
+```
+
+```
+## Percentage Of Reads in Blacklisted Regions: 8
+```
+
+```
+## SSD: 4.15396194667776
+```
+
+```
+## Fragment Length Cross-Coverage:
+```
+
+```
+## Relative Cross-Coverage:
+```
+
+```
+## Percentage Of Reads in GenomicFeature:
+```
+
+```
+##                         ProportionOfCounts
+## BlackList                       0.09376116
+## LongPromoter20000to2000         0.39108812
+## Promoters2000to500              0.06601580
+## Promoters500                    0.05096595
+## All5utrs                        0.02653351
+## Alltranscripts                  0.73319436
+## Allcds                          0.09148486
+## Allintrons                      0.61883381
+## All3utrs                        0.02559232
+```
+
+```
+## Percentage Of Reads in Peaks: NA
+```
+
+```
+## Number of Peaks: 0
+```
+
+```
+## GRanges object with 0 ranges and 0 metadata columns:
+##    seqnames    ranges strand
+##       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
+##   -------
+##   seqinfo: no sequences
+```
+
+---
+## QC of multiple samples
+
+It is best to review ChIPseq quality versus your input controls and other Myc samples which we are using (or even external data if you do not have your own).
+
+This will allow us to identify expected patterns of ChIPseq enrichment in our samples versus controls as well as spot any outlier samples by these metrics.
+
+We can run **ChIPQCsample()** on all our samples of interest using an **lapply**.
+
+
+
+
+
+
+```r
+bamsToQC &lt;- c("Sorted_Myc_Ch12_1.bam", "Sorted_Myc_Ch12_2.bam", "Sorted_Myc_MEL_1.bam", 
+    "Sorted_Myc_MEL_2.bam", "Sorted_Input_MEL.bam", "Sorted_Input_Ch12.bam")
+myQC &lt;- bplapply(bamsToQC, ChIPQCsample, annotation = "mm10", blacklist = toBlkList, 
+    chromosomes = paste0("chr", 1:10))
+names(myQC) &lt;- bamsToQC
+```
+
+---
+## QC of multiple samples
+
+All ChIPQC functions can work with a named list of **ChIPQCsample** objects to aggregate scores into table as well as plots.
+
+Here we use the **QCmetrics()** function to give an overview of quality metrics. 
+
+
+
+
+```r
+QCmetrics(myQC)
+```
+
+```
+##                          Reads Map% Filt% Dup% ReadL FragL RelCC  SSD RiP%
+## Sorted_Myc_Ch12_1.bam 10993821  100  21.9    0    35   186 1.070 3.82   NA
+## Sorted_Myc_Ch12_2.bam 10060460  100  18.4    0    35   146 1.310 2.84   NA
+## Sorted_Myc_MEL_1.bam  10111080  100  20.8    0    35   177 1.220 3.42   NA
+## Sorted_Myc_MEL_2.bam  10686984  100  23.4    0    35   177 1.050 4.20   NA
+## Sorted_Input_MEL.bam   8591703  100  23.6    0    36   184 0.620 4.51   NA
+## Sorted_Input_Ch12.bam 10429244  100  23.7    0    35   182 0.275 4.26   NA
+##                       RiBL%
+## Sorted_Myc_Ch12_1.bam  12.8
+## Sorted_Myc_Ch12_2.bam  10.1
+## Sorted_Myc_MEL_1.bam   11.9
+## Sorted_Myc_MEL_2.bam   14.0
+## Sorted_Input_MEL.bam   15.9
+## Sorted_Input_Ch12.bam  12.8
+```
+
+---
+class: inverse, center, middle
+
+# Assessing fragment length
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+## Assessing fragment length
+
+The prediction of fragment length is an essential part of ChIPseq affecting peaks calling, summit identification and coverage profiles. 
+
+The use of cross-correlation or cross-coverage allows for an assessment of reads clustering by strand and so a measure of quality. 
+
+---
+## Assessing fragment length
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/ChIP-seq_biology_slides.png" alt="offset" height="400" width="600"&gt;
+&lt;/div&gt;
+
+---
+
+## Assessing fragment length
+
+* In ChIPseq typically short single end reads of dsDNA.
+
+* **dsDNA single end sequencing means**
++ 5' of fragment will be sequenced on "+" strand
++ 3' of fragment end will be on "-" strand.
+
+* **Although we only have partial sequence of strand, with predicted fragment length we can predicted the whole fragment**
++ "+" reads should extend only in positive direction 
++ "-" reads only in negative
+
+---
+
+## Assessing fragment length
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/pileup.png" alt="offset" height="500" width="400"&gt;
+&lt;/div&gt;
+
+---
+
+## Assessing fragment length
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/offset.jpg" alt="offset" height="500" width="400"&gt;
+&lt;/div&gt;
+
+---
+
+## Assessing fragment length
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/shifts.gif" alt="offset" height="200" width="700"&gt;
+&lt;/div&gt;
+&lt;div align="center"&gt;
+&lt;img src="imgs/cor.gif" alt="offset" height="300" width="700"&gt;
+&lt;/div&gt;
+
+---
+
+## Cross-coverage plot 
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/shifts.jpg" alt="offset" height="500" width="400"&gt;
+&lt;/div&gt;
+
+---
+
+## Cross-coverage plot
+The **plotCC** function can be used to plot our cross-coverage profiles
+
+The **plotCC()** function accepts our list of ChIPQC sample objects and a **facetBy** argument to allow us to group our cross-coverage profiles.
+
+
+```r
+plotCC(myQC, facetBy = "Sample")
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/qcmetridedecs-1.png)&lt;!-- --&gt;
+
+---
+
+## Cross-coverage plot
+
+We can include additional metadata to allow us to group our plot in different ways.
+
+We can include metadata as a data.frame where the first column is our sample names.
+
+
+
+```r
+myMeta &lt;- data.frame(Sample = names(myQC), Tissue = c("Ch12", "Ch12", "MEL", "MEL", 
+    "MEL", "Ch12"), Antibody = c(rep("Myc", 4), rep("Input", 2)))
+myMeta
+```
+
+```
+##                  Sample Tissue Antibody
+## 1 Sorted_Myc_Ch12_1.bam   Ch12      Myc
+## 2 Sorted_Myc_Ch12_2.bam   Ch12      Myc
+## 3  Sorted_Myc_MEL_1.bam    MEL      Myc
+## 4  Sorted_Myc_MEL_2.bam    MEL      Myc
+## 5  Sorted_Input_MEL.bam    MEL    Input
+## 6 Sorted_Input_Ch12.bam   Ch12    Input
+```
+
+---
+## Cross-coverage plot
+
+We can now include our metadata to the **addMetaData** argument which will allow us to **facetBy** the supplied metadata columns.
+
+Additionally here we use the **colourBy** parameter to add colour to antibody groups.
+
+
+```r
+plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody")
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/qcmetricsede-1.png)&lt;!-- --&gt;
+
+---
+## Cross-coverage plot
+
+All plots in ChIPQC are in fact built in ggplot2 so we can edit and update our plot like all ggplot objects.
+
+
+```r
+plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody") + theme_bw() + 
+    ggtitle("ChIPQC results")
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/qcmetricsrf-1.png)&lt;!-- --&gt;
+
+---
+class: inverse, center, middle
+
+# Blacklists and SSD
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## Blacklists
+
+ChIPseq will often show the presence of common artefacts, such as ultra-high signal regions. Such regions can confound peak calling, fragment length estimation and QC metrics. Anshul Kundaje created the DAC blacklist as a reference to help deal with these regions.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/blacklist.png" alt="offset" height="500" width="400"&gt;
+&lt;/div&gt;
+
+---
+## Blacklist affects many metrics
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/blacklistsAffects.jpg" alt="offset" height="400" width="400"&gt;
+&lt;/div&gt;
+
+---
+## Blacklists and SSD
+
+SSD is one of these measures that is sensitive to blacklisted artefacts. SSD is a measure of standard deviation of signal across the genome with higher scores reflecting significant pile-up of reads. SSD can therefore be used to assess both the extent of ultra high signals and the signal. But first blacklisted regions must be removed.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/ssdAndBlacklist.png" alt="offset" height="400" width="300"&gt;
+&lt;/div&gt;
+
+---
+## Standardised Standard Deviation
+
+ChIPQC calculates SSD before and after removing signal coming from Blacklisted regions.
+
+The **plotSSD()** function plots samples's pre-blacklisting score in **red** and post-blacklisting score in **blue**.
+
+Higher scores for pre-blacklisted SSD can suggest a strong background signal in blacklisted regions for that sample.
+
+
+```r
+plotSSD(myQC) + xlim(0, 5)
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+---
+## Standardised Standard Deviation
+
+Since SSD score is strongly affected by blacklisting it may be necessary to change the axis to see any differences between samples for post-blacklisting scores.
+
+Higher post-blacklisted SSD scores reflect samples with stronger peak signal.
+
+
+```r
+plotSSD(myQC) + xlim(0.2, 0.8)
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+
+---
+class: inverse, center, middle
+
+# Library complexity and enrichment
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## Library complexity
+
+A potential source of noise in ChIPseq is overamplification of the ChIPseq library during a PCR step. This can lead to large number of duplicate reads which may confound peak calling.
+
+![](imgs/mappable.png)
+
+---
+## Duplication
+
+We should compare our duplication rate across samples to identify any sample experiencing overamplification and so potential of a lower complexity.
+
+The **flagtagcounts()** function reports can report the number of duplicates and total mapped reads and so from there we can calculate our duplication rate.
+
+
+```r
+myFlags &lt;- flagtagcounts(myQC)
+myFlags["DuplicateByChIPQC", ]/myFlags["Mapped", ]
+```
+
+```
+## Sorted_Myc_Ch12_1.bam Sorted_Myc_Ch12_2.bam  Sorted_Myc_MEL_1.bam 
+##            0.07203883            0.08633293            0.15987076 
+##  Sorted_Myc_MEL_2.bam  Sorted_Input_MEL.bam Sorted_Input_Ch12.bam 
+##            0.06253850            0.14269010            0.13873057
+```
+
+
+---
+## Enrichment for reads across genes.
+
+We can also use ChIPQC to review where our distribution of reads across gene features using the **plotRegi()** function.
+
+Here we expect ChIPseq signal to be stronger in 5'UTRs and promoters when compared to input samples.
+
+
+```r
+p &lt;- plotRegi(myQC)
+```
+
+---
+## Enrichment for reads across genes.
+
+
+```r
+p
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+
+---
+class: inverse, center, middle
+
+# Peak Calling
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+## Peak calling
+
+To identify regions of Myc transcription factor binding we can use a **peak caller**.
+
+Although peak caller are available in R (including our own), the most popular and widely used peak called remains **MACS2**.
+
+MACS2 calls peaks in a few simple steps.
+
+* Predict fragment length.
+* Shift reads to centre of predicted fragment.
+* Scan across genome and identify regions enriched compare to control samples using count based statistic.
+
+---
+## Installing MACS2
+
+Though this software is not directly available in R we can use the tools we used to install Salmon to get MACS2. 
+
+* Install conda with **[Anaconda](https://anaconda.org/)** or **[Miniconda](https://conda.io/miniconda.html)**
+
+![testing](imgs/bioconda.jpg)
+
+
+* Set bioconda channels according to the *[construction](https://bioconda.github.io/index.html#set-up-channels)*
+
+* Install packages e.g. *[MACS2](https://bioconda.github.io/recipes/macs2/README.html)*
+
+
+
+---
+## Running MACS2
+
+To run MACS2 to we simply need to supply.
+
+* A BAM file to find enriched regions in. (specified after **-t**)
+* A Name for peak calls (specified after **–name**).
+* An output folder to write peaks into (specified after **–outdir**).
+* Optionally, but highly recommended, we can identify a control to compare to (specified after **–c**).
+
+
+```bash
+macs2 callpeak -t Sorted_Myc_MEL_1.bam
+               –name Mel_Rep1 
+               –-outdir PeakDirectory
+               -c Sorted_Input_MEL.bam 
+
+```
+---
+## Running MACS2 in R
+
+We can still run our MACS2 from the comfort of R using the **system()** function.
+
+We simply need to build our MACS2 peak call command in R and pass to the **system()** function. 
+
+
+```r
+myChIP &lt;- "Sorted_Myc_MEL_1.bam"
+myControl &lt;- "Sorted_Input_MEL.bam"
+
+macsCommand &lt;- paste0("macs2 callpeak -t ", myChIP, " -n ", "Mel_Rep1", " –-outdir ", 
+    "PeakDirectory", " -c ", myControl)
+system(macsCommand)
+```
+
+
+
+---
+## Working with Peaks
+
+MACS peak calls can be found in our specied output directory with the suffix and extension "_peaks.xls".
+
+MACS peaks come as a tab seperated file thinly disguised as a ".xls".
+
+In addition to the genomic coordinates of peaks, these files contain useful information on the samples, parameters and version used for peak calling at the top.
+
+
+
+
+```
+## [1] "# Command line: callpeak -t Sorted_Myc_MEL_1.bam -n Mel1 -c Sorted_Input_MEL.bam"
+## [2] "# ARGUMENTS LIST:"                                                               
+## [3] "# name = Mel1"                                                                   
+## [4] "# format = AUTO"                                                                 
+## [5] "# ChIP-seq file = ['Sorted_Myc_MEL_1.bam']"                                      
+## [6] "# control file = ['Sorted_Input_MEL.bam']"                                       
+## [7] "# effective genome size = 2.70e+09"                                              
+## [8] "# band width = 300"
+```
+
+---
+## Importing MACS peaks
+
+We can import peak files therefore using read.delim function. Note we have set *comment.char* argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
+
+
+```r
+macsPeaks &lt;- "data/Mel1_peaks.xls"
+```
+
+
+```r
+macsPeaks_DF &lt;- read.delim(macsPeaks, comment.char = "#")
+macsPeaks_DF[1:2, ]
+```
+
+```
+##    chr   start     end length abs_summit pileup X.log10.pvalue. fold_enrichment
+## 1 chr1 4785371 4785642    272    4785563  20.89        10.66553         5.33590
+## 2 chr1 5082993 5083247    255    5083123  33.42        12.68072         4.30257
+##   X.log10.qvalue.        name
+## 1         7.37727 Mel1_peak_1
+## 2         9.27344 Mel1_peak_2
+```
+
+---
+## Converting MACS peaks
+
+Now we have the information in a table we can create a GRanges object.
+
+GRanges objects are made of chromosome names and intervals stored as IRanges.
+
+
+```r
+library(GenomicRanges)
+macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, 
+    "start"], macsPeaks_DF[, "end"]))
+macsPeaks_GR
+```
+
+```
+## GRanges object with 16757 ranges and 0 metadata columns:
+##           seqnames            ranges strand
+##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt;
+##       [1]     chr1   4785371-4785642      *
+##       [2]     chr1   5082993-5083247      *
+##       [3]     chr1   7397544-7398115      *
+##       [4]     chr1   7616290-7616433      *
+##       [5]     chr1   8134747-8134893      *
+##       ...      ...               ...    ...
+##   [16753]     chrY   2657144-2657294      *
+##   [16754]     chrY 90784142-90784289      *
+##   [16755]     chrY 90818471-90818771      *
+##   [16756]     chrY 90824549-90824905      *
+##   [16757]     chrY 90825407-90825575      *
+##   -------
+##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
+```
+
+---
+## Peaks as GRanges
+
+
+As we have seen before elements in GRanges can accessed and set using various GRanges functions.
+Here we can deconstruct our object back to contig names and interval ranges.
+
+
+```r
+seqnames(macsPeaks_GR)
+```
+
+```
+## factor-Rle of length 16757 with 21 runs
+##   Lengths:   916   822  1795   582   596 ...  1089   836   954   395     7
+##   Values :  chr1 chr10 chr11 chr12 chr13 ...  chr7  chr8  chr9  chrX  chrY
+## Levels(21): chr1 chr10 chr11 chr12 chr13 chr14 ... chr7 chr8 chr9 chrX chrY
+```
+
+```r
+ranges(macsPeaks_GR)
+```
+
+```
+## IRanges object with 16757 ranges and 0 metadata columns:
+##               start       end     width
+##           &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+##       [1]   4785371   4785642       272
+##       [2]   5082993   5083247       255
+##       [3]   7397544   7398115       572
+##       [4]   7616290   7616433       144
+##       [5]   8134747   8134893       147
+##       ...       ...       ...       ...
+##   [16753]   2657144   2657294       151
+##   [16754]  90784142  90784289       148
+##   [16755]  90818471  90818771       301
+##   [16756]  90824549  90824905       357
+##   [16757]  90825407  90825575       169
+```
+
+---
+## Peaks as GRanges
+
+GRanges objects may have metadata attached. Here we attach some useful information on our peaks including the summit position and the fold enrichment over input.
+
+
+```r
+mcols(macsPeaks_GR) &lt;- macsPeaks_DF[, c("abs_summit", "fold_enrichment")]
+macsPeaks_GR
+```
+
+```
+## GRanges object with 16757 ranges and 2 metadata columns:
+##           seqnames            ranges strand | abs_summit fold_enrichment
+##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt;
+##       [1]     chr1   4785371-4785642      * |    4785563         5.33590
+##       [2]     chr1   5082993-5083247      * |    5083123         4.30257
+##       [3]     chr1   7397544-7398115      * |    7397837         9.58306
+##       [4]     chr1   7616290-7616433      * |    7616380         7.65860
+##       [5]     chr1   8134747-8134893      * |    8134873         2.94486
+##       ...      ...               ...    ... .        ...             ...
+##   [16753]     chrY   2657144-2657294      * |    2657196         4.25981
+##   [16754]     chrY 90784142-90784289      * |   90784227         6.91704
+##   [16755]     chrY 90818471-90818771      * |   90818595         5.63525
+##   [16756]     chrY 90824549-90824905      * |   90824771         5.21309
+##   [16757]     chrY 90825407-90825575      * |   90825485         3.09097
+##   -------
+##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
+```
+
+
+---
+## Filter peaks in blacklisted regions
+
+We will want to remove any peaks overlapping blacklisted regions prior to any downstream analysis. 
+We can do this using simple overlapping with GRanges objects.
+
+
+
+```r
+library(rtracklayer)
+blkList &lt;- import.bed(toBlkList)
+macsPeaks_GR &lt;- macsPeaks_GR[!macsPeaks_GR %over% blkList]
+```
+
+
+
+---
+class: inverse, center, middle
+
+# Peak Annotation
+
+&lt;html&gt;&lt;div style='float:left'&gt;&lt;/div&gt;&lt;hr color='#EB811B' size=1px width=720px&gt;&lt;/html&gt; 
+
+---
+
+---
+
+## Annotation of peaks to genes
+
+So far we have been working with ChIPseq peaks corresponding to transcription factor binding. Transcription factors, as implied in the name, can affect the expression of their target genes.
+
+The target of transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:-
+
+Peaks are typically annotated to a gene if
+* They overlap the gene.
+* The gene is the closest (and within a minimum distance).
+
+
+
+---
+
+## Peak annotation
+
+
+A useful package for annotation of peaks to genes is **ChIPseeker**. 
+
+By using pre-defined annotation in the from of a **TXDB** object for mouse (mm10 genome), ChIPseeker will provide us with an overview of where peaks land in the gene and distance to TSS sites.
+
+First load the libraries we require for the next part.
+
+
+
+
+```r
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(org.Mm.eg.db)
+library(GenomeInfoDb)
+library(ChIPseeker)
+```
+
+---
+
+## Peak annotation
+
+
+The annotatePeak function accepts a GRanges object of the regions to annotate, a TXDB object for gene locations and a database object name to retrieve gene names from.
+
+
+
+```r
+peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, 
+    annoDb = "org.Mm.eg.db")
+```
+
+```
+## &gt;&gt; preparing features information...		 2020-07-19 05:09:00 PM 
+## &gt;&gt; identifying nearest features...		 2020-07-19 05:09:01 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2020-07-19 05:09:02 PM 
+## &gt;&gt; assigning genomic annotation...		 2020-07-19 05:09:02 PM 
+## &gt;&gt; adding gene annotation...			 2020-07-19 05:09:23 PM 
+## &gt;&gt; assigning chromosome lengths			 2020-07-19 05:09:23 PM 
+## &gt;&gt; done...					 2020-07-19 05:09:24 PM
+```
+
+```r
+class(peakAnno)
+```
+
+```
+## [1] "csAnno"
+## attr(,"package")
+## [1] "ChIPseeker"
+```
+---
+## Peak annotation
+
+The result is a csAnno object containing annotation for peaks and overall annotation statistics.
+
+
+```r
+peakAnno
+```
+
+```
+## Annotated peaks generated by ChIPseeker
+## 16753/16753  peaks were annotated
+## Genomic Annotation Summary:
+##              Feature  Frequency
+## 9           Promoter 41.3299111
+## 4             5' UTR  0.3581448
+## 3             3' UTR  1.9697965
+## 1           1st Exon  1.9280129
+## 7         Other Exon  2.4891064
+## 2         1st Intron 13.1319764
+## 8       Other Intron 16.1284546
+## 6 Downstream (&lt;=300)  1.4803319
+## 5  Distal Intergenic 21.1842655
+```
+
+---
+## Peak annotation
+
+
+The csAnno object contains the information on annotation of individual peaks to genes.
+
+To extract this from the csAnno object the ChIPseeker functions *as.GRanges* or *as.data.frame* can be used to produce the respective object with peaks and their associated genes.
+
+
+```r
+peakAnno_GR &lt;- as.GRanges(peakAnno)
+peakAnno_DF &lt;- as.data.frame(peakAnno)
+```
+
+---
+## Peak annotation
+
+```r
+peakAnno_GR[1, ]
+```
+
+```
+## GRanges object with 1 range and 14 metadata columns:
+##       seqnames          ranges strand | abs_summit fold_enrichment  annotation
+##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt; &lt;character&gt;
+##   [1]     chr1 4785371-4785642      * |    4785563          5.3359    Promoter
+##         geneChr geneStart   geneEnd geneLength geneStrand      geneId
+##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;  &lt;integer&gt;  &lt;integer&gt; &lt;character&gt;
+##   [1]         1   4783572   4785692       2121          2       27395
+##               transcriptId distanceToTSS            ENSEMBL      SYMBOL
+##                &lt;character&gt;     &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;
+##   [1] ENSMUST00000132625.1            50 ENSMUSG00000033845      Mrpl15
+##                                  GENENAME
+##                               &lt;character&gt;
+##   [1] mitochondrial ribosomal protein L15
+##   -------
+##   seqinfo: 21 sequences from mm10 genome
+```
+
+---
+## Vizualising peak annotation
+
+Now we have the annotated peaks from ChIPseeker we can use some of ChIPseeker's plotting functions to display distribution of peaks in gene features. Here we use the **plotAnnoBar** function to plot this as a bar chart but  **plotAnnoPie** would produce a similar plot as a pie chart.
+
+
+
+```r
+plotAnnoBar(peakAnno)
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+---
+## Vizualising peak annotation
+
+Similarly we can plot the distribution of peaks around TSS sites.
+
+
+
+```r
+plotDistToTSS(peakAnno)
+```
+
+![](imgs/TSS1.png)
+
+---
+# Visualising peak annotation
+
+ChIPseeker can also offer a succinct plot to describe the overlap between annotations.
+
+
+
+```r
+upsetplot(peakAnno, vennpie = F)
+```
+
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+
+
+---
+## Time for an exercise!
+
+Exercise on reading and writing data can be found [here](../../exercises/exercises/chipseq_part2_Exercises.html)
+
+---
+## Answers to exercise
+
+Answers can be found [here](../../exercises/answers/chipseq_part2_answers.html)
+
+R code for solutions can be found [here](../../exercises/answers/chipseq_part2_answers.R)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

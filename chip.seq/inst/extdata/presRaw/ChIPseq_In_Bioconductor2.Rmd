@@ -850,7 +850,7 @@ upsetplot(peakAnno, vennpie=F)
 ---
 ## Time for an exercise!
 
-Exercise on reading and writing data can be found [here](../../exercises/exercises/chipseq_part2_Exercises.html)
+Exercise on ChIP-seq data can be found [here](../../exercises/exercises/chipseq_part2_exercise.html)
 
 ---
 ## Answers to exercise

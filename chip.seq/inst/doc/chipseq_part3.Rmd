@@ -130,7 +130,7 @@ ebf1_proBunique<- ebf1_proB[!ebf1_proB %over% ebf1_B]
 
 ```{r v,echo=toMessage}
 library(rGREAT)
-great_Job <- submitGreatJob(ebf1_Bunique,species="mm10")
+great_Job <- submitGreatJob(ebf1_Bunique,species="mm10",request_interval=1,version = "3.0.0")
 availableCategories(great_Job)
 great_ResultTable = getEnrichmentTables(great_Job,
                                         category="Pathway Data")
@@ -139,7 +139,7 @@ msigPath_Bcells <- great_ResultTable[["MSigDB Pathway"]]
 
 msigPath_Bcells[1:10,]
 
-great_Job <- submitGreatJob(ebf1_proBunique,species="mm10",request_interval=1)
+great_Job <- submitGreatJob(ebf1_proBunique,species="mm10",request_interval=1,version = "3.0.0")
 availableCategories(great_Job)
 great_ResultTable = getEnrichmentTables(great_Job,
                                         category="Pathway Data")

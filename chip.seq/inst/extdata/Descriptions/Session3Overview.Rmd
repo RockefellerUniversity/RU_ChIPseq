@@ -1,0 +1,10 @@
+<br>
+
+#### **ChIPseq, Session 1**
+
+This section introduces the analysis of ChIPseq data in Bioconductor
+Session sections:
+
+* Functional enrichment analysis of TF targets
+* R interface to GREAT server
+* Motif enrichment using Meme-ChIP

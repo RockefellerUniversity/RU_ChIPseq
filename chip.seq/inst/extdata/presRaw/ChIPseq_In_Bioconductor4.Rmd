@@ -407,16 +407,16 @@ Here we define the peaks which occur in both the Ch12 replicates.
 Since logical matrix is equivalent to a 1 or 0  matrix (1 = TRUE and 0 = FALSE), we can use the rowSums function to extract peaks in at least 2 of the Ch12 replicates.
 
 
-```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
-ch12_HC_Peaks <- allPeaksSet_nR[
-  rowSums(as.data.frame(
-    mcols(allPeaksSet_nR)[,c("ch12_1","ch12_2")])) >= 2
-  ]
+```{r,eval=T,echo=T,warning=FALSE}
+ch12_HC_Peaks <- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[,c("ch12_1","ch12_2")])) >= 2]
+
 export.bed(ch12_HC_Peaks,"ch12_HC_Peaks.bed")
+
 ch12_HC_Peaks[1:2,]
 ```
 
 ---
+
 ![](imgs/ch12HC.png)
 ---
 # High confidence unique peaks.

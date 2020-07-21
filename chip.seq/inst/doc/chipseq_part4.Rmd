@@ -160,6 +160,15 @@ save(CTCFcounts,file="../Data/CTCFcounts.RData")
 
 ```{r,dwd,eval=TRUE,echo=toMessage}
 
+## For example ##
+HC_Peaks <- allPeaksSet_nR[
+  rowSums(as.data.frame(mcols(allPeaksSet_nR)[,c("CTCF_Ch12_1","CTCF_Ch12_2")])) >= 2 |
+  rowSums(as.data.frame(mcols(allPeaksSet_nR)[,c("CTCF_MEL_1","CTCF_MEL_2")])) >= 2  
+  ]
+
+library(Rsamtools)
+
+
 load("data/CTCFcounts.RData")
 
 metaDataFrame <- data.frame(CellLine=c("Ch12","Ch12","Mel","Mel"))

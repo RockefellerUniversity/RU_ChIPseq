@@ -22,6 +22,22 @@ navbar:
         href: presentations/singlepage/ChIPseq_In_Bioconductor2.html
       - text: Code
         href: presentations/r_code/ChIPseq_In_Bioconductor2.R
+    - text: Session3
+      menu:
+      - text: Slide
+        href: presentations/slides/ChIPseq_In_Bioconductor3.html
+      - text: Single Page
+        href: presentations/singlepage/ChIPseq_In_Bioconductor3.html
+      - text: Code
+        href: presentations/r_code/ChIPseq_In_Bioconductor3.R
+    - text: Session4
+      menu:
+      - text: Slide
+        href: presentations/slides/ChIPseq_In_Bioconductor4.html
+      - text: Single Page
+        href: presentations/singlepage/ChIPseq_In_Bioconductor4.html
+      - text: Code
+        href: presentations/r_code/ChIPseq_In_Bioconductor4.R
   - text: Exercises
     menu:
     - text: chipseq_part1

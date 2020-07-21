@@ -8,11 +8,11 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LazyData: TRUE
 biocViews: Training
-Depends: methods, ggplot2, rmarkdown, ashr, ChIPQC, DiffBind, ShortRead, 
+Depends: methods, ggplot2, rmarkdown, ashr, ChIPQC, DiffBind, ShortRead, DESeq2, limma,
     BSgenome.Mmusculus.UCSC.mm10, Rsubread, Rbowtie2, R.utils, Rsamtools, 
     rtracklayer, GenomicRanges, TxDb.Mmusculus.UCSC.mm10.knownGene,
     org.Mm.eg.db, GenomeInfoDb, ChIPseeker, ggupset, TxDb.Hsapiens.UCSC.hg38.knownGene,
-    TxDb.Hsapiens.UCSC.hg19.knownGene, org.Hs.eg.db, ChIPQC, tracktables
+    TxDb.Hsapiens.UCSC.hg19.knownGene, org.Hs.eg.db, ChIPQC, tracktables, goseq, rGREAT, KEGG.db, GO.db
 Suggests: knitr,
     rmarkdown,
     testthat,

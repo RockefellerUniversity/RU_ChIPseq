@@ -1,9 +1,43 @@
 params <-
 list(isSlides = "no")
 
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
-AsSlides <- TRUE
+## ----include=FALSE------------------------------------------------------------
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# ChIPseq (part 4)
+
+---
+"    
+  )
+  
+}
+
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Peaks and replicates
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Peaks and replicates
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
@@ -154,7 +188,7 @@ vennDiagram(mcols(allPeaksSet_nR))
 vennCounts(mcols(allPeaksSet_nR))
 
 
-## ----eval=T,echo=T,warning=FALSE----------------------------------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
 ch12_HC_Peaks <- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[,c("ch12_1","ch12_2")])) >= 2]
 
 export.bed(ch12_HC_Peaks,"ch12_HC_Peaks.bed")
@@ -173,6 +207,28 @@ export.bed(ch12_HC_UniquePeaks,"ch12_HC_UniquePeaks.bed")
 ch12_HC_UniquePeaks[1,]
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Differential ChIP Enrichment
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Differential ChIP Enrichment
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
 HC_Peaks <- allPeaksSet_nR[
   rowSums(as.data.frame(
@@ -184,25 +240,24 @@ HC_Peaks
 export.bed(HC_Peaks,"HC_Peaks.bed")
 
 
-## ----eval=F, echo=T,warning=FALSE---------------------------------------------
-## 
-## library(Rsamtools)
-## 
-## bams <- c("~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_1.bam",
-##           "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_2.bam",
-##           "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Mel_1.bam",
-##           "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Mel_2.bam")
-## bamFL <- BamFileList(bams,yieldSize = 5000000)
-## bamFL
+## ----eval=F,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
+
+library(Rsamtools)
+
+bams <- c("~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_1.bam",
+          "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_2.bam",
+          "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Mel_1.bam",
+          "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Mel_2.bam")
+bamFL <- BamFileList(bams,yieldSize = 5000000)
+bamFL
 
 
-## ----eval=F, echo=T, warning=FALSE--------------------------------------------
+## ----eval=F,echo=T, eval=F, echo=T, warning=FALSE-----------------------------
 ## library(GenomicAlignments)
 ## myMycCounts <- summarizeOverlaps(HC_Peaks,
 ##                               reads = bamFL,
 ##                               ignore.strand = TRUE)
 ## class(myMycCounts)
-## save(myMycCounts,file="data/MycCounts.RData")
 
 
 ## ---- eval=T, echo=F, warning=FALSE-------------------------------------------

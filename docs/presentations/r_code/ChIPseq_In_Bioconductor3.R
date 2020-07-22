@@ -1,9 +1,21 @@
 params <-
 list(isSlides = "no")
 
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
-AsSlides <- TRUE
+## ----include=FALSE------------------------------------------------------------
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# ChIPseq (part 3)
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE----
@@ -26,6 +38,35 @@ peakAnno <- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000),
 annotatedPeaksGR <- as.GRanges(peakAnno)
 annotatedPeaksDF <- as.data.frame(peakAnno)
 annotatedPeaksDF[1:2,]
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Gene Set Enrichment
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Gene Set Enrichment
+
+---
+"    
+  )
+  
+}
+
+
+
+## ----eval=T,echo=T, eval=F, echo=T, warning=FALSE,tidy=T----------------------
+## library(GO.db)
+## library(KEGG.db)
+## library(reactome.db)
+## library(GSEABase)
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
@@ -58,6 +99,12 @@ library(goseq)
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
 library(goseq)
 pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+supGenomes <- supportedGenomes()
+supGenomes[1:2,]
+
 
 
 ## ----echo=T, eval=F, echo=T, warning=FALSE------------------------------------
@@ -124,16 +171,36 @@ msigProMotifs <- great_ResultTable[["MSigDB Predicted Promoter Motifs"]]
 msigProMotifs[1:4,]
 
 
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Moitfs
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Motifs
+
+---
+"    
+  )
+  
+}
+
+
+
 ## ---- echo=TRUE,include=FALSE-------------------------------------------------
 
-library(BSgenome)
 library(BSgenome.Mmusculus.UCSC.mm10)
 BSgenome.Mmusculus.UCSC.mm10
 
 
 ## ---- echo=TRUE,collapse=F----------------------------------------------------
 
-library(BSgenome)
 library(BSgenome.Mmusculus.UCSC.mm10)
 BSgenome.Mmusculus.UCSC.mm10
 

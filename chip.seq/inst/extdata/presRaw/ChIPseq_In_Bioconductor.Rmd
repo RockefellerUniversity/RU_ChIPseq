@@ -1,5 +1,5 @@
 ---
-title: "ChIPseq In Bioconductor <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
+title: "ChIPseq In Bioconductor (part 1) <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 

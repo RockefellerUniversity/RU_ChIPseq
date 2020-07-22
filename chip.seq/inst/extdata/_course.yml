@@ -2,7 +2,7 @@ Description:
   CourseName: ChIPseq with Bioconductor
   OverviewRmd: CourseOverview.Rmd
 Presentations:
-    titles: Session1 Session2 
-    PresRmd: ChIPseq_In_Bioconductor.Rmd ChIPseq_In_Bioconductor2.Rmd 
-    PresOverviewRmd: Session1Overview.Rmd Session2Overview.Rmd
-    Exercises: chipseq_part1.Rmd chipseq_part2.Rmd
+    titles: Session1 Session2 Session3 Session4
+    PresRmd: ChIPseq_In_Bioconductor.Rmd ChIPseq_In_Bioconductor2.Rmd ChIPseq_In_Bioconductor3.Rmd ChIPseq_In_Bioconductor4.Rmd 
+    PresOverviewRmd: Session1Overview.Rmd Session2Overview.Rmd Session3Overview.Rmd Session4Overview.Rmd
+    Exercises: chipseq_part1.Rmd chipseq_part2.Rmd chipseq_part3.Rmd chipseq_part4.Rmd

@@ -39,7 +39,7 @@ library(GenomicAlignments)
 library(tracktables)
 library(limma)
 
-peakFiles <- dir("../Data/CTCFpeaks/",pattern="*.peaks",
+peakFiles <- dir("data/CTCFpeaks/",pattern="*.peaks",
                  full.names = TRUE)
 peakFiles
 macsPeaks_DF <- list()
@@ -125,7 +125,7 @@ writeXStringSet(peaksSequences[sample(1:length(peaksSequences),1000)],file="comm
 6 Load in the CTCF counts, identify peaks with higher signal in Ch12 cell line (padj <0.05, log2FoldChange > 3) and create an HTML report with tracktables.
 
 
-```{r,dwd,eval=FALSE}
+```{r,dwdww,eval=FALSE,echo=FALSE}
 
 ## For example ##
 HC_Peaks <- allPeaksSet_nR[
@@ -146,9 +146,13 @@ CTCFcounts <- summarizeOverlaps(HC_Peaks,
                               reads = bamFL,
                               ignore.strand = TRUE)
 class(CTCFcounts)
-#save(CTCFcounts,file="../Data/CTCFcounts.RData")
-###
-load("../Data/CTCFcounts.RData")
+save(CTCFcounts,file="../Data/CTCFcounts.RData")
+```
+
+
+```{r,dwd,eval=TRUE}
+
+load("data/CTCFcounts.RData")
 
 metaDataFrame <- data.frame(CellLine=c("Ch12","Ch12","Mel","Mel"))
 rownames(metaDataFrame) <- colnames(CTCFcounts)

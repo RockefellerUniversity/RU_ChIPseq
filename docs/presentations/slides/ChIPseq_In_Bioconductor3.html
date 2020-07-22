@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>ChIPseq_In_Bioconductor3.utf8</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
+    <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# ChIPseq In Bioconductor
+<html>
+<div style="float:left">
+
+</div>
+<hr color='#EB811B' size=1px width=796px>
+</html>
+### Rockefeller University, Bioinformatics Resource Centre
+### <a href="http://rockefelleruniversity.github.io/RU_ChIPseq/" class="uri">http://rockefelleruniversity.github.io/RU_ChIPseq/</a>
+
+---
+
+
+
+
+
+# Data
+
+In todays session we will continue to review the Myc ChIPseq we were working on in our last sessions.
+
+This include Myc ChIP-seq for MEL and Ch12 celllines.
+
+Information and files for the [Myc ChIPseq in MEL cell line can be found here](https://www.encodeproject.org/experiments/ENCSR000EUA/)
+
+Information and files for the [Myc ChIPseq in Ch12 cell line can be found here](https://www.encodeproject.org/experiments/ENCSR000ERN/)
+
+&lt;!-- --- --&gt;
+
+&lt;!-- # Data --&gt;
+
+&lt;!-- We will be working with peak calls today, so we can download the MACS2 peak calls from the Encode website. --&gt;
+
+&lt;!-- [Myc Mel Rep1](https://www.encodeproject.org/files/ENCFF363WUG/@@download/ENCFF363WUG.bed.gz) --&gt;
+
+&lt;!-- [Myc Mel Rep2](https://www.encodeproject.org/files/ENCFF139JHS/@@download/ENCFF139JHS.bed.gz) --&gt;
+
+&lt;!-- [Myc Ch12 Rep1](https://www.encodeproject.org/files/ENCFF160KXR/@@download/ENCFF160KXR.bed.gz) --&gt;
+
+&lt;!-- [Myc Ch12 Rep2](https://www.encodeproject.org/files/ENCFF962BGJ/@@download/ENCFF962BGJ.bed.gz) --&gt;
+
+---
+
+# Data
+
+I have provided peakcalls from MACS2 following the processing steps outlined in our last session.
+
+Peak calls for Myc in MEL and Ch12 cellines can be found in 
+
+**data/peaks/**
+
+* **data/peaks/Mel_1_peaks.xls**
+* **data/peaks/Mel_2_peaks.xls**
+* **data/peaks/Ch12_1_peaks.xls**
+* **data/peaks/Ch12_1_peaks.xls**
+
+---
+
+# Annotation of peaks to genes.
+
+In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/chipseq_course/Presentations/Slides/ChIPseq_In_Bioconductor2.html#45).
+
+Since transcription factors, as suggested in name, may regulate the transcription of their target genes, we used the **ChIPseeker package** to associate our peaks, representing potential transcription factor binding events, to their overlapping or closest mm10 genes.
+
+
+```r
+library(GenomicRanges)
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(ChIPseeker)
+macsPeaks &lt;- "data/peaks/Mel_1_peaks.xls"
+macsPeaks_DF &lt;- read.delim(macsPeaks,comment.char="#")
+macsPeaks_GR &lt;- GRanges(
+ seqnames=macsPeaks_DF[,"chr"],
+ IRanges(macsPeaks_DF[,"start"],macsPeaks_DF[,"end"])
+)
+mcols(macsPeaks_GR) &lt;- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
+peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000), 
+                         TxDb=TxDb.Mmusculus.UCSC.mm10.knownGene, 
+                         annoDb="org.Mm.eg.db")
+```
+
+```
+## &gt;&gt; preparing features information...		 2020-07-21 05:43:06 PM 
+## &gt;&gt; identifying nearest features...		 2020-07-21 05:43:06 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2020-07-21 05:43:07 PM 
+## &gt;&gt; assigning genomic annotation...		 2020-07-21 05:43:07 PM 
+## &gt;&gt; adding gene annotation...			 2020-07-21 05:43:09 PM 
+## &gt;&gt; assigning chromosome lengths			 2020-07-21 05:43:09 PM 
+## &gt;&gt; done...					 2020-07-21 05:43:09 PM
+```
+
+---
+
+# Annotation of peaks to genes.
+
+This allowed us to produce a GRanges or data.frame of our peaks and their predicted target genes.
+
+
+```r
+annotatedPeaksGR &lt;- as.GRanges(peakAnno)
+annotatedPeaksDF &lt;- as.data.frame(peakAnno)
+annotatedPeaksDF[1:2,]
+```
+
+```
+##   seqnames   start     end width strand abs_summit fold_enrichment annotation
+## 1     chr1 4785370 4785641   272      *    4785565         5.23296   Promoter
+## 2     chr1 5082993 5083216   224      *    5083122         4.26417   Promoter
+##   geneChr geneStart geneEnd geneLength geneStrand geneId          transcriptId
+## 1       1   4783572 4785692       2121          2  27395  ENSMUST00000132625.1
+## 2       1   5083080 5162529      79450          1 108664 ENSMUST00000044369.12
+##   distanceToTSS            ENSEMBL  SYMBOL
+## 1            51 ENSMUSG00000033845  Mrpl15
+## 2             0 ENSMUSG00000033793 Atp6v1h
+##                                          GENENAME
+## 1             mitochondrial ribosomal protein L15
+## 2 ATPase, H+ transporting, lysosomal V1 subunit H
+```
+
+
+
+
+---
+#Geneset testing.
+
+Transcription factors or epigenetic marks may act on specific sets of genes grouped by a common biological feature (shared Biological function, common regulation in RNAseq experiment etc).
+
+A frequent step in ChIP-seq analysis is to test whether common gene sets are enriched for transcription factor binding or epigenetic marks.
+
+Sources of well curated genesets include [GO consortium](http://geneontology.org/) (gene's function, biological process and cellular localisation), [REACTOME](http://www.reactome.org/) (Biological Pathways) and [MsigDB](http://software.broadinstitute.org/gsea/msigdb/) (Computationally and Experimentally derived).
+
+---
+# Gene ontology and geneset testing for ChIPseq
+
+Geneset enrichment testing may be performed on the sets of genes with peaks associated to them. In this example we will consider genes with peaks within 1000bp of a gene's TSS.
+
+We will not access these database libraries directly in testing but will use other R/Bioconductor libraries which make extensive use of them.
+
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/TSSPeak.png" alt="offset" height="250" width="600"&gt;
+&lt;/div&gt;
+
+---
+# Gene ontology and geneset testing.
+
+
+To perform geneset testing here, we will use the **GOseq package**.
+
+We must provide a named numeric vector of 1s or 0s to illustrate whether a gene had any peaks overlapping it's TSS.
+
+In this example we use all TSS sites we found to be overlapped by Myc peaks.
+
+The peaks landing in TSS regions will be marked as "Promoter" in the **annotation** column of our annotated GRanges object. 
+
+
+```r
+annotatedPeaksGR[1,]
+```
+
+```
+## GRanges object with 1 range and 14 metadata columns:
+##       seqnames          ranges strand | abs_summit fold_enrichment  annotation
+##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt; &lt;character&gt;
+##   [1]     chr1 4785370-4785641      * |    4785565         5.23296    Promoter
+##         geneChr geneStart   geneEnd geneLength geneStrand      geneId
+##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;  &lt;integer&gt;  &lt;integer&gt; &lt;character&gt;
+##   [1]         1   4783572   4785692       2121          2       27395
+##               transcriptId distanceToTSS            ENSEMBL      SYMBOL
+##                &lt;character&gt;     &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;
+##   [1] ENSMUST00000132625.1            51 ENSMUSG00000033845      Mrpl15
+##                                  GENENAME
+##                               &lt;character&gt;
+##   [1] mitochondrial ribosomal protein L15
+##   -------
+##   seqinfo: 21 sequences from mm10 genome
+```
+---
+# Gene ontology and geneset testing.
+
+
+We can extract the unique names of genes with peaks in their TSS by subsetting the annotated GRanges and retrieving gene names from the **geneId** column.
+
+
+```r
+annotatedPeaksGR_TSS &lt;- annotatedPeaksGR[
+  annotatedPeaksGR$annotation == "Promoter",]
+genesWithPeakInTSS &lt;- unique(annotatedPeaksGR_TSS$geneId)
+genesWithPeakInTSS[1:2]
+```
+
+```
+## [1] "27395"  "108664"
+```
+
+---
+# Gene ontology and functional testing.
+
+
+Next we can extract all genes which are included in the TxDb object to use as our universe of genes for pathway enrichment.
+
+
+
+```r
+allGeneGR &lt;- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
+```
+
+```
+##   66 genes were dropped because they have exons located on both strands
+##   of the same reference sequence or on more than one reference sequence,
+##   so cannot be represented by a single genomic range.
+##   Use 'single.strand.genes.only=FALSE' to get all the genes in a
+##   GRangesList object, or use suppressMessages() to suppress this message.
+```
+
+```r
+allGeneGR[1:3, ]
+```
+
+```
+## GRanges object with 3 ranges and 1 metadata column:
+##             seqnames            ranges strand |     gene_id
+##                &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
+##   100009600     chr9 21062393-21073096      - |   100009600
+##   100009609     chr7 84935565-84964115      - |   100009609
+##   100009614    chr10 77711457-77712009      + |   100009614
+##   -------
+##   seqinfo: 66 sequences (1 circular) from mm10 genome
+```
+
+```r
+allGeneIDs &lt;- allGeneGR$gene_id
+```
+
+---
+# Gene ontology and functional testing.
+
+
+Once we have a vector of all genes we can create a named vector of 1s or 0s representing whether a gene had peak in TSS or not. 
+We can turn a logical vector into 1 for TRUE and 0 for FALSE simply using the **as.integer()** function.
+
+
+```r
+allGenesForGOseq &lt;- as.integer(allGeneIDs %in% genesWithPeakInTSS)
+names(allGenesForGOseq) &lt;- allGeneIDs
+allGenesForGOseq[1:3]
+```
+
+```
+## 100009600 100009609 100009614 
+##         1         0         0
+```
+
+
+---
+
+# Gene ontology and functional testing.
+
+Now we have the the input for GOseq we can test against KEGG (or GO if we choose) using a standard hypergeometric test.
+
+First we must construct a **nullp** data.frame for use within **goseq** using the **nullp()** function and supplying our named vector, genome to be used and gene identifier used.
+
+The **nullp()** function attempts to correct for gene length biases we may see in geneset testing. i.e. a longer gene may have more chance to have a peak within it.
+
+
+
+
+
+```r
+library(goseq)
+pwf = nullp(allGenesForGOseq, "mm10", "knownGene", plot.fit = FALSE)
+```
+
+```
+## Can't find mm10/knownGene length data in genLenDataBase...
+```
+
+```
+## Found the annotation package, TxDb.Mmusculus.UCSC.mm10.knownGene
+```
+
+```
+## Trying to get the gene lengths from it.
+```
+
+---
+
+# Gene ontology and functional testing.
+
+Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of genesets.
+
+We also select a database of genesets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" genesets.
+
+As we are testing peaks in 1000bp windows around genes's TSSs we can simply use the **"Hypergeometric"** for the method parameter.
+
+
+```r
+Kegg_MycPeaks &lt;- goseq(pwf,"mm10","knownGene",
+                       test.cats=c("KEGG"),
+                       method="Hypergeometric")
+
+Kegg_MycPeaks[1:2,]
+```
+
+
+
+
+```
+##    category over_represented_pvalue under_represented_pvalue numDEInCat
+## 89    03010            8.744084e-33                        1         76
+## 90    03013            5.729961e-27                        1        105
+##    numInCat
+## 89       88
+## 90      158
+```
+---
+# Gene ontology and functional testing.
+
+The dataframe of enrichment results contains KEGG IDs but no description of pathways and processes.
+
+We can use the **KEGG.db** package to extract a mapping of IDs to descriptive statistics.
+
+
+
+```r
+library(KEGG.db)
+xx &lt;- as.list(KEGGPATHID2NAME)
+idtoName &lt;- cbind(names(xx),unlist(xx))
+idtoName[1:5,]
+```
+
+```
+##       [,1]    [,2]                                      
+## 00010 "00010" "Glycolysis / Gluconeogenesis"            
+## 00020 "00020" "Citrate cycle (TCA cycle)"               
+## 00030 "00030" "Pentose phosphate pathway"               
+## 00040 "00040" "Pentose and glucuronate interconversions"
+## 00051 "00051" "Fructose and mannose metabolism"
+```
+---
+# Gene ontology and functional testing.
+
+We can now merge our data.frame of ID to pathway name mappings to our data.frame of enrichment results.
+
+
+```r
+KeggN_MycPeaks &lt;- merge(idtoName,Kegg_MycPeaks,by=1,all=TRUE)
+orderByP &lt;- order(KeggN_MycPeaks$over_represented_pvalue)
+KeggN_MycPeaks &lt;- KeggN_MycPeaks[orderByP,]
+KeggN_MycPeaks[1:5,]
+```
+
+```
+##        V1                                V2 over_represented_pvalue
+## 187 03010                          Ribosome            8.744084e-33
+## 188 03013                     RNA transport            5.729961e-27
+## 194 03040                       Spliceosome            3.424264e-22
+## 186 03008 Ribosome biogenesis in eukaryotes            2.183456e-16
+## 145 00970       Aminoacyl-tRNA biosynthesis            1.458264e-11
+##     under_represented_pvalue numDEInCat numInCat
+## 187                        1         76       88
+## 188                        1        105      158
+## 194                        1         83      123
+## 186                        1         54       76
+## 145                        1         32       42
+```
+---
+
+# Gene ontology and functional testing. GREAT method.
+
+In addition to a standard enrichment tests, methods have been implemented specifically for ChIP-seq. Many of these tools aim to incorporate peaks distal to genes into their enrichment testing such as the popular [GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) toolset.
+
+Incorporating distal peaks by rules such as nearest gene results in some genes having a higher chance of being selected and hence some genesets as a whole having a higher chance of having its members selected.
+
+[GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) defines regulatory regions for each, individual gene and compares the proportion of peaks mapping to a geneset's regulatory regions to the proportion of the genome occupied by geneset's regulatory regions.
+
+i.e. If a gene set's regulatory regions account for 1% of the genome then one might expect 1% of peaks to overlap these regions by chance.
+---
+rGREAT - R interface to GREAT server.
+=========================================================
+
+We can use the GREAT Bioconductor interface available in the rGREAT package. 
+
+
+```r
+library(rGREAT)
+```
+
+```
+## 
+## ------------------
+## Note: On Aug 19 2019 GREAT released version 4 where it supports `hg38`
+## genome and removes some ontologies such pathways. `submitGreatJob()`
+## still takes `hg19` as default. `hg38` can be specified by the `species
+## = 'hg38'` argument. To use the older versions such as 3.0.0, specify as
+## `submitGreatJob(..., version = '3.0.0')`.
+## ------------------
+```
+---
+Gene ontology and functional testing. GREAT method.
+=========================================================
+
+To submit jobs we can use our GRanges of Myc peaks and specify a genome with the **submitGreatJob** function.
+
+This function returns a GreatJob object containing a reference to our results on the GREAT server. To review the categories of results available we can use the availableCategories function on our GreatJob object.
+
+
+```r
+great_Job &lt;- submitGreatJob(macsPeaks_GR, species = "mm10", version = "3.0.0", request_interval = 1)
+availableCategories(great_Job)
+```
+
+```
+## [1] "GO"                               "Phenotype Data and Human Disease"
+## [3] "Pathway Data"                     "Gene Expression"                 
+## [5] "Regulatory Motifs"                "Gene Families"
+```
+---
+Gene ontology and functional testing. GREAT method.
+=========================================================
+
+The results table can be retrieved using the getEnrichmentTables function and specifying which tables we wish to review.
+
+Here we retrieve the results tables for the "Regulatory Motifs" genesets which contains 2 seperate database results.
+
+
+```r
+great_ResultTable = getEnrichmentTables(great_Job,
+                                        category="Regulatory Motifs")
+```
+
+```
+## The default enrichment tables contain no associated genes for the input
+## regions. You can set `download_by = 'tsv'` to download the complete
+## table, but note only the top 500 regions can be retreived. See the
+## following link:
+## 
+## https://great-help.atlassian.net/wiki/spaces/GREAT/pages/655401/Export#Export-GlobalExport
+```
+
+```r
+names(great_ResultTable)
+```
+
+```
+## [1] "MSigDB Predicted Promoter Motifs" "MSigDB miRNA Motifs"
+```
+---
+Gene ontology and functional testing. GREAT method.
+=========================================================
+
+Now we can review the enrichment of our genes with Myc peaks in their TSS for the "MSigDB Predicted Promoter Motifs" genesets.
+
+
+```r
+msigProMotifs &lt;- great_ResultTable[["MSigDB Predicted Promoter Motifs"]]
+msigProMotifs[1:4, ]
+```
+
+```
+##                     ID
+## 1   SCGGAAGY_V$ELK1_02
+## 2     GGGCGGR_V$SP1_Q6
+## 3      CACGTG_V$MYC_Q2
+## 4 RCGCANGCGY_V$NRF1_Q6
+##                                                                              name
+## 1                Motif SCGGAAGY matches ELK1: ELK1, member of ETS oncogene family
+## 2                             Motif GGGCGGR matches SP1: Sp1 transcription factor
+## 3 Motif CACGTG matches MYC: v-myc myelocytomatosis viral oncogene homolog (avian)
+## 4                     Motif RCGCANGCGY matches NRF1: nuclear respiratory factor 1
+##   Binom_Genome_Fraction Binom_Expected Binom_Observed_Region_Hits
+## 1            0.05912876       814.6169                       1586
+## 2            0.20132920      2773.7130                       3782
+## 3            0.07555623      1040.9380                       1638
+## 4            0.05163166       711.3293                       1195
+##   Binom_Fold_Enrichment Binom_Region_Set_Coverage Binom_Raw_PValue
+## 1              1.946928                0.11511940    1.738355e-136
+## 2              1.363515                0.27451550     1.823467e-94
+## 3              1.573580                0.11889380     1.110696e-71
+## 4              1.679953                0.08673877     2.182812e-65
+##   Binom_Adjp_BH Hyper_Total_Genes Hyper_Expected Hyper_Observed_Gene_Hits
+## 1 1.069088e-133              1069       502.9698                      806
+## 2  5.607161e-92              2689      1265.1880                     1812
+## 3  2.276927e-69               941       442.7452                      695
+## 4  3.356073e-63               822       386.7551                      606
+##   Hyper_Fold_Enrichment Hyper_Gene_Set_Coverage Hyper_Term_Gene_Coverage
+## 1              1.602482              0.07821446                0.7539757
+## 2              1.432198              0.17583700                0.6738565
+## 3              1.569752              0.06744299                0.7385760
+## 4              1.566883              0.05880640                0.7372263
+##   Hyper_Raw_PValue Hyper_Adjp_BH
+## 1     1.739538e-83  5.349079e-81
+## 2    5.523247e-114 3.396797e-111
+## 3     1.936613e-65  3.970057e-63
+## 4     1.614352e-56  2.482066e-54
+```
+
+--- 
+
+# Motifs
+
+A common practice in transcription factor ChIP-seq is to investigate the motifs enriched under peaks. 
+
+Denovo motif enrichment can be performed in R/Bioconductor but this can be very time consuming. Here we will use the Meme-ChIP suite available online to identify denovo motifs.
+
+Meme-ChIP requires a FASTA file of sequences under peaks as input so we extract this using the **BSgenome** package.
+
+---
+
+# Extracting sequences under regions
+
+
+First we need to load the BSgenome object for the genome we are working on, UCSC's mm10 build for the mouse genome, **BSgenome.Mmusculus.UCSC.mm10**.
+
+
+
+
+
+```r
+library(BSgenome)
+library(BSgenome.Mmusculus.UCSC.mm10)
+BSgenome.Mmusculus.UCSC.mm10
+```
+
+```
+## Mouse genome:
+## # organism: Mus musculus (Mouse)
+## # provider: UCSC
+## # provider version: mm10
+## # release date: Dec. 2011
+## # release name: Genome Reference Consortium GRCm38
+## # 66 sequences:
+## #   chr1                 chr2                 chr3                
+## #   chr4                 chr5                 chr6                
+## #   chr7                 chr8                 chr9                
+## #   chr10                chr11                chr12               
+## #   chr13                chr14                chr15               
+## #   ...                  ...                  ...                 
+## #   chrUn_GL456372       chrUn_GL456378       chrUn_GL456379      
+## #   chrUn_GL456381       chrUn_GL456382       chrUn_GL456383      
+## #   chrUn_GL456385       chrUn_GL456387       chrUn_GL456389      
+## #   chrUn_GL456390       chrUn_GL456392       chrUn_GL456393      
+## #   chrUn_GL456394       chrUn_GL456396       chrUn_JH584304      
+## # (use 'seqnames()' to see all the sequence names, use the '$' or '[[' operator
+## # to access a given sequence)
+```
+---
+
+#Extracting sequences under regions
+
+
+The motif for the ChIP-ed transcription factor should in the centre of a peak. Meme-ChIP will trim our peaks to a common length internally if sequences are of different length.
+
+It is best therefore to provide a peak set resized to a common length.
+
+
+```r
+macsSummits_GR &lt;- GRanges(seqnames(macsPeaks_GR),
+                          IRanges(macsPeaks_GR$abs_summit,
+                                  macsPeaks_GR$abs_summit),
+                          score=macsPeaks_GR$fold_enrichment)
+macsSummits_GR &lt;- resize(macsSummits_GR,100,fix="center")
+```
+
+---
+#Extracting sequences under regions
+
+We now have a GRanges, centred on the summit, highest point of signal for every peak.
+
+
+```r
+macsSummits_GR
+```
+
+```
+## GRanges object with 13777 ranges and 1 metadata column:
+##           seqnames              ranges strand |     score
+##              &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;
+##       [1]     chr1     4785515-4785614      * |   5.23296
+##       [2]     chr1     5083072-5083171      * |   4.26417
+##       [3]     chr1     7397785-7397884      * |   9.84580
+##       [4]     chr1     9545350-9545449      * |  11.85079
+##       [5]     chr1     9700928-9701027      * |   5.14291
+##       ...      ...                 ...    ... .       ...
+##   [13773]     chrX 168674050-168674149      * |   5.21700
+##   [13774]     chrX 169047705-169047804      * |   5.33257
+##   [13775]     chrX 169320320-169320419      * |   4.67030
+##   [13776]     chrY     1245745-1245844      * |   4.04550
+##   [13777]     chrY     1286577-1286676      * |   5.00143
+##   -------
+##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
+```
+
+---
+#Extracting sequences under regions
+
+
+Once we have recentered our peaks we can use the **getSeq** function with our GRanges of resized common peaks and the BSgenome object for mm10.
+
+The **getSeq** function returns a *DNAStringSet* object containing sequences under peaks. 
+
+
+```r
+peaksSequences &lt;- getSeq(BSgenome.Mmusculus.UCSC.mm10,
+                         macsSummits_GR)
+names(peaksSequences) &lt;- paste0(seqnames(macsSummits_GR),":",
+                                         start(macsSummits_GR),
+                                         "-",
+                                         end(macsSummits_GR))
+
+peaksSequences[1:2,]
+```
+
+```
+## DNAStringSet object of length 2:
+##     width seq                                               names               
+## [1]   100 CGTCCATCGCCAGAGTGACGCGG...CTGGGCTTCAGGTTGGCCAGGCT chr1:4785515-4785614
+## [2]   100 CCGCCCTCAGCTGCGGTCACGTG...TGAGTGAGGCTCGCAACGTCTCC chr1:5083072-5083171
+```
+---
+# Writing to FASTA file
+
+
+The *writeXStringSet* function allows the user to write DNA/RNA/AA(aminoacid)StringSet objects out to file. 
+
+By default the *writeXStringSet* function writes the sequence information in FASTA format (as required for Meme-ChIP).
+
+
+```r
+writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
+```
+
+---
+
+Now the file "mycMel_rep1.fa" contains sequences around the geometric centre of peaks suitable for Motif analysis in Meme-ChIP. 
+
+In your own work you will typically run this from your own laptop with Meme installed locally but today we will upload our generated FASTA file to their [web portal](http://meme-suite.org/tools/meme-chip). 
+
+Results files from Meme-ChIP can be found [here](http://rockefelleruniversity.github.io/myc_Meme_Example/meme-chip.html)
+
+---
+# Parsing back fimo results
+
+We can retrieve the locations of Myc motifs identified in Meme-ChIP from the Fimo output.
+
+Fimo reports Myc motif locations as a GFF3 file which we should be able to visualise in IGV. 
+Sadly, this GFF file's naming conventions cause only a fraction of motifs to be reported.
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/fimoBad.png" alt="offset" height="300" width="600"&gt;
+&lt;/div&gt;
+
+---
+# Fimo to R.
+
+Fortunately we can parse our motif's GFF file into R and address this using the **import()** function in  the **rtracklayer** package.
+
+
+```r
+library(rtracklayer)
+motifGFF &lt;- import("~/Downloads/fimo.gff")
+```
+---
+# Fimo to valid GFF3.
+
+We can give the sequences some more sensible names and export the GFF to file to visualise in IGV.
+
+
+```r
+motifGFF$Name &lt;- paste0(seqnames(motifGFF),":",
+                        start(motifGFF),"-",end(motifGFF))
+motifGFF$ID &lt;- paste0(seqnames(motifGFF),":",
+                      start(motifGFF),"-",end(motifGFF))
+export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
+```
+
+&lt;div align="center"&gt;
+&lt;img src="imgs/fimoGood.png" alt="offset" height="250" width="600"&gt;
+&lt;/div&gt;
+
+
+---
+&lt;!-- --- --&gt;
+&lt;!-- # High confidence peaks --&gt;
+
+&lt;!-- As we discussed in our last session, ChIPseq data will often contain artefact signal and noise. Following the work by the Encode consortium, it is becoming more standard practice to have replicate samples for ChIP-seq. --&gt;
+
+&lt;!-- One approach to selecting reproducible peaks in ChIPseq is to identify peaks which are present in the majority of replicates. --&gt;
+
+&lt;!-- We can first read in the other replicate dataset for MEL Myc ChIPseq below. --&gt;
+
+&lt;!-- ```{r, echo=TRUE,collapse=F} --&gt;
+
+&lt;!-- library(GenomicRanges) --&gt;
+&lt;!-- library(TxDb.Mmusculus.UCSC.mm10.knownGene) --&gt;
+&lt;!-- library(ChIPseeker) --&gt;
+&lt;!-- macsPeaks &lt;- "data/peaks/Mel_2_peaks.xls" --&gt;
+&lt;!-- macsPeaks_DF2 &lt;- read.delim(macsPeaks,comment.char="#") --&gt;
+&lt;!-- macsPeaks_GR2 &lt;- GRanges( --&gt;
+&lt;!--  seqnames=macsPeaks_DF2[,"chr"], --&gt;
+&lt;!--  IRanges(macsPeaks_DF2[,"start"],macsPeaks_DF2[,"end"]) --&gt;
+&lt;!-- ) --&gt;
+&lt;!-- mcols(macsPeaks_GR2) &lt;- macsPeaks_DF2[,c("abs_summit", "fold_enrichment")] --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Manipulating Peak Sets - Finding Common peaks --&gt;
+
+
+&lt;!-- When looking at peaks which occur in both samples it is clear that the number of peaks in first replicate overlapping those in second is different from number of second replicate peaks overlapping first. --&gt;
+
+&lt;!-- This is because 2 peaks from one replicate may overlap 1 peak in the other replicate. --&gt;
+
+&lt;!-- ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE} --&gt;
+&lt;!-- firstANDsecondPeakSets &lt;- macsPeaks_GR[macsPeaks_GR %over% macsPeaks_GR2] --&gt;
+&lt;!-- secondANDfirstPeakSets &lt;- macsPeaks_GR2[macsPeaks_GR2 %over% macsPeaks_GR] --&gt;
+
+&lt;!-- length(firstANDsecondPeakSets) --&gt;
+&lt;!-- length(secondANDfirstPeakSets) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- ![alt text](imgs/oneToMany.png) --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- # Manipulating Peak Sets - Finding Common peaks --&gt;
+
+
+&lt;!-- A common step with finding overlapping transcription factor peaks is to reduce peaksets to single non-overlapping peakset before interrogating whether a peak occurred in a sample. --&gt;
+
+&lt;!-- This allows for a single peak set to be used as a consensus peakset between replicates. --&gt;
+
+
+&lt;!-- ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE} --&gt;
+&lt;!-- allPeaks &lt;- c(macsPeaks_GR,macsPeaks_GR2) --&gt;
+&lt;!-- allPeaksReduced &lt;- reduce(allPeaks) --&gt;
+&lt;!-- length(allPeaks) --&gt;
+&lt;!-- length(allPeaksReduced) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- ![alt text](imgs/mel_Flattened.png) --&gt;
+
+
+&lt;!-- --- --&gt;
+
+&lt;!-- Now we can use a logical expression to subset our reduced/flattened peak set to those overlapping peaks in both the first and second replicate. --&gt;
+
+&lt;!-- ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE} --&gt;
+&lt;!-- commonPeaks &lt;- allPeaksReduced[allPeaksReduced %over% macsPeaks_GR  --&gt;
+&lt;!--                                &amp; allPeaksReduced %over% macsPeaks_GR2] --&gt;
+&lt;!-- length(commonPeaks) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- --- --&gt;
+&lt;!-- ![alt text](imgs/Ch12_highcon.png) --&gt;
+
+---
+
+# Time for an exercise.
+
+[Link_to_exercises](../../Exercises/chipseq_part3_exercises.html)
+
+[Link_to_answers](../../Answers/chipseq_part3_answers.html)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

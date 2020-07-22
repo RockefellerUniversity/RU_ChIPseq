@@ -71,7 +71,7 @@ library(ggplot2)
 myFlags <- flagtagcounts(myQClist)
 dupRates <- myFlags["DuplicateByChIPQC",]/myFlags["Mapped",]
 toPlot <- data.frame(Sample=names(dupRates),DupPercent=dupRates*100)
-toPlot <- merge(myMeta,toPlot)
+toPlot <- merge(myMeta,toPlot,by=1)
 ggplot(toPlot,aes(x=Sample,y=DupPercent,fill=Antibody))+
   geom_bar(stat="identity")+coord_flip()+theme_bw()
 ```

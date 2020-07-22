@@ -1,9 +1,10 @@
 ---
-title: "ChIPseq In Bioconductor part4"
+title: "ChIPseq In Bioconductor (part 4) <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
   xaringan::moon_reader:
+    css: ["default", "metropolisCustom.css", "metropolis-fontsCustom.css"]
     lib_dir: libs
     nature:
       highlightStyle: github
@@ -16,17 +17,29 @@ output:
     number_sections: false  ## if you want number sections at each table header
     theme: united  # many options for theme, this one is my favorite.
     highlight: tango  # specifies the syntax highlighting style
-
-
+params:
+  isSlides: "no"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-AsSlides <- TRUE
+```{r,include=FALSE}
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+```
+
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides != "yes"){
+  cat("# ChIPseq (part 4)
+
+---
+"    
+  )
+  
+}
+
 ```
 
 
-# Data
+## Data
 
 In todays session we will continue to review the Myc ChIPseq we were working on in our last sessions.
 
@@ -52,21 +65,21 @@ Information and files for the [Myc ChIPseq in Ch12 cell line can be found here](
 
 ---
 
-# Data
+## Data
 
 I have provided peakcalls from MACS2 following the processing steps outlined in our last session.
 
 Peak calls for Myc in MEL and Ch12 cellines can be found in 
 
-**Data/peaks/**
+**data/peaks/**
 
-* **Data/peaks/Mel_1_peaks.xls**
-* **Data/peaks/Mel_2_peaks.xls**
-* **Data/peaks/Ch12_1_peaks.xls**
-* **Data/peaks/Ch12_1_peaks.xls**
+* **data/peaks/Mel_1_peaks.xls**
+* **data/peaks/Mel_2_peaks.xls**
+* **data/peaks/Ch12_1_peaks.xls**
+* **data/peaks/Ch12_1_peaks.xls**
 
 ---
-# Mapping Transcription factor binding and epigenetic states
+## Mapping Transcription factor binding and epigenetic states
 
 A common goal in ChIPseq is characterise genome wide transcription factor binding sites or epigenetic states. 
 
@@ -77,7 +90,7 @@ The presence of transciption factor binding sites and epigenetics events is ofte
 </div>
 
 ---
-# Mapping Transcription factor binding and epigenetic states
+## Mapping Transcription factor binding and epigenetic states
 
 With the release of Encode's wide scale mapping of transcription factor binding sites or epigenetic states and the advent of multiplexing technologies for high throughput sequencing, in has become common practice to have replicated ChIPseq experiments so as to have higher confidence in identified epigenetic events.
 
@@ -87,7 +100,7 @@ With the release of Encode's wide scale mapping of transcription factor binding 
 
 
 ---
-# Changes in Transcription factor binding and epigentic states.
+## Changes in Transcription factor binding and epigentic states
 
 In addition to the genome wide characterisation of epigenetic events, ChIPseq had been increasingly used to identify changes in epigenetic events between conditions and/or cell lines.
 
@@ -97,7 +110,7 @@ In addition to the genome wide characterisation of epigenetic events, ChIPseq ha
 
 
 ---
-# Myc ChIPseq in Mel and Ch12 cell-lines.
+## Myc ChIPseq in Mel and Ch12 cell-lines
 
 We have been working to process and a characterise Myc ChIPseq replicate in the Mel cell-line to gain an understanding of a potential role for Myc in Mel cell-line.
 
@@ -105,14 +118,37 @@ In this session we will look at how we can define a high confidence/reproducible
 
 
 ---
-# Reading in a set of peaks
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Peaks and replicates
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Peaks and replicates
+
+---
+"    
+  )
+  
+}
+
+``` 
+
+---
+## Reading in a set of peaks
 
 First we need to read our peak calls from MACS2 into R. 
 
 The Myc peak calls we will review are within the peaks directory, so here we list all files matching our expected file pattern using the **dir() function.**
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
-peakFiles <- dir("../../Data/peaks/",pattern="*.peaks",
+peakFiles <- dir("../../data/peaks/",pattern="*.peaks",
                  full.names = TRUE)
 peakFiles
 
@@ -120,7 +156,7 @@ peakFiles
 
 
 ---
-# Reading in a set of peaks
+## Reading in a set of peaks
 
 We can loop through our tab seperated files (disguised as *.xls* functions) and import them into R as a list of data.frames using a loop.
 
@@ -135,7 +171,7 @@ length(macsPeaks_DF)
 ```
 
 ---
-# Reading in a set of peaks
+## Reading in a set of peaks
 
 Now with our list of data.frames of peak calls, we loop through the list and create a **GRanges** for each of our peak calls.
 ```{r, include=FALSE}
@@ -163,7 +199,7 @@ macsPeaks_GR[[1]]
 ```
 
 ---
-# Reading in a set of peaks
+## Reading in a set of peaks
 
 We will want to assign a sensible set of names to our peak calls.
 
@@ -183,7 +219,7 @@ sampleNames
 ```
 
 ---
-# Reading in a set of peaks
+## Reading in a set of peaks
 
 Now we have a named list of our peak calls as **GRanges** objects.
 
@@ -197,7 +233,7 @@ names(macsPeaks_GRL)
 ```
 
 ---
-# GRangesList objects
+## GRangesList objects
 
 The GRangesList object can behave just as our standard lists. Here we use the **lengths()** function to a get the number of peaks in each replicate.
 
@@ -207,7 +243,7 @@ lengths(macsPeaks_GRL)
 
 
 ---
-# GRangesList objects
+## GRangesList objects
 
 A major advantage of **GRangesList** objects is that we can apply many of the **GRanges** accessor and operator functions directly to our **GRangesList**. 
 
@@ -220,7 +256,7 @@ width(macsPeaks_GRLCentred)
 ```
 
 ---
-# GRangesList objects
+## GRangesList objects
 
 Now we have our GRangesList we can extract the peak calls for the Mel replicates.
 
@@ -233,7 +269,7 @@ length(Mel_2_Peaks)
 
 ---
 
-# Finding unique peaks
+## Finding unique peaks
 
 We can extract peak calls unique to replicate 1 or 2 using the **%over%** operator.
 
@@ -248,12 +284,12 @@ export.bed(Mel_2_Unique,"Mel_2_Unique.bed")
 
 ---
 
-# Finding unique peaks
+## Finding unique peaks
 
 ![](imgs/uniquePeaks.png)
 ---
 
-# Finding common peaks
+## Finding common peaks
 
 Similarly we can extract peak calls common to replicate 1 or 2.
 
@@ -277,7 +313,7 @@ export.bed(Mel_2_Common,"Mel_2_Common.bed")
 ![](imgs/2for1.png)
 
 ---
-# Defining a consensus, redundant set.
+## Defining a consensus, redundant set
 
 To address this problem, a common operation in ChIPseq is to define a non-redundant set of peaks across all samples.
 
@@ -289,7 +325,7 @@ allPeaksSet_Overlapping
 ```
 
 ---
-# Defining a consensus, non-redundant set.
+## Defining a consensus, non-redundant set
 
 We can then use the **reduce()** function to collapse our peaks into non-redundant, distinct peaks representing peaks present in any sample.
 
@@ -303,7 +339,7 @@ export.bed(allPeaksSet_nR,"allPeaksSet_nR.bed")
 ![](imgs/nrp.png)
 
 ---
-# Defining a common set of peaks.
+## Defining a common set of peaks
 
 With our newly defined non-redundant peak set we can now identify from this set which peaks were present in both our replicates using the **%over%** operator and a logical expression.
 
@@ -319,7 +355,7 @@ export.bed(commonPeaks,"commonPeaks.bed")
 
 ![](imgs/commonPR.png)
 ---
-# Defining a unique set of peaks.
+## Defining a unique set of peaks
 
 Similarly we can identify which peaks are present only in one replicate.
 
@@ -338,7 +374,7 @@ export.bed(mel2_Only,"mel2_Only.bed")
 ---
 ![](imgs/newMelOnly.png)
 ---
-# Complex overlaps.
+## Complex overlaps
 
 When working with larger numbers of peaks we will often define a logical matrix describing in which samples our non-redundant peaks were present.
 
@@ -353,7 +389,7 @@ overlap[[1]][1:2]
 ```
 
 ---
-# Complex overlaps.
+## Complex overlaps
 
 We can now use to **do.call** and **cbind** function to column bind our list of overlaps into our matrix of peak occurrence.
 
@@ -364,7 +400,7 @@ overlapMatrix[1:2,]
 ```
 
 ---
-# Complex overlaps.
+## Complex overlaps
 
 We can add the matrix back into the metadata columns of our **GRanges()** of non-redundant peaks using the **mcols()** accessor.
 
@@ -376,7 +412,7 @@ allPeaksSet_nR[1:2,]
 ```
 
 ---
-# Complex overlaps.
+## Complex overlaps
 
 The **limma** package is commonly used in the analysis of RNAseq and microarray data and contains many useful helpfull functions.
 
@@ -389,7 +425,7 @@ vennDiagram(mcols(allPeaksSet_nR))
 ```
 
 ---
-# Complex overlaps.
+## Complex overlaps
 
 The **limma** package's **vennCounts** function allows us to retrieve the counts displayed in the Venn diagram as a data.frame.
 
@@ -398,7 +434,7 @@ vennCounts(mcols(allPeaksSet_nR))
 ```
 
 ---
-# High confidence peaks.
+## High confidence peaks
 
 With our non-redundant set of peaks and our matrix of peak occurrence, we can define replicated peaks within conditions.
 
@@ -419,7 +455,7 @@ ch12_HC_Peaks[1:2,]
 ---
 ![](imgs/ch12HC.png)
 ---
-# High confidence unique peaks.
+## High confidence unique peaks
 
 Similarly we can define peaks which are replicated in Ch12 but absent in Mel samples.
 
@@ -438,7 +474,30 @@ ch12_HC_UniquePeaks[1,]
 ![](imgs/ch12U.png)
 
 ---
-# Finding differential regions.
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Differential ChIP Enrichment
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Differential ChIP Enrichment
+
+---
+"    
+  )
+  
+}
+
+``` 
+
+---
+## Finding differential regions
 
 Identifying peaks specific to cell-lines or conditions however does not capture the full range of changes in epigenetic events.
 
@@ -447,7 +506,7 @@ To identify differences in epigenetic events we can attempty to quantify the cha
 ![](imgs/igsss_1.png)
 
 ---
-# Finding differential regions.
+## Finding differential regions
 
 We first must establish a set of regions within which to quantify IP-ed fragments.
 
@@ -469,7 +528,7 @@ export.bed(HC_Peaks,"HC_Peaks.bed")
 ---
 ![](imgs/hcPeaks2.png)
 ---
-# Counting regions.
+## Counting regions
 
 We will count from our aligned BAM files to quantify IP fragments.
 
@@ -489,7 +548,7 @@ bamFL
 
 
 ---
-# Counting regions.
+## Counting regions
 
 We can count the number of fragments overlapping our peaks using the **summarizeOverlaps** function. Since ChIPseq is strandless, we set the **ignore.strand** parameter to **TRUE**.
 
@@ -501,19 +560,19 @@ myMycCounts <- summarizeOverlaps(HC_Peaks,
                               reads = bamFL,
                               ignore.strand = TRUE)
 class(myMycCounts)
-save(myMycCounts,file="../../Data/MycCounts.RData")
+save(myMycCounts,file="../../data/MycCounts.RData")
 ```
 
 
 
 ```{r, eval=T, echo=F, warning=FALSE}
 suppressPackageStartupMessages(library(GenomicAlignments))
-load("../../Data/MycCounts.RData")
+load("../../data/MycCounts.RData")
 class(myMycCounts)
 ```
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 To assess changes in ChIPseq signal across cell-lines we will use the **DESeq2** package.
 
@@ -528,7 +587,7 @@ metaDataFrame
 ```
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 We can use the **DESeqDataSetFromMatrix()** function to create a **DESeq2** object.
 
@@ -545,7 +604,7 @@ deseqMyc <- DESeqDataSetFromMatrix(countData = assay(myMycCounts),
 ```
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 We can now run the DESeq2 workflow on our **DESeq2** object using the **DESeq()** function.
 
@@ -554,7 +613,7 @@ deseqMyc <- DESeq(deseqMyc)
 ```
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 Our **DESeq2** object is updated to include useful statistics such our normalised values and variance of signal within each non-redundant peak call.
 
@@ -562,7 +621,7 @@ Our **DESeq2** object is updated to include useful statistics such our normalise
 deseqMyc
 ```
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 We can extract our information of differential regions using the **results()** function.
 
@@ -582,7 +641,7 @@ class(MelMinusCh12)
 ```
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 The GRanges object contains information on the comparison made in DESeq2.
 
@@ -594,7 +653,7 @@ MelMinusCh12[1,]
 
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
 We can now filter our non-redundant peaks to those with significantly more signal in Mel or Ch12 cell-lines by filtering by log2FoldChange and padj (p-value adjusted for multiple correction) less than 0.05.
 
@@ -613,9 +672,9 @@ export.bed(DowninMel,"DowninMel.bed")
 
 
 ---
-# Differential regions using DESeq2
+## Differential regions using DESeq2
 
-Finally we can make our reviewing of sites in IGV alittle easier using the **tracktables** package. 
+Finally we can make our reviewing of sites in IGV a little easier using the **tracktables** package. 
 
 The **tracktables** package's **makebedtable()** function accepts a **GRanges** object and writes an HTML report contains links to IGV.
 
@@ -631,19 +690,5 @@ browseURL(myReport)
 
 ---
 
-# Time for an exercise.
 
-[Link_to_exercises](../../Exercises/chipseq_part4_exercises.html)
-
-[Link_to_answers](../../Answers/chipseq_part4_answers.html)
-
-
-<!-- --- -->
-<!-- # Defining a consensus, non-redundant set. -->
-
-
-<!-- ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE} -->
-<!-- allPeaksSet_nR <- reduce(allPeaksSet_Overlapping,with.revmap=TRUE) -->
-<!-- allPeaksSet_nR -->
-<!-- ``` -->
 

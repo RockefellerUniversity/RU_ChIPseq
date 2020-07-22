@@ -148,7 +148,7 @@ First we need to read our peak calls from MACS2 into R.
 The Myc peak calls we will review are within the peaks directory, so here we list all files matching our expected file pattern using the **dir() function.**
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
-peakFiles <- dir("../../data/peaks/",pattern="*.peaks",
+peakFiles <- dir("data/peaks/",pattern="*.peaks",
                  full.names = TRUE)
 peakFiles
 
@@ -533,7 +533,7 @@ We will count from our aligned BAM files to quantify IP fragments.
 
 As we have seen previously we can use the **BamFileList()** function to specify which BAMs to count and importantly, to control memory we specify the number of reads to be held in memory at one time using the **yield()** parameter.
 
-```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
+```{r,eval=F,echo=T, eval=T, echo=T, warning=FALSE}
 
 library(Rsamtools)
 
@@ -553,20 +553,19 @@ We can count the number of fragments overlapping our peaks using the **summarize
 
 The returned object is a familiar **RangedSummarizedExperiment** containing our GRanges of non-redundant peaks and the counts in these regions for our BAM files.
 
-```{r,eval=T,echo=T, eval=F, echo=T, warning=FALSE}
+```{r,eval=F,echo=T, eval=F, echo=T, warning=FALSE}
 library(GenomicAlignments)
 myMycCounts <- summarizeOverlaps(HC_Peaks,
                               reads = bamFL,
                               ignore.strand = TRUE)
 class(myMycCounts)
-save(myMycCounts,file="../../data/MycCounts.RData")
 ```
 
 
 
 ```{r, eval=T, echo=F, warning=FALSE}
 suppressPackageStartupMessages(library(GenomicAlignments))
-load("../../data/MycCounts.RData")
+load("data/MycCounts.RData")
 class(myMycCounts)
 ```
 

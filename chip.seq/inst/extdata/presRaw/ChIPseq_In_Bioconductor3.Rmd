@@ -395,7 +395,7 @@ To submit jobs we can use our GRanges of Myc peaks and specify a genome with the
 This function returns a GreatJob object containing a reference to our results on the GREAT server. To review the categories of results available we can use the availableCategories function on our GreatJob object.
 
 ```{r,eval=T,echo=T, eval=T, echo=T,messages=F,message=F,warning=FALSE,tidy=T}
-great_Job <- submitGreatJob(macsPeaks_GR,species="mm10")
+great_Job <- submitGreatJob(macsPeaks_GR,species="mm10",version = "3.0.0",request_interval = 1)
 availableCategories(great_Job)
 ```
 
@@ -559,7 +559,7 @@ Sadly, this GFF file's naming conventions cause only a fraction of motifs to be 
 
 Fortunately we can parse our motif's GFF file into R and address this using the **import()** function in  the **rtracklayer** package.
 
-```{r, echo=TRUE,collapse=F}
+```{r, echo=TRUE,collapse=F,eval=FALSE}
 library(rtracklayer)
 motifGFF <- import("~/Downloads/fimo.gff")
 ```
@@ -568,7 +568,7 @@ motifGFF <- import("~/Downloads/fimo.gff")
 
 We can give the sequences some more sensible names and export the GFF to file to visualise in IGV.
 
-```{r, echo=TRUE,collapse=F}
+```{r, echo=TRUE,collapse=F,eval=FALSE}
 motifGFF$Name <- paste0(seqnames(motifGFF),":",
                         start(motifGFF),"-",end(motifGFF))
 motifGFF$ID <- paste0(seqnames(motifGFF),":",
@@ -661,4 +661,12 @@ export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
 
 
 
+---
+## Time for an exercise!
 
+Exercise on ChIPseq data can be found [here](../../exercises/exercises/chipseq_part3_exercise.html)
+
+---
+## Answers to exercise
+
+Answers can be found [here](../../exercises/answers/chipseq_part3_answers.html)

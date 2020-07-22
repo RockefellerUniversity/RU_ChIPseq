@@ -444,11 +444,10 @@ Since logical matrix is equivalent to a 1 or 0  matrix (1 = TRUE and 0 = FALSE),
 
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
-ch12_HC_Peaks <- allPeaksSet_nR[
-  rowSums(as.data.frame(
-    mcols(allPeaksSet_nR)[,c("ch12_1","ch12_2")])) >= 2
-  ]
+ch12_HC_Peaks <- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[,c("ch12_1","ch12_2")])) >= 2]
+
 export.bed(ch12_HC_Peaks,"ch12_HC_Peaks.bed")
+
 ch12_HC_Peaks[1:2,]
 ```
 
@@ -688,7 +687,16 @@ myReport <- makebedtable(MelMinusCh12Filt,"MelMinusCh12.html",
 browseURL(myReport)
 ```
 
----
 
+
+---
+## Time for an exercise!
+
+Exercise on ChIPseq data can be found [here](../../exercises/exercises/chipseq_part4_exercise.html)
+
+---
+## Answers to exercise
+
+Answers can be found [here](../../exercises/answers/chipseq_part4_answers.html)
 
 

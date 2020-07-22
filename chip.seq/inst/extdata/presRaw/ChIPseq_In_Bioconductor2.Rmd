@@ -419,7 +419,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## Blacklists
 
 ChIPseq will often show the presence of common artefacts, such as ultra-high signal regions. Such regions can confound peak calling, fragment length estimation and QC metrics. Anshul Kundaje created the DAC blacklist as a reference to help deal with these regions.
@@ -492,7 +492,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## Library complexity
 
 A potential source of noise in ChIPseq is overamplification of the ChIPseq library during a PCR step. This can lead to large number of duplicate reads which may confound peak calling.
@@ -554,7 +554,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## Peak calling
 
 To identify regions of Myc transcription factor binding we can use a **peak caller**.
@@ -731,7 +731,6 @@ if(params$isSlides == "yes"){
 
 ```
 
----
 
 ## Annotation of peaks to genes
 

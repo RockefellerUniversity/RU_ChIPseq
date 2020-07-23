@@ -1,5 +1,5 @@
 ---
-title: "ChIPseq In Bioconductor <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
+title: "ChIPseq In Bioconductor (part1) <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
@@ -420,7 +420,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 ## Aligning ChIPseq reads
 
 Following assessment of read quality and any read filtering we applied, we will want to align our reads to the genome so as to identify any genomic locations showing enrichment for aligned reads above background.
@@ -626,7 +626,7 @@ if(params$isSlides == "yes"){
 
 ```
 
----
+
 
 ## Mapped reads
 

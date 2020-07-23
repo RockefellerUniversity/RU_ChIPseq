@@ -1,9 +1,21 @@
 params <-
 list(isSlides = "no")
 
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
-AsSlides <- TRUE
+## ----include=FALSE------------------------------------------------------------
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# ChIPseq (part 3)
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE----
@@ -26,6 +38,28 @@ peakAnno <- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000),
 annotatedPeaksGR <- as.GRanges(peakAnno)
 annotatedPeaksDF <- as.data.frame(peakAnno)
 annotatedPeaksDF[1:2,]
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Geneset Enrichment
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Geneset Enrichment
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
@@ -122,6 +156,28 @@ names(great_ResultTable)
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
 msigProMotifs <- great_ResultTable[["MSigDB Predicted Promoter Motifs"]]
 msigProMotifs[1:4,]
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Motifs
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Motifs
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ---- echo=TRUE,include=FALSE-------------------------------------------------

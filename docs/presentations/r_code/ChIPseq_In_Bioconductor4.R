@@ -1,9 +1,43 @@
 params <-
 list(isSlides = "no")
 
-## ----setup, include=FALSE-----------------------------------------------------
-knitr::opts_chunk$set(echo = TRUE)
-AsSlides <- TRUE
+## ----include=FALSE------------------------------------------------------------
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides != "yes"){
+  cat("# ChIPseq (part 4)
+
+---
+"    
+  )
+  
+}
+
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Consensus Peaks
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Consensus Peaks
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
@@ -171,6 +205,28 @@ ch12_HC_UniquePeaks <- allPeaksSet_nR[
   ]
 export.bed(ch12_HC_UniquePeaks,"ch12_HC_UniquePeaks.bed")
 ch12_HC_UniquePeaks[1,]
+
+
+## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
+
+# Differential Peaks
+
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Differential Peaks
+
+---
+"    
+  )
+  
+}
+
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------

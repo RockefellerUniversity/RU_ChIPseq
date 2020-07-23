@@ -1,6 +1,6 @@
 <br>
 
-#### **ChIPseq, Session 1**
+#### **ChIPseq, Session 4**
 
 This section introduces the analysis of ChIPseq data in Bioconductor
 Session sections:

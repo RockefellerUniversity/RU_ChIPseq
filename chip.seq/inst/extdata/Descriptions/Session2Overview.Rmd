@@ -1,6 +1,6 @@
 <br>
 
-#### **ChIPseq, Session 1**
+#### **ChIPseq, Session 2**
 
 This section covers more in-depth QC of ChIPseq and calling peaks with MACS2.
 Session sections:

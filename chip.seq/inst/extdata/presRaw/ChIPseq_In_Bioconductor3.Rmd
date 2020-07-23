@@ -1,5 +1,5 @@
 ---
-title: "ChIPseq In Bioconductor <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
+title: "ChIPseq In Bioconductor (part3) <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
@@ -21,13 +21,25 @@ params:
   isSlides: "no"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-AsSlides <- TRUE
+```{r,include=FALSE}
+suppressPackageStartupMessages(require(knitr))
+knitr::opts_chunk$set(echo = TRUE, tidy = T)
+```
+
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides != "yes"){
+  cat("# ChIPseq (part 3)
+
+---
+"    
+  )
+  
+}
+
 ```
 
 
-# Data
+## Data
 
 In todays session we will continue to review the Myc ChIPseq we were working on in our last sessions.
 
@@ -53,7 +65,7 @@ Information and files for the [Myc ChIPseq in Ch12 cell line can be found here](
 
 ---
 
-# Data
+## Data
 
 I have provided peakcalls from MACS2 following the processing steps outlined in our last session.
 
@@ -68,7 +80,7 @@ Peak calls for Myc in MEL and Ch12 cellines can be found in
 
 ---
 
-# Annotation of peaks to genes.
+## Annotation of peaks to genes
 
 In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/chipseq_course/Presentations/Slides/ChIPseq_In_Bioconductor2.html#45).
 
@@ -92,7 +104,7 @@ peakAnno <- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000),
 
 ---
 
-# Annotation of peaks to genes.
+## Annotation of peaks to genes
 
 This allowed us to produce a GRanges or data.frame of our peaks and their predicted target genes.
 
@@ -102,11 +114,30 @@ annotatedPeaksDF <- as.data.frame(peakAnno)
 annotatedPeaksDF[1:2,]
 ```
 
+---
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
 
+# Geneset Enrichment
 
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
 
 ---
-#Geneset testing.
+"    
+  )
+}else{
+  cat("# Geneset Enrichment
+
+---
+"    
+  )
+  
+}
+
+```
+
+## Geneset testing
 
 Transcription factors or epigenetic marks may act on specific sets of genes grouped by a common biological feature (shared Biological function, common regulation in RNAseq experiment etc).
 
@@ -115,7 +146,7 @@ A frequent step in ChIP-seq analysis is to test whether common gene sets are enr
 Sources of well curated genesets include [GO consortium](http://geneontology.org/) (gene's function, biological process and cellular localisation), [REACTOME](http://www.reactome.org/) (Biological Pathways) and [MsigDB](http://software.broadinstitute.org/gsea/msigdb/) (Computationally and Experimentally derived).
 
 ---
-# Gene ontology and geneset testing for ChIPseq
+## Gene ontology and geneset testing for ChIPseq
 
 Geneset enrichment testing may be performed on the sets of genes with peaks associated to them. In this example we will consider genes with peaks within 1000bp of a gene's TSS.
 
@@ -127,7 +158,7 @@ We will not access these database libraries directly in testing but will use oth
 </div>
 
 ---
-# Gene ontology and geneset testing.
+## Gene ontology and geneset testing
 
 
 To perform geneset testing here, we will use the **GOseq package**.
@@ -142,7 +173,7 @@ The peaks landing in TSS regions will be marked as "Promoter" in the **annotatio
 annotatedPeaksGR[1,]
 ```
 ---
-# Gene ontology and geneset testing.
+## Gene ontology and geneset testing
 
 
 We can extract the unique names of genes with peaks in their TSS by subsetting the annotated GRanges and retrieving gene names from the **geneId** column.
@@ -155,7 +186,7 @@ genesWithPeakInTSS[1:2]
 ```
 
 ---
-# Gene ontology and functional testing.
+## Gene ontology and functional testing
 
 
 Next we can extract all genes which are included in the TxDb object to use as our universe of genes for pathway enrichment.
@@ -168,7 +199,7 @@ allGeneIDs <- allGeneGR$gene_id
 ```
 
 ---
-# Gene ontology and functional testing.
+## Gene ontology and functional testing
 
 
 Once we have a vector of all genes we can create a named vector of 1s or 0s representing whether a gene had peak in TSS or not. 
@@ -183,7 +214,7 @@ allGenesForGOseq[1:3]
 
 ---
 
-# Gene ontology and functional testing.
+## Gene ontology and functional testing
 
 Now we have the the input for GOseq we can test against KEGG (or GO if we choose) using a standard hypergeometric test.
 
@@ -203,7 +234,7 @@ pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 
 ---
 
-# Gene ontology and functional testing.
+## Gene ontology and functional testing
 
 Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of genesets.
 
@@ -236,7 +267,7 @@ Kegg_MycPeaks[1:2,]
 
 ```
 ---
-# Gene ontology and functional testing.
+## Gene ontology and functional testing
 
 The dataframe of enrichment results contains KEGG IDs but no description of pathways and processes.
 
@@ -253,7 +284,7 @@ idtoName[1:5,]
 
 ```
 ---
-# Gene ontology and functional testing.
+## Gene ontology and functional testing
 
 We can now merge our data.frame of ID to pathway name mappings to our data.frame of enrichment results.
 
@@ -265,7 +296,7 @@ KeggN_MycPeaks[1:5,]
 ```
 ---
 
-# Gene ontology and functional testing. GREAT method.
+## Gene ontology and functional testing - GREAT
 
 In addition to a standard enrichment tests, methods have been implemented specifically for ChIP-seq. Many of these tools aim to incorporate peaks distal to genes into their enrichment testing such as the popular [GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) toolset.
 
@@ -319,19 +350,40 @@ msigProMotifs <- great_ResultTable[["MSigDB Predicted Promoter Motifs"]]
 msigProMotifs[1:4,]
 ```
 
---- 
+---
+```{r, results='asis',include=TRUE,echo=FALSE}
+if(params$isSlides == "yes"){
+  cat("class: inverse, center, middle
 
 # Motifs
 
+<html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
+
+---
+"    
+  )
+}else{
+  cat("# Motifs
+
+---
+"    
+  )
+  
+}
+
+```
+
+## Motifs
+
 A common practice in transcription factor ChIP-seq is to investigate the motifs enriched under peaks. 
 
-Denovo motif enrichment can be performed in R/Bioconductor but this can be very time consuming. Here we will use the Meme-ChIP suite available online to identify denovo motifs.
+Denovo motif enrichment can be performed in R/Bioconductor but this can be very time consuming. Here we will use the MEME-ChIP suite available online to identify denovo motifs.
 
-Meme-ChIP requires a FASTA file of sequences under peaks as input so we extract this using the **BSgenome** package.
+MEME-ChIP requires a FASTA file of sequences under peaks as input so we extract this using the **BSgenome** package.
 
 ---
 
-# Extracting sequences under regions
+## Extracting sequences under regions
 
 
 First we need to load the BSgenome object for the genome we are working on, UCSC's mm10 build for the mouse genome, **BSgenome.Mmusculus.UCSC.mm10**.
@@ -352,10 +404,10 @@ BSgenome.Mmusculus.UCSC.mm10
 ```
 ---
 
-#Extracting sequences under regions
+## Extracting sequences under regions
 
 
-The motif for the ChIP-ed transcription factor should in the centre of a peak. Meme-ChIP will trim our peaks to a common length internally if sequences are of different length.
+The motif for the ChIP-ed transcription factor should in the centre of a peak. MEME-ChIP will trim our peaks to a common length internally if sequences are of different length.
 
 It is best therefore to provide a peak set resized to a common length.
 
@@ -369,7 +421,7 @@ macsSummits_GR <- resize(macsSummits_GR,100,fix="center")
 ```
 
 ---
-#Extracting sequences under regions
+## Extracting sequences under regions
 
 We now have a GRanges, centred on the summit, highest point of signal for every peak.
 
@@ -378,7 +430,7 @@ macsSummits_GR
 ```
 
 ---
-#Extracting sequences under regions
+## Extracting sequences under regions
 
 
 Once we have recentered our peaks we can use the **getSeq** function with our GRanges of resized common peaks and the BSgenome object for mm10.
@@ -396,12 +448,12 @@ names(peaksSequences) <- paste0(seqnames(macsSummits_GR),":",
 peaksSequences[1:2,]
 ```
 ---
-# Writing to FASTA file
+## Writing to FASTA file
 
 
 The *writeXStringSet* function allows the user to write DNA/RNA/AA(aminoacid)StringSet objects out to file. 
 
-By default the *writeXStringSet* function writes the sequence information in FASTA format (as required for Meme-ChIP).
+By default the *writeXStringSet* function writes the sequence information in FASTA format (as required for MEME-ChIP).
 
 ```{r, echo=TRUE,collapse=F}
 writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
@@ -410,18 +462,18 @@ writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
 
 ---
 
-Now the file "mycMel_rep1.fa" contains sequences around the geometric centre of peaks suitable for Motif analysis in Meme-ChIP. 
+Now the file "mycMel_rep1.fa" contains sequences around the geometric centre of peaks suitable for Motif analysis in MEME-ChIP. 
 
-In your own work you will typically run this from your own laptop with Meme installed locally but today we will upload our generated FASTA file to their [web portal](http://meme-suite.org/tools/meme-chip). 
+In your own work you will typically run this from your own laptop with MEME installed locally but today we will upload our generated FASTA file to their [web portal](http://meme-suite.org/tools/meme-chip). 
 
-Results files from Meme-ChIP can be found [here](http://rockefelleruniversity.github.io/myc_Meme_Example/meme-chip.html)
+Results files from MEME-ChIP can be found [here](http://rockefelleruniversity.github.io/myc_Meme_Example/meme-chip.html)
 
 ---
-# Parsing back fimo results
+## Parsing back FIMO results
 
-We can retrieve the locations of Myc motifs identified in Meme-ChIP from the Fimo output.
+We can retrieve the locations of Myc motifs identified in MEME-ChIP from the FIMO output.
 
-Fimo reports Myc motif locations as a GFF3 file which we should be able to visualise in IGV. 
+FIMO reports Myc motif locations as a GFF3 file which we should be able to visualise in IGV. 
 Sadly, this GFF file's naming conventions cause only a fraction of motifs to be reported.
 
 <div align="center">
@@ -429,7 +481,7 @@ Sadly, this GFF file's naming conventions cause only a fraction of motifs to be 
 </div>
 
 ---
-# Fimo to R.
+## FIMO to R
 
 Fortunately we can parse our motif's GFF file into R and address this using the **import()** function in  the **rtracklayer** package.
 
@@ -438,7 +490,7 @@ library(rtracklayer)
 motifGFF <- import("~/Downloads/fimo.gff")
 ```
 ---
-# Fimo to valid GFF3.
+## FIMO to valid GFF3
 
 We can give the sequences some more sensible names and export the GFF to file to visualise in IGV.
 
@@ -532,11 +584,14 @@ export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
 <!-- ![alt text](imgs/Ch12_highcon.png) -->
 
 ---
+## Time for an exercise!
 
-# Time for an exercise.
+Exercise on ChIP-seq data can be found [here](../../exercises/exercises/chipseq_part3_exercise.html)
 
-[Link_to_exercises](../../Exercises/chipseq_part3_exercises.html)
+---
+## Answers to exercise
 
-[Link_to_answers](../../Answers/chipseq_part3_answers.html)
+Answers can be found [here](../../exercises/answers/chipseq_part3_answers.html)
+
 
 

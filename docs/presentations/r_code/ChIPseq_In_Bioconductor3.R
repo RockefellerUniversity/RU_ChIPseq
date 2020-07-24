@@ -3,6 +3,8 @@ list(isSlides = "no")
 
 ## ----include=FALSE------------------------------------------------------------
 suppressPackageStartupMessages(require(knitr))
+library(TFBSTools)
+library(GSEABase)
 knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 
@@ -168,16 +170,6 @@ Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE------------------
 Myc_hallMarks[1:5,]
-
-
-## ----echo=T, eval=F, echo=T, warning=FALSE------------------------------------
-## 
-## Kegg_MycPeaks <- goseq(pwf,"mm10","knownGene",
-##                        test.cats=c("KEGG"),
-##                        method="Hypergeometric")
-## 
-## Kegg_MycPeaks[1:2,]
-## 
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------

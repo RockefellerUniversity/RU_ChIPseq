@@ -80,23 +80,31 @@ Peak calls for Myc in MEL and Ch12 cellines can be found in
 
 ---
 
-## Annotation of peaks to genes
+## Transcription factor binding site or epigenetic marks. 
 
-In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/chipseq_course/Presentations/Slides/ChIPseq_In_Bioconductor2.html#45).
+In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/slides/ChIPseq_In_Bioconductor2.html#38).
+
+
+```{r,eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE,tidy=FALSE}
+library(GenomicRanges)
+macsPeaks <- "data/peaks/Mel_1_peaks.xls"
+macsPeaks_DF <- read.delim(macsPeaks,comment.char="#")
+macsPeaks_GR <- GRanges(seqnames=macsPeaks_DF[,"chr"],
+                        IRanges(macsPeaks_DF[,"start"],macsPeaks_DF[,"end"]))
+mcols(macsPeaks_GR) <- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
+macsPeaks_GR[1:5,]
+```
+
+
+---
+
+## Annotation of peaks to genes
 
 Since transcription factors, as suggested in name, may regulate the transcription of their target genes, we used the **ChIPseeker package** to associate our peaks, representing potential transcription factor binding events, to their overlapping or closest mm10 genes.
 
-```{r,eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE}
-library(GenomicRanges)
+```{r,eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE,tidy=FALSE}
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(ChIPseeker)
-macsPeaks <- "data/peaks/Mel_1_peaks.xls"
-macsPeaks_DF <- read.delim(macsPeaks,comment.char="#")
-macsPeaks_GR <- GRanges(
- seqnames=macsPeaks_DF[,"chr"],
- IRanges(macsPeaks_DF[,"start"],macsPeaks_DF[,"end"])
-)
-mcols(macsPeaks_GR) <- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
 peakAnno <- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000), 
                          TxDb=TxDb.Mmusculus.UCSC.mm10.knownGene, 
                          annoDb="org.Mm.eg.db")
@@ -295,6 +303,94 @@ KeggN_MycPeaks <- KeggN_MycPeaks[orderByP,]
 KeggN_MycPeaks[1:5,]
 ```
 ---
+
+## Using other sources of gene sets.
+
+We may wish to take advantage of other gene set annotation available to us from sources such as MSigDB. We could have generated our own sets of interesting genes which we want to test for association with our peaks. 
+
+We can use our own custom gene sets in **goseq** by specifying the **gene2cat** argument to a data.frame containing genes and their corresponding geneset membership.
+
+```{r,eval=FALSE}
+?goseq
+```
+
+---
+
+## Custom gene sets from MsigDB.
+
+We can use the GSEAbase package again to extract a list of genesets from a MSigDB gmt file.
+
+```{r}
+require(GSEABase)
+hall <- getGmt("data/mouse_Hallmarks.gmt")
+myIDs <- geneIds(hall)
+myIDs[1]
+```
+
+---
+
+## Custom gene sets from MsigDB.
+
+And we can convert then this to a data.frame suitable for goseq.
+
+```{r}
+names(myIDs) <- paste0(names(myIDs),".")
+myID2Cat <- data.frame(ID=unname(unlist(myIDs)),Cat=names(unlist(myIDs)))
+myID2Cat$Cat <- gsub("\\..*","",myID2Cat$Cat)
+myID2Cat[1:5,]
+```
+
+
+---
+
+## Custom geneset testing
+
+We can then test this new geneset in the same way as before. We just need to supply the new categories as the data.frame to the **gene2cat** parameter. 
+
+```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE}
+library(goseq)
+pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
+Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
+                       gene2cat = myID2Cat,
+                       method="Hypergeometric")
+```
+
+---
+
+## Custom geneset results
+
+Finally we can review the results as we have with other goseq results. Here we can see Myc targets in our top hits from the hallmarks genesets.
+
+
+```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE}
+Myc_hallMarks[1:5,]
+```
+
+
+---
+
+## Gene ontology and functional testing
+
+Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of genesets.
+
+We also select a database of genesets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" genesets.
+
+As we are testing peaks in 1000bp windows around genes's TSSs we can simply use the **"Hypergeometric"** for the method parameter.
+
+```{r,echo=T, eval=F, echo=T, warning=FALSE}
+
+Kegg_MycPeaks <- goseq(pwf,"mm10","knownGene",
+                       test.cats=c("KEGG"),
+                       method="Hypergeometric")
+
+Kegg_MycPeaks[1:2,]
+
+```
+
+
+
+----
+
 
 ## Gene ontology and functional testing - GREAT
 
@@ -506,6 +602,58 @@ export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
 <img src="imgs/fimoGood.png" alt="offset" height="250" width="600">
 </div>
 
+---
+## Scanning for known motifs 
+
+We saw previously we can scan sequences using some of the Biostrings functionality **matchPattern**.
+
+Often with ChIP-seq we may know the motif we are looking for or we can use a set of known motifs from a database such as a [JASPAR](http://jaspar.genereg.net).
+
+We can access to JASPAR using the JASPAR2020 bioconductor library.
+
+```{r, echo=TRUE,collapse=F,eval=TRUE}
+library(JASPAR2020)
+JASPAR2020
+```
+
+---
+## Accessing motifs from JASPAR using TFBStools
+
+We can access the model for the our motif of interest using the **TFBSTools** package and its **getMatrixByName** function.
+
+```{r, echo=TRUE,collapse=F,eval=TRUE}
+library(TFBSTools)
+pfm <- getMatrixByName(JASPAR2020, 
+                       name="MYC")
+pfm
+```
+
+---
+## Motif scanning with motifmatchr
+
+With this PWM we can use the **motifmatchr** package to scan our summits for the Myc motif and return the postions of the motifs.
+
+We will need to provide our PWM, GRanges to scan within and BSGenome object to extract sequence from. 
+
+We also set the **out** paramter to positions for this instance.
+
+```{r, echo=TRUE,collapse=F,eval=TRUE}
+library(motifmatchr)
+MycMotifs <- matchMotifs(pfm,
+                         macsSummits_GR,BSgenome.Mmusculus.UCSC.mm10, 
+                         out = "positions")
+MycMotifs
+```
+
+---
+## Exporting motif matches.
+
+We can export the Myc motif positions within peaks for use later in IGV or for metaplot visualisation.
+
+
+```{r}
+export.bed(MycMotifs[[1]],con = "MycMotifs.bed")
+```
 
 ---
 <!-- --- -->

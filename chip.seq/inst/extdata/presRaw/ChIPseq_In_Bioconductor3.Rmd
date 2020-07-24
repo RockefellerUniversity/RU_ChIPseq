@@ -23,6 +23,8 @@ params:
 
 ```{r,include=FALSE}
 suppressPackageStartupMessages(require(knitr))
+library(TFBSTools)
+library(GSEABase)
 knitr::opts_chunk$set(echo = TRUE, tidy = T)
 ```
 
@@ -367,29 +369,9 @@ Myc_hallMarks[1:5,]
 ```
 
 
+
+
 ---
-
-## Gene ontology and functional testing
-
-Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of genesets.
-
-We also select a database of genesets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" genesets.
-
-As we are testing peaks in 1000bp windows around genes's TSSs we can simply use the **"Hypergeometric"** for the method parameter.
-
-```{r,echo=T, eval=F, echo=T, warning=FALSE}
-
-Kegg_MycPeaks <- goseq(pwf,"mm10","knownGene",
-                       test.cats=c("KEGG"),
-                       method="Hypergeometric")
-
-Kegg_MycPeaks[1:2,]
-
-```
-
-
-
-----
 
 
 ## Gene ontology and functional testing - GREAT

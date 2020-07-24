@@ -71,34 +71,59 @@ Peak calls for Myc in MEL and Ch12 cellines can be found in
 
 ---
 
-## Annotation of peaks to genes
+## Transcription factor binding site or epigenetic marks. 
 
-In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/chipseq_course/Presentations/Slides/ChIPseq_In_Bioconductor2.html#45).
+In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/slides/ChIPseq_In_Bioconductor2.html#38).
+
+
+
+```r
+library(GenomicRanges)
+macsPeaks &lt;- "data/peaks/Mel_1_peaks.xls"
+macsPeaks_DF &lt;- read.delim(macsPeaks,comment.char="#")
+macsPeaks_GR &lt;- GRanges(seqnames=macsPeaks_DF[,"chr"],
+                        IRanges(macsPeaks_DF[,"start"],macsPeaks_DF[,"end"]))
+mcols(macsPeaks_GR) &lt;- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
+macsPeaks_GR[1:5,]
+```
+
+```
+## GRanges object with 5 ranges and 2 metadata columns:
+##       seqnames          ranges strand | abs_summit fold_enrichment
+##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt;
+##   [1]     chr1 4785370-4785641      * |    4785565         5.23296
+##   [2]     chr1 5082993-5083216      * |    5083122         4.26417
+##   [3]     chr1 7397557-7398093      * |    7397835         9.84580
+##   [4]     chr1 9545120-9545629      * |    9545400        11.85079
+##   [5]     chr1 9700895-9701037      * |    9700978         5.14291
+##   -------
+##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
+```
+
+
+---
+
+## Annotation of peaks to genes
 
 Since transcription factors, as suggested in name, may regulate the transcription of their target genes, we used the **ChIPseeker package** to associate our peaks, representing potential transcription factor binding events, to their overlapping or closest mm10 genes.
 
 
 ```r
-library(GenomicRanges)
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(ChIPseeker)
-macsPeaks &lt;- "data/peaks/Mel_1_peaks.xls"
-macsPeaks_DF &lt;- read.delim(macsPeaks, comment.char = "#")
-macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, 
-    "start"], macsPeaks_DF[, "end"]))
-mcols(macsPeaks_GR) &lt;- macsPeaks_DF[, c("abs_summit", "fold_enrichment")]
-peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-1000, 1000), TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, 
-    annoDb = "org.Mm.eg.db")
+peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000), 
+                         TxDb=TxDb.Mmusculus.UCSC.mm10.knownGene, 
+                         annoDb="org.Mm.eg.db")
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2020-07-24 01:21:56 PM 
-## &gt;&gt; identifying nearest features...		 2020-07-24 01:21:56 PM 
-## &gt;&gt; calculating distance from peak to TSS...	 2020-07-24 01:21:57 PM 
-## &gt;&gt; assigning genomic annotation...		 2020-07-24 01:21:57 PM 
-## &gt;&gt; adding gene annotation...			 2020-07-24 01:22:00 PM 
-## &gt;&gt; assigning chromosome lengths			 2020-07-24 01:22:00 PM 
-## &gt;&gt; done...					 2020-07-24 01:22:00 PM
+## &gt;&gt; preparing features information...		 2020-07-24 03:34:25 PM 
+## &gt;&gt; identifying nearest features...		 2020-07-24 03:34:25 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2020-07-24 03:34:26 PM 
+## &gt;&gt; assigning genomic annotation...		 2020-07-24 03:34:26 PM 
+## &gt;&gt; adding gene annotation...			 2020-07-24 03:34:29 PM 
+## &gt;&gt; assigning chromosome lengths			 2020-07-24 03:34:29 PM 
+## &gt;&gt; done...					 2020-07-24 03:34:29 PM
 ```
 
 ---
@@ -380,6 +405,236 @@ KeggN_MycPeaks[1:5, ]
 ## 145                        1         32       42
 ```
 ---
+
+## Using other sources of gene sets.
+
+We may wish to take advantage of other gene set annotation available to us from sources such as MSigDB. We could have generated our own sets of interesting genes which we want to test for association with our peaks. 
+
+We can use our own custom gene sets in **goseq** by specifying the **gene2cat** argument to a data.frame containing genes and their corresponding geneset membership.
+
+
+```r
+`?`(goseq)
+```
+
+---
+
+## Custom gene sets from MsigDB.
+
+We can use the GSEAbase package again to extract a list of genesets from a MSigDB gmt file.
+
+
+```r
+require(GSEABase)
+```
+
+```
+## Loading required package: GSEABase
+```
+
+```
+## Loading required package: annotate
+```
+
+```
+## Loading required package: XML
+```
+
+```
+## Loading required package: graph
+```
+
+```
+## 
+## Attaching package: 'graph'
+```
+
+```
+## The following object is masked from 'package:XML':
+## 
+##     addNode
+```
+
+```
+## The following object is masked from 'package:Biostrings':
+## 
+##     complement
+```
+
+```
+## The following object is masked from 'package:stringr':
+## 
+##     boundary
+```
+
+```r
+hall &lt;- getGmt("data/mouse_Hallmarks.gmt")
+myIDs &lt;- geneIds(hall)
+myIDs[1]
+```
+
+```
+## $HALLMARK_TNFA_SIGNALING_VIA_NFKB
+##   [1] "11303"  "11304"  "27403"  "268379" "74591"  "11305"  "12778"  "11839" 
+##   [9] "11910"  "67972"  "11941"  "320707" "381290" "14595"  "56336"  "12044" 
+##  [17] "12047"  "12045"  "12046"  "12051"  "12053"  "20893"  "11797"  "11796" 
+##  [25] "17951"  "17952"  "17940"  "17948"  "12156"  "12226"  "194735" "436199"
+##  [33] "12227"  "12228"  "20293"  "20296"  "20292"  "20306"  "20297"  "20303" 
+##  [41] "20304"  "16007"  "14219"  "12443"  "12444"  "12445"  "56706"  "56036" 
+##  [49] "54199"  "12505"  "12515"  "12519"  "12522"  "12575"  "12608"  "12609" 
+##  [57] "12633"  "56708"  "12977"  "12981"  "14825"  "20310"  "330122" "20309" 
+##  [65] "15945"  "56066"  "20311"  "230073" "19347"  "320560" "67035"  "71712" 
+##  [73] "19252"  "319520" "13537"  "240672" "13614"  "13636"  "13653"  "13654" 
+##  [81] "13655"  "13660"  "57440"  "98878"  "259300" "20918"  "68969"  "23872" 
+##  [89] "14063"  "14066"  "14221"  "14281"  "14282"  "14283"  "14284"  "14345" 
+##  [97] "14373"  "13197"  "23882"  "17873"  "14528"  "14579"  "14584"  "321019"
+## [105] "15200"  "15205"  "15894"  "15898"  "50723"  "230623" "230613" "329918"
+## [113] "15902"  "15936"  "15937"  "15939"  "71586"  "15958"  "15959"  "667370"
+## [121] "15980"  "16160"  "16169"  "16173"  "16175"  "16176"  "83430"  "16193" 
+## [129] "16195"  "16197"  "16323"  "16324"  "16362"  "384783" "16369"  "16367" 
+## [137] "16449"  "16450"  "16476"  "16477"  "16478"  "216850" "22290"  "21847" 
+## [145] "16598"  "16600"  "16596"  "236537" "23849"  "16601"  "70789"  "16780" 
+## [153] "16835"  "22359"  "16878"  "56722"  "17133"  "26397"  "26399"  "26410" 
+## [161] "17118"  "17210"  "17681"  "17119"  "17869"  "107771" "59027"  "54446" 
+## [169] "18024"  "18030"  "18033"  "18034"  "18035"  "18037"  "18081"  "15370" 
+## [177] "18227"  "18124"  "108078" "381816" "55991"  "208098" "18578"  "238871"
+## [185] "110385" "18577"  "56376"  "67399"  "18626"  "18627"  "170768" "18640" 
+## [193] "18639"  "270198" "21664"  "22113"  "18792"  "18793"  "56193"  "20620" 
+## [201] "67916"  "65112"  "108767" "17872"  "19219"  "19225"  "19224"  "19267" 
+## [209] "19262"  "19288"  "54720"  "19696"  "19697"  "19698"  "11852"  "192656"
+## [217] "75234"  "30945"  "20229"  "20971"  "18788"  "20725"  "18787"  "20393" 
+## [225] "17691"  "235344" "104681" "20527"  "20525"  "227659" "17127"  "17126" 
+## [233] "20621"  "12702"  "20656"  "20698"  "74646"  "211949" "18412"  "20850" 
+## [241] "20851"  "21353"  "21354"  "21815"  "99929"  "24088"  "21923"  "21926" 
+## [249] "21928"  "21929"  "21930"  "106869" "21942"  "21950"  "57783"  "231130"
+## [257] "22029"  "211770" "106628" "21807"  "22151"  "227613" "73710"  "22154" 
+## [265] "22153"  "22152"  "545486" "67951"  "22339"  "230734" "229055" "230738"
+## [273] "22695"
+```
+
+---
+
+## Custom gene sets from MsigDB.
+
+And we can convert then this to a data.frame suitable for goseq.
+
+
+```r
+names(myIDs) &lt;- paste0(names(myIDs), ".")
+myID2Cat &lt;- data.frame(ID = unname(unlist(myIDs)), Cat = names(unlist(myIDs)))
+myID2Cat$Cat &lt;- gsub("\\..*", "", myID2Cat$Cat)
+myID2Cat[1:5, ]
+```
+
+```
+##       ID                              Cat
+## 1  11303 HALLMARK_TNFA_SIGNALING_VIA_NFKB
+## 2  11304 HALLMARK_TNFA_SIGNALING_VIA_NFKB
+## 3  27403 HALLMARK_TNFA_SIGNALING_VIA_NFKB
+## 4 268379 HALLMARK_TNFA_SIGNALING_VIA_NFKB
+## 5  74591 HALLMARK_TNFA_SIGNALING_VIA_NFKB
+```
+
+
+---
+
+## Custom geneset testing
+
+We can then test this new geneset in the same way as before. We just need to supply the new categories as the data.frame to the **gene2cat** parameter. 
+
+
+```r
+library(goseq)
+pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
+```
+
+```
+## Can't find mm10/knownGene length data in genLenDataBase...
+```
+
+```
+## Found the annotation package, TxDb.Mmusculus.UCSC.mm10.knownGene
+```
+
+```
+## Trying to get the gene lengths from it.
+```
+
+```r
+Myc_hallMarks &lt;- goseq(pwf,"mm10","knownGene",
+                       gene2cat = myID2Cat,
+                       method="Hypergeometric")
+```
+
+```
+## Using manually entered categories.
+```
+
+```
+## For 18802 genes, we could not find any categories. These genes will be excluded.
+```
+
+```
+## To force their use, please run with use_genes_without_cat=TRUE (see documentation).
+```
+
+```
+## This was the default behavior for version 1.15.1 and earlier.
+```
+
+```
+## Calculating the p-values...
+```
+
+---
+
+## Custom geneset results
+
+Finally we can review the results as we have with other goseq results. Here we can see Myc targets in our top hits from the hallmarks genesets.
+
+
+
+```r
+Myc_hallMarks[1:5,]
+```
+
+```
+##                              category over_represented_pvalue
+## 32            HALLMARK_MYC_TARGETS_V1            8.708417e-39
+## 13               HALLMARK_E2F_TARGETS            6.875178e-20
+## 33            HALLMARK_MYC_TARGETS_V2            1.012052e-18
+## 46 HALLMARK_UNFOLDED_PROTEIN_RESPONSE            3.000432e-13
+## 18            HALLMARK_G2M_CHECKPOINT            3.982043e-13
+##    under_represented_pvalue numDEInCat numInCat
+## 32                        1        165      245
+## 13                        1        142      261
+## 33                        1         52       64
+## 46                        1         92      169
+## 18                        1        140      295
+```
+
+
+---
+
+## Gene ontology and functional testing
+
+Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of genesets.
+
+We also select a database of genesets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" genesets.
+
+As we are testing peaks in 1000bp windows around genes's TSSs we can simply use the **"Hypergeometric"** for the method parameter.
+
+
+```r
+Kegg_MycPeaks &lt;- goseq(pwf, "mm10", "knownGene", test.cats = c("KEGG"), method = "Hypergeometric")
+
+Kegg_MycPeaks[1:2, ]
+```
+
+
+
+----
+
 
 ## Gene ontology and functional testing - GREAT
 
@@ -692,6 +947,161 @@ export.gff3(motifGFF, con = "~/Downloads/fimoUpdated.gff")
 &lt;img src="imgs/fimoGood.png" alt="offset" height="250" width="600"&gt;
 &lt;/div&gt;
 
+---
+## Scanning for known motifs 
+
+We saw previously we can scan sequences using some of the Biostrings functionality **matchPattern**.
+
+Often with ChIP-seq we may know the motif we are looking for or we can use a set of known motifs from a database such as a [JASPAR](http://jaspar.genereg.net).
+
+We can access to JASPAR using the JASPAR2020 bioconductor library.
+
+
+```r
+library(JASPAR2020)
+JASPAR2020
+```
+
+```
+## An object of class "JASPAR2020"
+## Slot "db":
+## [1] "/usr/local/lib/R/host-site-library/JASPAR2020/extdata/JASPAR2020.sqlite"
+```
+
+---
+## Accessing motifs from JASPAR using TFBStools
+
+We can access the model for the our motif of interest using the **TFBSTools** package and its **getMatrixByName** function.
+
+
+```r
+library(TFBSTools)
+```
+
+```
+## 
+## Attaching package: 'TFBSTools'
+```
+
+```
+## The following object is masked from 'package:ShortRead':
+## 
+##     name
+```
+
+```
+## The following object is masked from 'package:DelayedArray':
+## 
+##     matrixClass
+```
+
+```r
+pfm &lt;- getMatrixByName(JASPAR2020, name = "MYC")
+pfm
+```
+
+```
+## An object of class PFMatrix
+## ID: MA0147.3
+## Name: MYC
+## Matrix Class: Basic helix-loop-helix factors (bHLH)
+## strand: +
+## Tags: 
+## $centrality_logp
+## [1] "-296.164"
+## 
+## $family
+## [1] "bHLH-ZIP factors"
+## 
+## $medline
+## [1] "18555785"
+## 
+## $remap_tf_name
+## [1] "MYC"
+## 
+## $source
+## [1] "29126285"
+## 
+## $tax_group
+## [1] "vertebrates"
+## 
+## $tfbs_shape_id
+## [1] "140"
+## 
+## $type
+## [1] "ChIP-seq"
+## 
+## $unibind
+## [1] "1"
+## 
+## $collection
+## [1] "CORE"
+## 
+## $species
+##           9606 
+## "Homo sapiens" 
+## 
+## $acc
+## [1] "P01106"
+## 
+## Background: 
+##    A    C    G    T 
+## 0.25 0.25 0.25 0.25 
+## Matrix: 
+##   [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12]
+## A 1038 1019  438   44 4600   54  169   59   23   419   961   755
+## C 1345 1287 3746 4840   59 4525  157  162   56  2801  1524  1785
+## G 1649 1757  472   31  170   70 4578   63 4817  1198  1036  1348
+## T  910  879  286   27  113  293   38 4658   46   524  1421  1054
+```
+
+---
+## Motif scanning with motifmatchr
+
+With this PWM we can use the **motifmatchr** package to scan our summits for the Myc motif and return the postions of the motifs.
+
+We will need to provide our PWM, GRanges to scan within and BSGenome object to extract sequence from. 
+
+We also set the **out** paramter to positions for this instance.
+
+
+```r
+library(motifmatchr)
+MycMotifs &lt;- matchMotifs(pfm, macsSummits_GR, BSgenome.Mmusculus.UCSC.mm10, out = "positions")
+MycMotifs
+```
+
+```
+## GRangesList object of length 1:
+## [[1]]
+## GRanges object with 1600 ranges and 1 metadata column:
+##          seqnames              ranges strand |     score
+##             &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;
+##      [1]     chr1     9545433-9545444      - |   14.0312
+##      [2]     chr1   13151280-13151291      + |   15.7259
+##      [3]     chr1   13293444-13293455      + |   14.5201
+##      [4]     chr1   16665901-16665912      - |   14.6571
+##      [5]     chr1   43561269-43561280      + |   14.2468
+##      ...      ...                 ...    ... .       ...
+##   [1596]     chrX 155338504-155338515      + |   14.8300
+##   [1597]     chrX 155338504-155338515      - |   14.8266
+##   [1598]     chrX 160610006-160610017      + |   12.6818
+##   [1599]     chrX 166454533-166454544      + |   13.6368
+##   [1600]     chrX 166454533-166454544      - |   13.6368
+##   -------
+##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
+```
+
+---
+## Exporting motif matches.
+
+We can export the Myc motif positions within peaks for use later in IGV or for metaplot visualisation.
+
+
+
+```r
+export.bed(MycMotifs[[1]], con = "MycMotifs.bed")
+```
 
 ---
 &lt;!-- --- --&gt;

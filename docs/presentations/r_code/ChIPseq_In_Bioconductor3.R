@@ -18,17 +18,19 @@ if(params$isSlides != "yes"){
 
 
 
-## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE----
+## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE,tidy=FALSE----
 library(GenomicRanges)
-library(TxDb.Mmusculus.UCSC.mm10.knownGene)
-library(ChIPseeker)
 macsPeaks <- "data/peaks/Mel_1_peaks.xls"
 macsPeaks_DF <- read.delim(macsPeaks,comment.char="#")
-macsPeaks_GR <- GRanges(
- seqnames=macsPeaks_DF[,"chr"],
- IRanges(macsPeaks_DF[,"start"],macsPeaks_DF[,"end"])
-)
+macsPeaks_GR <- GRanges(seqnames=macsPeaks_DF[,"chr"],
+                        IRanges(macsPeaks_DF[,"start"],macsPeaks_DF[,"end"]))
 mcols(macsPeaks_GR) <- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
+macsPeaks_GR[1:5,]
+
+
+## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE,tidy=FALSE----
+library(TxDb.Mmusculus.UCSC.mm10.knownGene)
+library(ChIPseeker)
 peakAnno <- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000), 
                          TxDb=TxDb.Mmusculus.UCSC.mm10.knownGene, 
                          annoDb="org.Mm.eg.db")
@@ -138,6 +140,46 @@ KeggN_MycPeaks <- KeggN_MycPeaks[orderByP,]
 KeggN_MycPeaks[1:5,]
 
 
+## ----eval=FALSE---------------------------------------------------------------
+## ?goseq
+
+
+## -----------------------------------------------------------------------------
+require(GSEABase)
+hall <- getGmt("data/mouse_Hallmarks.gmt")
+myIDs <- geneIds(hall)
+myIDs[1]
+
+
+## -----------------------------------------------------------------------------
+names(myIDs) <- paste0(names(myIDs),".")
+myID2Cat <- data.frame(ID=unname(unlist(myIDs)),Cat=names(unlist(myIDs)))
+myID2Cat$Cat <- gsub("\\..*","",myID2Cat$Cat)
+myID2Cat[1:5,]
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE------------------
+library(goseq)
+pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
+Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
+                       gene2cat = myID2Cat,
+                       method="Hypergeometric")
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE------------------
+Myc_hallMarks[1:5,]
+
+
+## ----echo=T, eval=F, echo=T, warning=FALSE------------------------------------
+## 
+## Kegg_MycPeaks <- goseq(pwf,"mm10","knownGene",
+##                        test.cats=c("KEGG"),
+##                        method="Hypergeometric")
+## 
+## Kegg_MycPeaks[1:2,]
+## 
+
+
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
 library(rGREAT)
 
@@ -234,4 +276,28 @@ writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
 ## motifGFF$ID <- paste0(seqnames(motifGFF),":",
 ##                       start(motifGFF),"-",end(motifGFF))
 ## export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
+
+
+## ---- echo=TRUE,collapse=F,eval=TRUE------------------------------------------
+library(JASPAR2020)
+JASPAR2020
+
+
+## ---- echo=TRUE,collapse=F,eval=TRUE------------------------------------------
+library(TFBSTools)
+pfm <- getMatrixByName(JASPAR2020, 
+                       name="MYC")
+pfm
+
+
+## ---- echo=TRUE,collapse=F,eval=TRUE------------------------------------------
+library(motifmatchr)
+MycMotifs <- matchMotifs(pfm,
+                         macsSummits_GR,BSgenome.Mmusculus.UCSC.mm10, 
+                         out = "positions")
+MycMotifs
+
+
+## -----------------------------------------------------------------------------
+export.bed(MycMotifs[[1]],con = "MycMotifs.bed")
 

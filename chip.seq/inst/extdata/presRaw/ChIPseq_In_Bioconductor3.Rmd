@@ -1,6 +1,6 @@
 ---
 title: "ChIPseq In Bioconductor (part3) <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
-author: "Rockefeller University, Bioinformatics Resource Centre"
+author: "Rockefeller University, Bioinformatics Resource Center"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
   xaringan::moon_reader:
@@ -45,7 +45,7 @@ if(params$isSlides != "yes"){
 
 In todays session we will continue to review the Myc ChIPseq we were working on in our last sessions.
 
-This include Myc ChIP-seq for MEL and Ch12 celllines.
+This include Myc ChIPseq for MEL and Ch12 celllines.
 
 Information and files for the [Myc ChIPseq in MEL cell line can be found here](https://www.encodeproject.org/experiments/ENCSR000EUA/)
 
@@ -82,7 +82,7 @@ Peak calls for Myc in MEL and Ch12 cellines can be found in
 
 ---
 
-## Transcription factor binding site or epigenetic marks. 
+## ChIP peaks in R
 
 In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/slides/ChIPseq_In_Bioconductor2.html#38).
 
@@ -99,7 +99,6 @@ macsPeaks_GR[1:5,]
 
 
 ---
-
 ## Annotation of peaks to genes
 
 Since transcription factors, as suggested in name, may regulate the transcription of their target genes, we used the **ChIPseeker package** to associate our peaks, representing potential transcription factor binding events, to their overlapping or closest mm10 genes.
@@ -129,7 +128,7 @@ annotatedPeaksDF[1:2,]
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
-# Geneset Enrichment
+# Gene Set Enrichment
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
 
@@ -137,7 +136,7 @@ if(params$isSlides == "yes"){
 "    
   )
 }else{
-  cat("# Geneset Enrichment
+  cat("# Gene Set Enrichment
 
 ---
 "    
@@ -147,18 +146,18 @@ if(params$isSlides == "yes"){
 
 ```
 
-## Geneset testing
+## Gene Set testing
 
 Transcription factors or epigenetic marks may act on specific sets of genes grouped by a common biological feature (shared Biological function, common regulation in RNAseq experiment etc).
 
-A frequent step in ChIP-seq analysis is to test whether common gene sets are enriched for transcription factor binding or epigenetic marks.
+A frequent step in ChIPseq analysis is to test whether common gene sets are enriched for transcription factor binding or epigenetic marks.
 
-Sources of well curated genesets include [GO consortium](http://geneontology.org/) (gene's function, biological process and cellular localisation), [REACTOME](http://www.reactome.org/) (Biological Pathways) and [MsigDB](http://software.broadinstitute.org/gsea/msigdb/) (Computationally and Experimentally derived).
+Sources of well curated gene sets include [GO consortium](http://geneontology.org/) (gene's function, biological process and cellular localisation), [REACTOME](http://www.reactome.org/) (Biological Pathways) and [MsigDB](http://software.broadinstitute.org/gsea/msigdb/) (Computationally and Experimentally derived).
 
 ---
-## Gene ontology and geneset testing for ChIPseq
+## Gene Set testing for ChIPseq
 
-Geneset enrichment testing may be performed on the sets of genes with peaks associated to them. In this example we will consider genes with peaks within 1000bp of a gene's TSS.
+Gene set enrichment testing may be performed on the sets of genes with peaks associated to them. In this example we will consider genes with peaks within 1000bp of a gene's TSS.
 
 We will not access these database libraries directly in testing but will use other R/Bioconductor libraries which make extensive use of them.
 
@@ -168,10 +167,10 @@ We will not access these database libraries directly in testing but will use oth
 </div>
 
 ---
-## Gene ontology and geneset testing
+## Gene ontology and gene set testing
 
 
-To perform geneset testing here, we will use the **GOseq package**.
+To perform gene set testing here, we will use the **GOseq package**.
 
 We must provide a named numeric vector of 1s or 0s to illustrate whether a gene had any peaks overlapping it's TSS.
 
@@ -183,7 +182,7 @@ The peaks landing in TSS regions will be marked as "Promoter" in the **annotatio
 annotatedPeaksGR[1,]
 ```
 ---
-## Gene ontology and geneset testing
+## Gene ontology and gene set testing
 
 
 We can extract the unique names of genes with peaks in their TSS by subsetting the annotated GRanges and retrieving gene names from the **geneId** column.
@@ -230,7 +229,7 @@ Now we have the the input for GOseq we can test against KEGG (or GO if we choose
 
 First we must construct a **nullp** data.frame for use within **goseq** using the **nullp()** function and supplying our named vector, genome to be used and gene identifier used.
 
-The **nullp()** function attempts to correct for gene length biases we may see in geneset testing. i.e. a longer gene may have more chance to have a peak within it.
+The **nullp()** function attempts to correct for gene length biases we may see in gene set testing. i.e. a longer gene may have more chance to have a peak within it.
 
 
 ```{r,include=FALSE}
@@ -246,9 +245,9 @@ pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 
 ## Gene ontology and functional testing
 
-Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of genesets.
+Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of gene sets.
 
-We also select a database of genesets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" genesets.
+We also select a database of gene sets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" gene sets.
 
 As we are testing peaks in 1000bp windows around genes's TSSs we can simply use the **"Hypergeometric"** for the method parameter.
 
@@ -293,6 +292,7 @@ idtoName <- cbind(names(xx),unlist(xx))
 idtoName[1:5,]
 
 ```
+
 ---
 ## Gene ontology and functional testing
 
@@ -303,24 +303,25 @@ KeggN_MycPeaks <- merge(idtoName,Kegg_MycPeaks,by=1,all=TRUE)
 orderByP <- order(KeggN_MycPeaks$over_represented_pvalue)
 KeggN_MycPeaks <- KeggN_MycPeaks[orderByP,]
 KeggN_MycPeaks[1:5,]
-```
----
 
-## Using other sources of gene sets.
+```
+
+---
+## Using other sources of gene sets
 
 We may wish to take advantage of other gene set annotation available to us from sources such as MSigDB. We could have generated our own sets of interesting genes which we want to test for association with our peaks. 
 
-We can use our own custom gene sets in **goseq** by specifying the **gene2cat** argument to a data.frame containing genes and their corresponding geneset membership.
+We can use our own custom gene sets in **goseq** by specifying the **gene2cat** argument to a data.frame containing genes and their corresponding gene set membership.
 
-```{r,eval=FALSE}
+```{r,eval=FALSE, echo=T}
 ?goseq
 ```
 
 ---
 
-## Custom gene sets from MsigDB.
+## Custom gene sets from MsigDB
 
-We can use the GSEAbase package again to extract a list of genesets from a MSigDB gmt file.
+We can use the GSEAbase package again to extract a list of gene sets from a MSigDB gmt file.
 
 ```{r}
 require(GSEABase)
@@ -331,7 +332,7 @@ myIDs[1]
 
 ---
 
-## Custom gene sets from MsigDB.
+## Custom gene sets from MsigDB
 
 And we can convert then this to a data.frame suitable for goseq.
 
@@ -345,9 +346,9 @@ myID2Cat[1:5,]
 
 ---
 
-## Custom geneset testing
+## Custom gene set testing
 
-We can then test this new geneset in the same way as before. We just need to supply the new categories as the data.frame to the **gene2cat** parameter. 
+We can then test this new gene set in the same way as before. We just need to supply the new categories as the data.frame to the **gene2cat** parameter. 
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE}
 library(goseq)
@@ -359,9 +360,9 @@ Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
 
 ---
 
-## Custom geneset results
+## Custom gene set results
 
-Finally we can review the results as we have with other goseq results. Here we can see Myc targets in our top hits from the hallmarks genesets.
+Finally we can review the results as we have with other goseq results. Here we can see Myc targets in our top hits from the hallmarks gene sets.
 
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE}
@@ -374,17 +375,18 @@ Myc_hallMarks[1:5,]
 ---
 
 
-## Gene ontology and functional testing - GREAT
+## GREAT for GO and functional testing
 
-In addition to a standard enrichment tests, methods have been implemented specifically for ChIP-seq. Many of these tools aim to incorporate peaks distal to genes into their enrichment testing such as the popular [GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) toolset.
+In addition to a standard enrichment tests, methods have been implemented specifically for ChIPseq. Many of these tools aim to incorporate peaks distal to genes into their enrichment testing such as the popular [GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) toolset.
 
-Incorporating distal peaks by rules such as nearest gene results in some genes having a higher chance of being selected and hence some genesets as a whole having a higher chance of having its members selected.
+Incorporating distal peaks by rules such as nearest gene results in some genes having a higher chance of being selected and hence some gene sets as a whole having a higher chance of having its members selected.
 
-[GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) defines regulatory regions for each, individual gene and compares the proportion of peaks mapping to a geneset's regulatory regions to the proportion of the genome occupied by geneset's regulatory regions.
+[GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) defines regulatory regions for each, individual gene and compares the proportion of peaks mapping to a gene set's regulatory regions to the proportion of the genome occupied by gene set's regulatory regions.
 
 i.e. If a gene set's regulatory regions account for 1% of the genome then one might expect 1% of peaks to overlap these regions by chance.
+
 ---
-rGREAT - R interface to GREAT server.
+rGREAT - R interface to GREAT server
 =========================================================
 
 We can use the GREAT Bioconductor interface available in the rGREAT package. 
@@ -393,7 +395,7 @@ We can use the GREAT Bioconductor interface available in the rGREAT package.
 library(rGREAT)
 ```
 ---
-Gene ontology and functional testing. GREAT method.
+rGREAT for GO and functional testing
 =========================================================
 
 To submit jobs we can use our GRanges of Myc peaks and specify a genome with the **submitGreatJob** function.
@@ -405,23 +407,23 @@ great_Job <- submitGreatJob(macsPeaks_GR,species="mm10",version = "3.0.0",reques
 availableCategories(great_Job)
 ```
 ---
-Gene ontology and functional testing. GREAT method.
+rGREAT for GO and functional testing
 =========================================================
 
 The results table can be retrieved using the getEnrichmentTables function and specifying which tables we wish to review.
 
-Here we retrieve the results tables for the "Regulatory Motifs" genesets which contains 2 seperate database results.
+Here we retrieve the results tables for the "Regulatory Motifs" gene sets which contains 2 seperate database results.
 
-```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
+```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE, message =F}
 great_ResultTable = getEnrichmentTables(great_Job,
                                         category="Regulatory Motifs")
 names(great_ResultTable)
 ```
 ---
-Gene ontology and functional testing. GREAT method.
+rGREAT for GO and functional testin
 =========================================================
 
-Now we can review the enrichment of our genes with Myc peaks in their TSS for the "MSigDB Predicted Promoter Motifs" genesets.
+Now we can review the enrichment of our genes with Myc peaks in their TSS for the "MSigDB Predicted Promoter Motifs" gene sets.
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T}
 msigProMotifs <- great_ResultTable[["MSigDB Predicted Promoter Motifs"]]
@@ -453,7 +455,7 @@ if(params$isSlides == "yes"){
 
 ## Motifs
 
-A common practice in transcription factor ChIP-seq is to investigate the motifs enriched under peaks. 
+A common practice in transcription factor ChIPseq is to investigate the motifs enriched under peaks. 
 
 Denovo motif enrichment can be performed in R/Bioconductor but this can be very time consuming. Here we will use the MEME-ChIP suite available online to identify denovo motifs.
 
@@ -539,10 +541,13 @@ writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
 ```
 
 ---
+## MEME-ChIP
 
-Now the file "mycMel_rep1.fa" contains sequences around the geometric centre of peaks suitable for Motif analysis in MEME-ChIP. 
+Now the file "mycMel_rep1.fa" contains sequences around the geometric center of peaks suitable for Motif analysis in MEME-ChIP. 
 
 In your own work you will typically run this from your own laptop with MEME installed locally but today we will upload our generated FASTA file to their [web portal](http://meme-suite.org/tools/meme-chip). 
+
+Follow instructions [here](http://meme-suite.org/doc/download.html) to install MEME localy.
 
 Results files from MEME-ChIP can be found [here](http://rockefelleruniversity.github.io/myc_Meme_Example/meme-chip.html)
 
@@ -551,7 +556,7 @@ Results files from MEME-ChIP can be found [here](http://rockefelleruniversity.gi
 
 We can retrieve the locations of Myc motifs identified in MEME-ChIP from the FIMO output.
 
-FIMO reports Myc motif locations as a GFF3 file which we should be able to visualise in IGV. 
+FIMO reports Myc motif locations as a GFF3 file which we should be able to vizualise in IGV. 
 Sadly, this GFF file's naming conventions cause only a fraction of motifs to be reported.
 
 <div align="center">
@@ -567,6 +572,7 @@ Fortunately we can parse our motif's GFF file into R and address this using the 
 library(rtracklayer)
 motifGFF <- import("~/Downloads/fimo.gff")
 ```
+
 ---
 ## FIMO to valid GFF3
 
@@ -589,7 +595,7 @@ export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
 
 We saw previously we can scan sequences using some of the Biostrings functionality **matchPattern**.
 
-Often with ChIP-seq we may know the motif we are looking for or we can use a set of known motifs from a database such as a [JASPAR](http://jaspar.genereg.net).
+Often with ChIPseq we may know the motif we are looking for or we can use a set of known motifs from a database such as a [JASPAR](http://jaspar.genereg.net).
 
 We can access to JASPAR using the JASPAR2020 bioconductor library.
 
@@ -599,7 +605,7 @@ JASPAR2020
 ```
 
 ---
-## Accessing motifs from JASPAR using TFBStools
+## Get motifs from JASPAR with TFBStools
 
 We can access the model for the our motif of interest using the **TFBSTools** package and its **getMatrixByName** function.
 
@@ -613,7 +619,7 @@ pfm
 ---
 ## Motif scanning with motifmatchr
 
-With this PWM we can use the **motifmatchr** package to scan our summits for the Myc motif and return the postions of the motifs.
+With this PWM we can use the **motifmatchr** package to scan our summits for the Myc motif and return the positions of the motifs.
 
 We will need to provide our PWM, GRanges to scan within and BSGenome object to extract sequence from. 
 
@@ -628,20 +634,19 @@ MycMotifs
 ```
 
 ---
-## Exporting motif matches.
+## Exporting motif matches
 
-We can export the Myc motif positions within peaks for use later in IGV or for metaplot visualisation.
+We can export the Myc motif positions within peaks for use later in IGV or for metaplot vizualisation.
 
 
 ```{r}
 export.bed(MycMotifs[[1]],con = "MycMotifs.bed")
 ```
 
----
 <!-- --- -->
 <!-- # High confidence peaks -->
 
-<!-- As we discussed in our last session, ChIPseq data will often contain artefact signal and noise. Following the work by the Encode consortium, it is becoming more standard practice to have replicate samples for ChIP-seq. -->
+<!-- As we discussed in our last session, ChIPseq data will often contain artefact signal and noise. Following the work by the Encode consortium, it is becoming more standard practice to have replicate samples for ChIPseq. -->
 
 <!-- One approach to selecting reproducible peaks in ChIPseq is to identify peaks which are present in the majority of replicates. -->
 
@@ -716,7 +721,7 @@ export.bed(MycMotifs[[1]],con = "MycMotifs.bed")
 ---
 ## Time for an exercise!
 
-Exercise on ChIP-seq data can be found [here](../../exercises/exercises/chipseq_part3_exercise.html)
+Exercise on ChIPseq data can be found [here](../../exercises/exercises/chipseq_part3_exercise.html)
 
 ---
 ## Answers to exercise

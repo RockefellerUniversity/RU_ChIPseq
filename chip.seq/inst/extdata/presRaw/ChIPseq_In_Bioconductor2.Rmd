@@ -1,6 +1,6 @@
 ---
 title: "ChIPseq In Bioconductor (part2) <html><div style='float:left'></div><hr color='#EB811B' size=1px width=796px></html>"
-author: "Rockefeller University, Bioinformatics Resource Centre"
+author: "Rockefeller University, Bioinformatics Resource Center"
 date: "http://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
   xaringan::moon_reader:
@@ -84,7 +84,7 @@ ChIPseq has many sources of potential noise including
 * Varying efficiency of antibodies
 * Non-specific binding
 * Library complexity
-* ChIP artefacts and background
+* ChIP artifacts and background
 
 Many of these sources of noise can be assessed using some well established methodology.
 
@@ -117,8 +117,8 @@ For some discussions:
 
 * NEVER run ChIPseq without considering which input to use.
 
-e.g. When using tumour samples for ChIPseq, it is important to have matched input samples. 
-Differing conditions of same tissue may share common input. 
+For example: When using tumour samples for ChIPseq, it is important to have matched input samples. 
+Differing conditions of same tissue may share common input.
 
 ---
 ## Quality metrics for ChIPseq
@@ -146,9 +146,9 @@ QCresult <- ChIPQCsample(reads="/pathTo/myChIPreads.bam",
 
 We download the blacklist for mm10 from [Encode ](https://www.encodeproject.org/files/ENCFF547MET/@@download/ENCFF547MET.bed.gz)
 
-We can then provide an initial analysis of our ChIPseq samples quality using the **ChIPQCsample()** function from the [**ChIPQC** package.](http://bioconductor.org/packages/stats/bioc/ChIPQC/).
+We can then provide an initial analysis of our ChIPseq samples quality using the **ChIPQCsample()** function from the [**ChIPQC** package.](http://bioconductor.org/packages/stats/bioc/ChIPQC/)
 
-Here we evalute the quality of samples we aligned with Rsubread last week. The returned object is a **ChIPQCsample** object.
+Here we evaluate the quality of samples we aligned in the prior sessionwith Rsubread. The returned object is a **ChIPQCsample** object.
 
 ```{r mycQC,cache=TRUE,eval=FALSE}
 library(ChIPQC)
@@ -422,7 +422,7 @@ if(params$isSlides == "yes"){
 
 ## Blacklists
 
-ChIPseq will often show the presence of common artefacts, such as ultra-high signal regions. Such regions can confound peak calling, fragment length estimation and QC metrics. Anshul Kundaje created the DAC blacklist as a reference to help deal with these regions.
+ChIPseq will often show the presence of common artifacts, such as ultra-high signal regions. Such regions can confound peak calling, fragment length estimation and QC metrics. Anshul Kundaje created the DAC blacklist as a reference to help deal with these regions.
 
 <div align="center">
 <img src="imgs/blacklist.png" alt="offset" height="500" width="400">
@@ -438,14 +438,14 @@ ChIPseq will often show the presence of common artefacts, such as ultra-high sig
 ---
 ## Blacklists and SSD
 
-SSD is one of these measures that is sensitive to blacklisted artefacts. SSD is a measure of standard deviation of signal across the genome with higher scores reflecting significant pile-up of reads. SSD can therefore be used to assess both the extent of ultra high signals and the signal. But first blacklisted regions must be removed.
+SSD is one of these measures that is sensitive to blacklisted artifacts. SSD is a measure of standard deviation of signal across the genome with higher scores reflecting significant pile-up of reads. SSD can therefore be used to assess both the extent of ultra high signals and the signal. But first blacklisted regions must be removed.
 
 <div align="center">
 <img src="imgs/ssdAndBlacklist.png" alt="offset" height="400" width="300">
 </div>
 
 ---
-## Standardised Standard Deviation
+## Standardized Standard Deviation
 
 ChIPQC calculates SSD before and after removing signal coming from Blacklisted regions.
 
@@ -458,7 +458,7 @@ plotSSD(myQC)+xlim(0,5)
 ```
 
 ---
-## Standardised Standard Deviation
+## Standardized Standard Deviation
 
 Since SSD score is strongly affected by blacklisting it may be necessary to change the axis to see any differences between samples for post-blacklisting scores.
 
@@ -513,7 +513,7 @@ myFlags["DuplicateByChIPQC",]/myFlags["Mapped",]
 
 
 ---
-## Enrichment for reads across genes.
+## Enrichment for reads across genes
 
 We can also use ChIPQC to review where our distribution of reads across gene features using the **plotRegi()** function.
 
@@ -559,12 +559,12 @@ if(params$isSlides == "yes"){
 
 To identify regions of Myc transcription factor binding we can use a **peak caller**.
 
-Although peak caller are available in R (including our own), the most popular and widely used peak called remains **MACS2**.
+Although many peak callers are available in R and beyond, the most popular and widely used peak caller remains **MACS2**.
 
 MACS2 calls peaks in a few simple steps.
 
 * Predict fragment length.
-* Shift reads to centre of predicted fragment.
+* Shift reads to center of predicted fragment.
 * Scan across genome and identify regions enriched compare to control samples using count based statistic.
 
 ---
@@ -576,12 +576,14 @@ Though this software is not directly available in R we can use the tools we used
 
 ![testing](imgs/bioconda.jpg)
 
+---
+## Installing MACS2
+
+Once you have a conda installation you just need to:
 
 * Set bioconda channels according to the *[construction](https://bioconda.github.io/index.html#set-up-channels)*
 
 * Install packages e.g. *[MACS2](https://bioconda.github.io/recipes/macs2/README.html)*
-
-
 
 ---
 ## Running MACS2
@@ -736,7 +738,7 @@ if(params$isSlides == "yes"){
 
 So far we have been working with ChIPseq peaks corresponding to transcription factor binding. Transcription factors, as implied in the name, can affect the expression of their target genes.
 
-The target of transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:-
+The target of transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:
 
 Peaks are typically annotated to a gene if
 * They overlap the gene.
@@ -836,7 +838,7 @@ plotDistToTSS(peakAnno)
 ![](imgs/TSS1.png)
 
 ---
-# Visualising peak annotation
+# Vizualising peak annotation
 
 ChIPseeker can also offer a succinct plot to describe the overlap between annotations.
 

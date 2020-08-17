@@ -48,16 +48,16 @@ temp <- yield(fqSample)
 writeFastq(fastqSample,file = "~/Projects/Software/Github/RUBioconductor_Introduction/r_course/Data/sampled_ENCFF000CXH.fastq.gz",mode = "w")
 ```
 
-## ChIPseq introduction 
+## ChIPseq Introduction 
 
-Chromatin precipitation followed by deep sequencing (**ChIPseq**) is a well established technique which allows for the genome wide identification of transcription factor binding sites and epigenetic marks. 
+Chromatin immunoprecipitation, followed by deep sequencing (**ChIPseq**) is a well established technique which allows for the genome wide identification of transcription factor binding sites and epigenetic marks. 
 
 <div align="center">
 <img src="imgs/chipOverview1.png" alt="igv" height="400" width="600">
 </div>
 
 ---
-## ChIPseq introduction 
+## ChIPseq Introduction 
 
 .pull-left[
 <div align="center">
@@ -69,9 +69,10 @@ Chromatin precipitation followed by deep sequencing (**ChIPseq**) is a well esta
 
 * Cross-linked and protein bound DNA.
 * Enrichment by antibody for specific protein or DNA state.
-* End repair, A-tailed and illumina adaptors added.
-* Fragments sequenced from one/either end.
+* End repair, A-tailed and Illumina adapters added.
+* Fragments sequenced from either one/both ends.
 ]
+
 ---
 ## The data
 
@@ -91,9 +92,9 @@ We can retrieve the raw sequencing data from Encode website.
 
 Here we download the sequencing data for the Myc ChIPseq from the Mouse MEL cell line[, sample **ENCSR000EUA** (replicate 1), using the Encode portal.](https://www.encodeproject.org/experiments/ENCSR000EUA/)
 
-The direct link to the raw sequecing reads in FastQ format can be found [here.](https://www.encodeproject.org/files/ENCFF001NQP/@@download/ENCFF001NQP.fastq.gz)
+The direct link to the raw sequecing reads in FASTQ format can be found [here.](https://www.encodeproject.org/files/ENCFF001NQP/@@download/ENCFF001NQP.fastq.gz)
 
-Download the fastQ for the other Myc MEL replicate from [sample ENCSR000EUA](https://www.encodeproject.org/experiments/ENCSR000EUA/). Direct link is [here](https://www.encodeproject.org/files/ENCFF001NQQ/@@download/ENCFF001NQQ.fastq.gz).
+Download the FASTQ for the other Myc MEL replicate from [sample ENCSR000EUA](https://www.encodeproject.org/experiments/ENCSR000EUA/). Direct link is [here](https://www.encodeproject.org/files/ENCFF001NQQ/@@download/ENCFF001NQQ.fastq.gz).
 
 
 ---
@@ -121,9 +122,9 @@ if(params$isSlides == "yes"){
 
 ## Working with raw ChIPseq data
 
-Once we have downloaded the raw fastQ data we can use the [ShortRead package](https://bioconductor.org/packages/release/bioc/html/ShortRead.html) to review our sequence data quality.
+Once we have downloaded the raw FASTQ data we can use the [ShortRead package](https://bioconductor.org/packages/release/bioc/html/ShortRead.html) to review our sequence data quality.
 
-We have reviewed how to work with raw sequencing data in the [**FastQ in Bioconductor** session.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#1)
+We have reviewed how to work with raw sequencing data in the [**FASTQ in Bioconductor** session.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#1)
 
 First we load the [ShortRead library.](https://bioconductor.org/packages/release/bioc/html/ShortRead.html)
 
@@ -144,14 +145,14 @@ First we will review the raw sequencing reads using functions in the [ShortRead 
 
 We do not need to review all reads in the file to can gain an understanding of data quality. We can simply review a subsample of the reads and save ourselves some time and memory.
 
-Note when we subsample we retrieve random reads from across the entire fastQ file. This is important as fastQ files are often ordered by their position on the sequencer.
+Note when we subsample we retrieve random reads from across the entire FASTQ file. This is important as FASTQ files are often ordered by their position on the sequencer.
 
 ---
 ## Reading raw ChIPseq data
 
-We can subsample from a fastQ file using functions in **ShortRead** package.
+We can subsample from a FASTQ file using functions in **ShortRead** package.
 
-Here we use the [**FastqSampler** and **yield** function](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#41) to randomly sample a defined number of reads from a fastQ file. Here we subsample 1 million reads.
+Here we use the [**FastqSampler** and **yield** function](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#41) to randomly sample a defined number of reads from a FASTQ file. Here we subsample 1 million reads. This should be enough to have an understanding of the quality of the data.
 
 ```{r, echo=F,eval=F}
 fqSample <- FastqSampler("~/Downloads/ENCFF001NQP.fastq.gz",n=10^6)
@@ -183,10 +184,10 @@ fastq
 
 ## Raw ChIPseq data QC
 
-If we wished, we can assess information from the fastQ file using our [familiar accessor functions.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#15)
+If we wished, we can assess information from the FASTQ file using our [familiar accessor functions.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#15)
 
 * **sread()** - Retrieve sequence of reads.
-* **quality()** - Retrieve quality of reads as ASCI scores.
+* **quality()** - Retrieve quality of reads as ASCII scores.
 * **id()** - Retrieve IDs of reads.
 
 
@@ -201,7 +202,7 @@ readSequences
 ---
 ## Quality with raw ChIPseq data
 
-We can check some simple quality metrics for our subsampled fastQ data.
+We can check some simple quality metrics for our subsampled FASTQ data.
 
 First, we can review the overall reads' quality scores.
 
@@ -216,7 +217,6 @@ readQualities[1:10]
 ```
 
 ---
-
 ## Quality with raw ChIPseq data
 
 We can then produce a histogram of quality scores to get a better understanding of the distribution of scores.
@@ -244,7 +244,6 @@ readSequences_AlpFreq[1:3,]
 
 
 ---
-
 ## Base frequency with raw ChIPseq data
 
 Once we have the frequency of DNA bases in our sequence reads we can retrieve the sum across all reads.
@@ -306,7 +305,7 @@ ggplot(toPlot,aes(y=Count,x=Cycle,colour=Base))+geom_line()+ylim(150000,400000)+
 
 We can also assess mean read quality over cycles. This will allow us to identify whether there are any isses with quality dropping off over time.
 
-For this we use the [**as(*read_quality*,"matrix")**](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#29) function first to translate our ASCI quality scores to numeric quality scores.
+For this we use the [**as(*read_quality*,"matrix")**](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#29) function first to translate our ASCII quality scores to numeric quality scores.
 
 ```{r mycRep1ReadsQByCycle,cache=TRUE,dependson="mycRep1ReadsAlpFreq"}
 qualAsMatrix <- as(readQuality,"matrix")
@@ -327,7 +326,7 @@ boxplot(qualAsMatrix[1:1000,])
 
 ## Assess by cycle with raw ChIPseq data
 
-In this case the distribution of reads quality scores and read qualities over time look okay. We will often want to access fastQ samples together to see if any samples stick out by these metrics.
+In this case the distribution of reads quality scores and read qualities over time look okay. We will often want to access FASTQ samples together to see if any samples stick out by these metrics.
 
 Here we observed a second population of low quality scores so will remove some reads with low quality scores and high unknown bases.
 
@@ -372,7 +371,7 @@ fqStreamer <- FastqStreamer("~/Downloads/ENCFF001NQP.fastq.gz",
 
 ## Filtering data
 
-Now we [loop through file](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#43), filter reads and [write out a FastQ](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#39) of our filtered reads.
+Now we [loop through file](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#43), filter reads and [write out a FASTQ](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#39) of our filtered reads.
 
 We are filtering low quality reads and reads with many nonspecific (N) base calls. 
 
@@ -478,7 +477,7 @@ writeXStringSet(mainChrSeqSet,
 ---
 ## Creating an Rsubread index 
 
-We will be aligning using the **subjunc** algorithm from the folks behind subread. We can therefore use the **Rsubread** package. Before we attempt to align our fastq files, we will need to first build an index from our reference genome using the **buildindex()** function.
+We will be aligning using the **subjunc** algorithm from the folks behind subread. We can therefore use the **Rsubread** package. Before we attempt to align our FASTQ files, we will need to first build an index from our reference genome using the **buildindex()** function.
 
 The [**buildindex()** function simply takes the parameters of our desired index name and the FASTA file to build index from.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignmentInBioconductor.html#14)
 
@@ -497,9 +496,9 @@ buildindex("mm10_mainchrs","BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa",
 ---
 ## Rsubread ChIPseq alignment
 
-We can align our raw sequence data in fastQ format to the new FASTA file of our mm10 genome sequence using the **Rsubread** package. Specifically we will be using the **align** function as this utilizes the subread genomic alignment algorithm. 
+We can align our raw sequence data in FASTQ format to the new FASTA file of our mm10 genome sequence using the **Rsubread** package. Specifically we will be using the **align** function as this utilizes the subread genomic alignment algorithm. 
 
-The [**align()** function accepts arguments for the index to align to, the fastQ to align, the name of output BAM, the mode of alignment (rna or dna) and the phredOffset.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignmentInBioconductor.html#15)
+The [**align()** function accepts arguments for the index to align to, the FASTQ to align, the name of output BAM, the mode of alignment (rna or dna) and the phredOffset.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignmentInBioconductor.html#15)
 
 Note that here we set the phredOffset to be 64. Rsubread may get upset if we set this wrong.
 
@@ -530,7 +529,7 @@ myMapped <- align("mm10_mainchrs",
 
 One of the most well known group of alignment alogorthims are the Bowtie family. We can access Bowtie2 with the **Rbowtie2** package.
 
-The **QuasR** package allows access to the original Bowtie aligner, but it is a little slow and memory hungry.
+The **QuasR** package allows access to the original Bowtie aligner, but it is a little slow and memory hungry. [Check out our session dedicated to alignment for using QuasR](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignmentInBioconductor.html#36).
 
 ```{r sampleTabless1, echo=TRUE,eval=FALSE}
 library(Rbowtie2)
@@ -551,9 +550,9 @@ bowtie2_build(references="BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa",
 ---
 ## Rbowtie2 ChIPseq alignment
 
-We can then align our fastq data using the **bowtie2()** function specifying our newly created index, the desired name of SAM output and an uncompressed fastq.
+We can then align our FASTQ data using the **bowtie2()** function specifying our newly created index, the desired name of SAM output and an uncompressed FASTQ.
 
-We will need to uncompress our fastq then first. Here we use the **remove** is FALSE settin to maintain original compressed fastQ
+We will need to uncompress our FASTQ then first. Here we use the **remove** is FALSE setting to maintain the original compressed FASTQ.
 
 ```{r bsgcdcenoaame, echo=TRUE,eval=FALSE}
 library(R.utils)
@@ -582,7 +581,7 @@ An important consideration when using Rbowtie2 is its input and output of uncomp
 
 On the command line we may *stream* inputs to Rbowtie2, but in R this isnt an option (yet!)
 
-We would need to make sure we delete any temporary files created (SAM and/or uncompressed FastQ) to avoid filling up our hard drives. We can delete files in R using the **unlink()** function.
+We would need to make sure we delete any temporary files created (SAM and/or uncompressed FASTQ) to avoid filling up our hard drives. We can delete files in R using the **unlink()** function.
 
 ```{r bsgxxxnoaaxssme, echo=TRUE,eval=FALSE}
 unlink("ENCFF001NQP.sam")

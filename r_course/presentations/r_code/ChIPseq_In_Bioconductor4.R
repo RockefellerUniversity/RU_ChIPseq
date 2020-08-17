@@ -240,7 +240,7 @@ HC_Peaks
 export.bed(HC_Peaks,"HC_Peaks.bed")
 
 
-## ----eval=F, echo=T,warning=FALSE---------------------------------------------
+## ----eval=F, echo=T, warning=FALSE--------------------------------------------
 ## 
 ## library(Rsamtools)
 ## 
@@ -278,7 +278,7 @@ library(DESeq2)
 deseqMyc <- DESeqDataSetFromMatrix(countData = assay(myMycCounts),
                               colData = metaDataFrame,
                               design = ~ CellLine,
-                              rowRanges=HC_Peaks)
+                              rowRanges= HC_Peaks)
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------

@@ -345,9 +345,9 @@ summary {
 <h2>ChIPseq functional annotation and motif identification.</h2>
 <p>In this practical we will investigate the motifs and pathways associated with the Ebf1 transcription factor in proB-cells and B-cells.</p>
 <ul>
-<li>Pro-B-Cell Ebf1 data has been extracted from <strong>GSM499030</strong>.</li>
+<li><p>Pro-B-Cell Ebf1 data has been extracted from <strong>GSM499030</strong>.</p></li>
 <li><p>B-Cell Ebf1 data has been extracted from <strong>GSE35857</strong>.</p></li>
-<li><strong>Data/ebf1_proB.bed</strong></li>
+<li><p><strong>Data/ebf1_proB.bed</strong></p></li>
 <li><p><strong>Data/ebf1_B.bed</strong></p></li>
 </ul>
 <ol style="list-style-type: decimal">
@@ -359,14 +359,14 @@ summary {
 <ol start="4" style="list-style-type: decimal">
 <li>Annotate common B cell peaks to genes with TSS set as +/- 500bp</li>
 </ol>
-<pre><code>## &gt;&gt; preparing features information...      2020-07-24 04:26:37 PM 
-## &gt;&gt; identifying nearest features...        2020-07-24 04:26:37 PM 
-## &gt;&gt; calculating distance from peak to TSS...   2020-07-24 04:26:38 PM 
-## &gt;&gt; assigning genomic annotation...        2020-07-24 04:26:38 PM 
-## &gt;&gt; adding gene annotation...          2020-07-24 04:26:54 PM</code></pre>
-<pre><code>## 'select()' returned 1:many mapping between keys and columns</code></pre>
-<pre><code>## &gt;&gt; assigning chromosome lengths           2020-07-24 04:26:54 PM 
-## &gt;&gt; done...                    2020-07-24 04:26:54 PM</code></pre>
+<pre><code>## &gt;&gt; preparing features information...      2020-08-17 10:14:31 PM 
+## &gt;&gt; identifying nearest features...        2020-08-17 10:14:33 PM 
+## &gt;&gt; calculating distance from peak to TSS...   2020-08-17 10:14:34 PM 
+## &gt;&gt; assigning genomic annotation...        2020-08-17 10:14:34 PM 
+## &gt;&gt; adding gene annotation...          2020-08-17 10:14:56 PM</code></pre>
+<pre><code>## &#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>## &gt;&gt; assigning chromosome lengths           2020-08-17 10:14:56 PM 
+## &gt;&gt; done...                    2020-08-17 10:14:56 PM</code></pre>
 <ol start="5" style="list-style-type: decimal">
 <li>Create a barplot of the occurrence of differing annotations (“Promoter”, “Distal Intergenic” and “other”).</li>
 </ol>
@@ -377,9 +377,9 @@ summary {
 <pre><code>##   66 genes were dropped because they have exons located on both strands
 ##   of the same reference sequence or on more than one reference sequence,
 ##   so cannot be represented by a single genomic range.
-##   Use 'single.strand.genes.only=FALSE' to get all the genes in a
+##   Use &#39;single.strand.genes.only=FALSE&#39; to get all the genes in a
 ##   GRangesList object, or use suppressMessages() to suppress this message.</code></pre>
-<pre><code>## Can't find mm10/knownGene length data in genLenDataBase...</code></pre>
+<pre><code>## Can&#39;t find mm10/knownGene length data in genLenDataBase...</code></pre>
 <pre><code>## Found the annotation package, TxDb.Mmusculus.UCSC.mm10.knownGene</code></pre>
 <pre><code>## Trying to get the gene lengths from it.</code></pre>
 <pre><code>## Warning in pcls(G): initial point very close to some inequality constraints</code></pre>
@@ -414,7 +414,7 @@ summary {
 ## [3] &quot;Pathway Data&quot;                     &quot;Gene Expression&quot;                 
 ## [5] &quot;Regulatory Motifs&quot;                &quot;Gene Families&quot;</code></pre>
 <pre><code>## The default enrichment tables contain no associated genes for the input
-## regions. You can set `download_by = 'tsv'` to download the complete
+## regions. You can set `download_by = &#39;tsv&#39;` to download the complete
 ## table, but note only the top 500 regions can be retreived. See the
 ## following link:
 ## 
@@ -501,7 +501,7 @@ summary {
 ## [3] &quot;Pathway Data&quot;                     &quot;Gene Expression&quot;                 
 ## [5] &quot;Regulatory Motifs&quot;                &quot;Gene Families&quot;</code></pre>
 <pre><code>## The default enrichment tables contain no associated genes for the input
-## regions. You can set `download_by = 'tsv'` to download the complete
+## regions. You can set `download_by = &#39;tsv&#39;` to download the complete
 ## table, but note only the top 500 regions can be retreived. See the
 ## following link:
 ## 

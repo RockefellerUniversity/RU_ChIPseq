@@ -48,7 +48,7 @@ annotatedPeaksDF[1:2,]
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
-# Geneset Enrichment
+# Gene Set Enrichment
 
 <html><div style='float:left'></div><hr color='#EB811B' size=1px width=720px></html> 
 
@@ -56,7 +56,7 @@ if(params$isSlides == "yes"){
 "    
   )
 }else{
-  cat("# Geneset Enrichment
+  cat("# Gene Set Enrichment
 
 ---
 "    
@@ -142,7 +142,8 @@ KeggN_MycPeaks <- KeggN_MycPeaks[orderByP,]
 KeggN_MycPeaks[1:5,]
 
 
-## ----eval=FALSE---------------------------------------------------------------
+
+## ----eval=FALSE, echo=T-------------------------------------------------------
 ## ?goseq
 
 
@@ -181,7 +182,7 @@ great_Job <- submitGreatJob(macsPeaks_GR,species="mm10",version = "3.0.0",reques
 availableCategories(great_Job)
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message =F-----------------
 great_ResultTable = getEnrichmentTables(great_Job,
                                         category="Regulatory Motifs")
 names(great_ResultTable)

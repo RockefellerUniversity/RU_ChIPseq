@@ -159,8 +159,8 @@ myQCCTCF <- ChIPQCsample("ENCFF789ZHS.bam",blacklist = blkList, annotation = "hg
 ```
 
 ```{r, eval=T, echo=F}
-save(myQCCTCF, file = "ex2_chipqc.RData")
-load("ex2_chipqc.RData")
+#save(myQCCTCF, file = "data/ex2_chipqc.RData")
+load("data/ex2_chipqc.RData")
 ```
 
 ```{r instalssdfsqlBSdwdwss2waa2, warning=FALSE, eval=TRUE, echo=toMessage}

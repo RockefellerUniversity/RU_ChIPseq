@@ -31,6 +31,8 @@ We will also perform some of our own QC on some human data of Pancreas CTCF data
 
 We can also retrieve the relevant peak calls from [here](https://www.encodeproject.org/files/ENCFF627LTJ/@@download/ENCFF627LTJ.bed.gz)
 
+
+
 1. Load the CTCFQC.RData into R
 
 ```{r instalcscldeBSded,include=FALSE,eval=FALSE}
@@ -128,7 +130,7 @@ peakAnno <- annotatePeak(myPeakGR, tssRegion=c(-500, 500),
 plotAnnoPie(peakAnno)
 ```
 
-0. Export annotated peaks to a tab separated file.
+9. Export annotated peaks to a tab separated file.
 
 ```{r instalsscsccdfsqlBSsls2wa,eval=TRUE,echo=toMessage}
 toWrite <- as.data.frame(peakAnno)

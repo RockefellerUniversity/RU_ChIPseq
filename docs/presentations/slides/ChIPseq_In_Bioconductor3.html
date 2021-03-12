@@ -58,7 +58,7 @@ Information and files for the [Myc ChIPseq in Ch12 cell line can be found here](
 
 ## Data
 
-I have provided peakcalls from MACS2 following the processing steps outlined in our last session.
+In the data directory we have provided peak calls from MACS2 following the processing steps outlined in our last session.
 
 Peak calls for Myc in MEL and Ch12 cellines can be found in 
 
@@ -73,7 +73,7 @@ Peak calls for Myc in MEL and Ch12 cellines can be found in
 
 ## ChIP peaks in R
 
-In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/slides/ChIPseq_In_Bioconductor2.html#38).
+In our last session we reviewed how we can [identify putative transciption factor binding sites using peak calling programs such as MACS2.](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/slides/ChIPseq_In_Bioconductor2.html#38)
 
 
 
@@ -116,13 +116,13 @@ peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000),
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2021-03-12 12:23:16 AM 
-## &gt;&gt; identifying nearest features...		 2021-03-12 12:23:16 AM 
-## &gt;&gt; calculating distance from peak to TSS...	 2021-03-12 12:23:16 AM 
-## &gt;&gt; assigning genomic annotation...		 2021-03-12 12:23:16 AM 
-## &gt;&gt; adding gene annotation...			 2021-03-12 12:23:19 AM 
-## &gt;&gt; assigning chromosome lengths			 2021-03-12 12:23:19 AM 
-## &gt;&gt; done...					 2021-03-12 12:23:19 AM
+## &gt;&gt; preparing features information...		 2021-03-12 10:05:19 PM 
+## &gt;&gt; identifying nearest features...		 2021-03-12 10:05:19 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2021-03-12 10:05:19 PM 
+## &gt;&gt; assigning genomic annotation...		 2021-03-12 10:05:19 PM 
+## &gt;&gt; adding gene annotation...			 2021-03-12 10:05:22 PM 
+## &gt;&gt; assigning chromosome lengths			 2021-03-12 10:05:22 PM 
+## &gt;&gt; done...					 2021-03-12 10:05:22 PM
 ```
 
 ---
@@ -185,14 +185,13 @@ We will not access these database libraries directly in testing but will use oth
 ---
 ## Gene ontology and gene set testing
 
+To perform gene set testing here, we will use the **clusterProfiler package**.
 
-To perform gene set testing here, we will use the **GOseq package**.
-
-We must provide a named numeric vector of 1s or 0s to illustrate whether a gene had any peaks overlapping it's TSS.
+clusterProfiler provides multiple enrichment functions that allow for comparison of your gene list to known (e.g. GO, KEGG) or custom gene sets. Detailed information about all of the functionality within this package is available [here](http://yulab-smu.top/clusterProfiler-book/).
 
 In this example we use all TSS sites we found to be overlapped by Myc peaks.
 
-The peaks landing in TSS regions will be marked as "Promoter" in the **annotation** column of our annotated GRanges object. 
+The peaks landing in TSS regions will be marked as "Promoter" in the **annotation** column of our annotated GRanges object.
 
 
 ```r
@@ -216,6 +215,8 @@ annotatedPeaksGR[1, ]
 ##   -------
 ##   seqinfo: 21 sequences from mm10 genome
 ```
+
+
 ---
 ## Gene ontology and gene set testing
 
@@ -244,27 +245,15 @@ Next we can extract all genes which are included in the TxDb object to use as ou
 
 ```r
 allGeneGR &lt;- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
+allGeneGR[1:2, ]
 ```
 
 ```
-##   66 genes were dropped because they have exons located on both strands
-##   of the same reference sequence or on more than one reference sequence,
-##   so cannot be represented by a single genomic range.
-##   Use 'single.strand.genes.only=FALSE' to get all the genes in a
-##   GRangesList object, or use suppressMessages() to suppress this message.
-```
-
-```r
-allGeneGR[1:3, ]
-```
-
-```
-## GRanges object with 3 ranges and 1 metadata column:
+## GRanges object with 2 ranges and 1 metadata column:
 ##             seqnames            ranges strand |     gene_id
 ##                &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;character&gt;
 ##   100009600     chr9 21062393-21073096      - |   100009600
 ##   100009609     chr7 84935565-84964115      - |   100009609
-##   100009614    chr10 77711457-77712009      + |   100009614
 ##   -------
 ##   seqinfo: 66 sequences (1 circular) from mm10 genome
 ```
@@ -276,9 +265,167 @@ allGeneIDs &lt;- allGeneGR$gene_id
 ---
 ## Gene ontology and functional testing
 
+Once we have our gene list and the universe of genes in the same format, we can use them in the **enrichGO** function to perform gene ontology analysis
 
-Once we have a vector of all genes we can create a named vector of 1s or 0s representing whether a gene had peak in TSS or not. 
-We can turn a logical vector into 1 for TRUE and 0 for FALSE simply using the **as.integer()** function.
+For the **ont** argument, we can choose between the "BP", "MF", and "CC" subontologies, or "ALL" for all three.
+
+
+```r
+library(clusterProfiler)
+library(org.Mm.eg.db)
+GO_result &lt;- enrichGO(gene = genesWithPeakInTSS, universe = allGeneIDs, OrgDb = org.Mm.eg.db, 
+    ont = "BP")
+```
+
+---
+## Gene ontology and functional testing
+
+We now have an **enrichResult** instance. From this object, we can extract a data frame of the most highly enriched gene ontology categories.
+
+```r
+GO_result_df &lt;- data.frame(GO_result)
+GO_result_df[1:5, ]
+```
+
+```
+##                    ID                          Description GeneRatio   BgRatio
+## GO:0022613 GO:0022613 ribonucleoprotein complex biogenesis  288/4900 406/20728
+## GO:0034660 GO:0034660              ncRNA metabolic process  294/4900 443/20728
+## GO:0034470 GO:0034470                     ncRNA processing  249/4900 354/20728
+## GO:0042254 GO:0042254                  ribosome biogenesis  213/4900 293/20728
+## GO:0006364 GO:0006364                      rRNA processing  153/4900 205/20728
+##                  pvalue     p.adjust       qvalue
+## GO:0022613 3.653401e-92 2.238074e-88 1.801319e-88
+## GO:0034660 6.228134e-83 1.907677e-79 1.535399e-79
+## GO:0034470 2.051683e-78 4.189536e-75 3.371958e-75
+## GO:0042254 2.327514e-71 3.564587e-68 2.868967e-68
+## GO:0006364 5.119177e-54 6.272016e-51 5.048048e-51
+##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        geneID
+## GO:0022613                                                 59014/19989/27993/73674/55989/57750/22596/17975/67949/66942/20643/13211/15278/67459/67223/215193/353258/67239/56200/67332/108707/110816/18114/216156/20054/20222/103136/70683/69878/52705/432508/56351/18813/64934/67465/52513/57316/103573/18148/52530/216766/216767/19069/12261/18432/67493/104662/192159/276919/216987/217011/78394/56321/217038/110809/12812/67684/107732/19942/68979/67671/72344/217431/20115/71952/15519/217869/69237/217995/30946/208366/70930/28126/94066/105372/108143/66254/72198/218629/20088/52535/27374/75751/27275/72662/14000/223499/78581/239528/67959/109075/12181/55944/27367/20826/74778/72193/75705/21357/66409/106298/224092/57808/68193/67014/106338/207932/224481/67045/213773/66978/67097/20630/19896/72462/54127/27756/53817/15516/224823/66229/53414/18519/72515/12607/67242/20641/108013/69241/225348/67936/67222/20044/68731/66419/20227/67674/107071/28000/59028/19211/54364/107094/66583/18150/18572/13669/227522/20935/27176/227656/118451/64930/227674/227715/66489/75422/13046/98956/66181/271842/320632/20638/67134/66580/67204/16418/68295/67996/228889/66481/68879/69126/69639/229317/56758/97112/74200/56417/70767/56195/68147/229937/70285/100019/230082/20104/12578/72181/20116/69072/67205/75062/230737/214150/14105/67025/69902/50912/74035/66448/57741/20817/433864/75416/17089/65961/231452/94061/100503670/100608/117109/11837/71990/19988/208144/19384/22384/100609/74097/66596/192196/28035/68011/57905/56505/72171/213895/110109/60321/20901/68988/20103/68077/107686/13871/69731/20085/27998/14113/20055/22121/67973/20068/67148/101867/67920/67276/234344/234374/50783/19656/78651/24015/234549/214627/214572/66164/67619/72544/235036/215194/71989/382137/77591/11920/102462/67941/225215/245000/22258/72831/16785/67115/66446/13205/72584/68995/72554/19655/110954/245474/26905/76130/237107/69499/22184/237221
+## GO:0034660 59014/17864/19989/27993/73674/212679/57750/23874/69163/17975/67949/66942/226414/15278/67459/381314/107508/67223/77065/215193/73681/67239/56200/108707/110816/18114/216156/20054/100113398/28088/70683/52705/17299/216443/18813/64934/52513/57316/74467/71701/18148/104458/66628/52530/194908/68626/54351/67493/104662/216987/78394/217038/70422/20848/69684/19942/52686/68979/76265/72344/68730/217431/20115/328092/66132/211064/328162/74691/69237/217995/30946/68916/208366/69955/70930/105148/210106/28114/100715/105372/66254/72198/105083/67053/68045/20088/67011/105638/56335/18130/72662/110960/14000/67724/223499/78581/68260/239528/109075/12181/20826/74778/72026/21357/66409/74108/70120/57808/106248/52575/106338/207932/224481/67045/213773/19896/57773/72462/54127/22321/68915/224823/66229/53414/18519/224907/72515/72167/240174/76781/58523/225348/67936/15115/107045/68857/67222/20044/70223/68731/20227/19697/67674/107071/109077/70044/59028/54364/107094/66583/18150/18572/72133/227522/13434/74455/27176/227656/68205/227715/66489/20823/75422/98956/66181/271842/69185/66580/66044/16418/228889/66481/67005/69639/229487/56417/229543/71807/70560/20226/229780/28036/68147/108943/229937/70285/100019/109093/230082/69934/74753/230233/20104/12578/100087/72181/68276/20116/69072/66966/67205/214150/107271/67025/69902/50912/74035/71957/78697/75416/78890/17089/211006/65961/231413/94061/100503670/56361/117109/71990/70650/208144/100929/100609/83701/74097/231803/56463/53379/353172/69786/72171/70047/14911/381802/213895/110109/60321/66078/68077/13871/20085/27998/14113/20055/233189/67973/20068/244141/101861/101867/233802/71941/67920/67276/234344/234374/70359/78651/212528/66590/68544/214627/66369/67619/234734/72544/30947/85305/66965/212728/215194/71989/67049/382137/77591/102462/69882/69606/68291/75686/97541/67789/72341/67115/66446/102436/54632/69942/72554/245474/76130/69499/15108
+## GO:0034470                                                                                                                                                                                                                                                                                                    59014/19989/27993/73674/57750/69163/17975/67949/66942/15278/67459/67223/77065/215193/73681/67239/56200/108707/110816/18114/216156/20054/100113398/28088/70683/52705/17299/18813/64934/52513/57316/74467/18148/66628/52530/68626/54351/67493/104662/216987/78394/217038/70422/20848/19942/52686/68979/76265/72344/68730/217431/20115/66132/211064/328162/69237/217995/30946/68916/208366/69955/70930/210106/28114/105372/66254/72198/67053/68045/20088/67011/105638/56335/18130/72662/14000/67724/223499/78581/68260/239528/109075/12181/20826/74778/72026/21357/66409/74108/57808/106248/52575/106338/207932/224481/67045/213773/19896/57773/72462/54127/224823/66229/53414/18519/224907/72515/72167/240174/58523/225348/67936/68857/67222/20044/68731/20227/67674/107071/109077/70044/59028/54364/107094/66583/18150/18572/72133/227522/13434/74455/27176/227656/68205/227715/66489/20823/75422/98956/66181/271842/69185/66580/16418/228889/66481/67005/69639/56417/229543/229780/28036/68147/108943/229937/70285/100019/230082/69934/74753/230233/20104/12578/100087/72181/68276/20116/69072/66966/67205/214150/67025/69902/50912/74035/71957/78697/75416/78890/17089/65961/231413/94061/100503670/56361/117109/71990/70650/208144/100929/100609/83701/74097/53379/69786/72171/70047/14911/381802/213895/110109/60321/66078/68077/13871/20085/27998/14113/20055/233189/67973/20068/101861/101867/233802/67920/67276/234344/234374/70359/78651/212528/214627/66369/67619/234734/72544/30947/66965/212728/215194/71989/67049/382137/77591/102462/69882/69606/68291/72341/67115/66446/54632/69942/72554/245474/76130/69499/15108
+## GO:0042254                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   59014/19989/27993/73674/55989/57750/22596/17975/67949/66942/15278/67459/67223/215193/353258/67239/56200/108707/110816/18114/216156/20054/103136/70683/52705/18813/64934/52513/57316/103573/18148/52530/216767/19069/12261/18432/67493/104662/216987/217011/78394/56321/217038/107732/19942/68979/67671/72344/217431/20115/71952/69237/217995/30946/208366/70930/28126/94066/105372/66254/72198/218629/20088/52535/75751/72662/14000/223499/78581/109075/12181/27367/20826/74778/66409/106298/224092/57808/68193/67014/106338/207932/224481/67045/213773/67097/19896/72462/54127/224823/66229/53414/18519/72515/12607/225348/67936/67222/20044/68731/66419/20227/67674/107071/59028/19211/54364/107094/66583/18150/18572/227522/20935/27176/227656/118451/64930/227674/227715/66489/75422/98956/66181/271842/67134/66580/16418/228889/66481/69126/69639/229317/97112/68147/229937/70285/100019/230082/20104/12578/72181/20116/69072/67205/230737/67025/69902/50912/74035/66448/57741/433864/75416/17089/65961/231452/94061/100503670/100608/117109/11837/71990/19988/208144/19384/100609/74097/66596/72171/213895/110109/60321/20103/68077/13871/20085/27998/14113/20055/67973/20068/101867/67920/67276/234344/234374/78651/24015/234549/214627/66164/67619/72544/235036/215194/71989/382137/77591/102462/67941/225215/72831/16785/67115/66446/13205/72584/72554/110954/245474/76130/237107/69499
+## GO:0006364                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                59014/19989/27993/73674/57750/17975/67949/66942/15278/67459/67223/215193/67239/56200/108707/110816/18114/216156/20054/70683/52705/18813/64934/52513/57316/18148/52530/67493/104662/216987/78394/217038/19942/68979/72344/217431/20115/69237/217995/30946/208366/70930/105372/66254/72198/20088/72662/223499/78581/109075/12181/20826/74778/66409/57808/106338/207932/224481/67045/213773/19896/72462/54127/224823/66229/53414/18519/72515/225348/67936/67222/20044/68731/20227/67674/107071/59028/54364/107094/66583/18150/18572/227522/27176/227656/227715/66489/75422/98956/66181/271842/66580/16418/228889/66481/69639/68147/229937/70285/100019/230082/20104/12578/72181/20116/69072/67205/67025/69902/50912/74035/75416/17089/65961/94061/100503670/117109/71990/208144/100609/74097/72171/213895/110109/60321/68077/13871/20085/27998/14113/20055/67973/20068/101867/67920/67276/234344/234374/78651/214627/67619/72544/215194/71989/382137/77591/102462/67115/66446/72554/245474/76130/69499
+##            Count
+## GO:0022613   288
+## GO:0034660   294
+## GO:0034470   249
+## GO:0042254   213
+## GO:0006364   153
+```
+
+---
+## Gene ontology and functional testing
+
+Network plots can be generated from any enrichResult object using the **enrichplot** package.
+
+We measure similarities between the various significant gene sets and group them accordingly. The **showCategory** argument specifies how many top gene ontology hits to show. 
+
+```r
+library(enrichplot)
+GO_result_plot &lt;- pairwise_termsim(GO_result)
+emapplot(GO_result_plot, showCategory = 20)
+```
+
+![](ChIPseq_In_Bioconductor3_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+
+---
+## Gene ontology and functional testing
+
+In addition to gene ontology, we can test our gene list against custom gene sets that we import as gmt files using the clusterProfiler **enricher** function. Similar to the enrichGO function, this will produce an enrichResult object that can be used for visualization. 
+
+Here we will get gene sets from MSigDB using the **msigdbr** package. We can use this package to pull out specific gene sets, which can be seen [at this link](http://software.broadinstitute.org/gsea/msigdb/). We can also run the **msigdbr_collections** function to see the categories and subcategory codes that will be used for accessing the gene sets. 
+
+
+```r
+library(msigdbr)
+msigdbr_collections()
+```
+
+```
+## # A tibble: 22 x 3
+##    gs_cat gs_subcat         num_genesets
+##    &lt;chr&gt;  &lt;chr&gt;                    &lt;int&gt;
+##  1 C1     ""                         299
+##  2 C2     "CGP"                     3358
+##  3 C2     "CP"                        56
+##  4 C2     "CP:BIOCARTA"              292
+##  5 C2     "CP:KEGG"                  186
+##  6 C2     "CP:PID"                   196
+##  7 C2     "CP:REACTOME"             1554
+##  8 C2     "CP:WIKIPATHWAYS"          587
+##  9 C3     "MIR:MIR_Legacy"           221
+## 10 C3     "MIR:MIRDB"               2377
+## # … with 12 more rows
+```
+
+---
+
+## Gene ontology and functional testing
+
+From the data frame on the previous slide we can identify the category/subcategory we want, and use those in the **msigdbr** function. Here we will use "H" to access the Hallmark gene sets, and in the end we need to get a data frame where the first column contains the name of the gene sets and the second column contains the gene ID. 
+
+
+```r
+library(msigdbr)
+msig_t2g &lt;- msigdbr(species = "Mus musculus", category = "H", subcategory = NULL)
+msig_t2g &lt;- msig_t2g[, colnames(msig_t2g) %in% c("gs_name", "entrez_gene")]
+msig_t2g[1:3, ]
+```
+
+```
+## # A tibble: 3 x 2
+##   gs_name               entrez_gene
+##   &lt;chr&gt;                       &lt;int&gt;
+## 1 HALLMARK_ADIPOGENESIS       11303
+## 2 HALLMARK_ADIPOGENESIS       74610
+## 3 HALLMARK_ADIPOGENESIS       52538
+```
+
+---
+## Gene ontology and functional testing
+
+We then run the gene set enrichment, using the term to gene mapping we created as the **TERM2GENE** argument in the enricher function. 
+
+```r
+hallmark &lt;- enricher(gene = genesWithPeakInTSS, universe = allGeneIDs, TERM2GENE = msig_t2g)
+hallmark_df &lt;- data.frame(hallmark)
+hallmark_df[1:3, ]
+```
+
+```
+##                                              ID             Description
+## HALLMARK_MYC_TARGETS_V1 HALLMARK_MYC_TARGETS_V1 HALLMARK_MYC_TARGETS_V1
+## HALLMARK_E2F_TARGETS       HALLMARK_E2F_TARGETS    HALLMARK_E2F_TARGETS
+## HALLMARK_MYC_TARGETS_V2 HALLMARK_MYC_TARGETS_V2 HALLMARK_MYC_TARGETS_V2
+##                         GeneRatio  BgRatio       pvalue     p.adjust
+## HALLMARK_MYC_TARGETS_V1  153/1418 199/4348 2.655952e-39 1.327976e-37
+## HALLMARK_E2F_TARGETS     126/1418 200/4348 1.836534e-19 4.591335e-18
+## HALLMARK_MYC_TARGETS_V2   50/1418  58/4348 2.485022e-17 4.141703e-16
+##                               qvalue
+## HALLMARK_MYC_TARGETS_V1 1.034423e-37
+## HALLMARK_E2F_TARGETS    3.576408e-18
+## HALLMARK_MYC_TARGETS_V2 3.226168e-16
+##                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             geneID
+## HALLMARK_MYC_TARGETS_V1 15510/18393/66942/17219/51810/107508/15182/56200/67332/66094/103136/18674/53605/12461/73192/12567/56351/18813/67465/18972/12464/103573/18148/14694/12330/52530/22333/27041/13681/12261/22627/110809/18102/18673/16211/26446/22123/16647/20382/18263/22630/26443/13665/13877/218236/105148/28126/30877/11792/15381/12465/18458/55944/14375/15382/66409/14852/22195/19385/20462/28185/21454/19826/67097/20383/109801/108121/27756/66973/15516/225027/20641/225363/27366/70769/11757/56086/20823/229279/110074/99138/67134/67204/26444/12428/15191/12462/68436/51788/13684/19359/20104/230484/107995/51797/230721/26445/74326/20810/230908/19934/69719/14208/13204/11991/11837/19988/19384/22384/17220/27979/381760/53379/56150/66870/12468/68011/23983/12785/12034/68988/20103/21849/107686/53607/14113/57296/50995/19899/16828/68981/27050/20133/13690/233870/19935/21781/17218/24015/14719/17463/101943/85305/26441/12858/56403/23918/67115/66446/18655/108062/53381/66235
+## HALLMARK_E2F_TARGETS                                                                                                                                                                         18393/17219/67196/98386/66403/12534/21917/53605/103468/12567/18813/18972/21379/15574/103573/15366/19360/20425/20877/78304/22059/114714/110809/18102/67684/21973/103733/16647/15374/20382/21877/11799/67241/18949/13665/218210/66197/69716/19355/70472/14375/26934/105988/12419/14852/19385/20462/22042/106618/15361/22154/18969/70769/20833/12236/110074/20638/67134/12531/69270/17865/110750/69639/70099/140917/51788/27354/12578/230484/50927/73804/107995/51797/11637/19891/100336/16765/21335/17089/19687/11991/50883/22256/12704/19384/19718/74097/17220/18861/12190/100710/71777/70699/14056/56150/66979/17768/68298/19362/77891/16881/12447/18971/108961/13626/233726/22390/18817/66422/109145/17218/68278/69724/17535/13433/16201/67629/12649/66131/56403/20842/12530/17350/19139/24061/53381
+## HALLMARK_MYC_TARGETS_V2                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        27993/15510/66942/15278/338359/20509/70683/12567/18813/64934/21379/18148/18432/69071/18673/28126/30877/75751/53414/72515/21453/13340/107071/59028/107094/226169/70769/20322/13537/67134/68493/53608/69902/20810/100608/56361/22256/15277/110109/27998/101612/71974/67973/18817/66422/17218/66590/66164/235036/76130
+##                         Count
+## HALLMARK_MYC_TARGETS_V1   153
+## HALLMARK_E2F_TARGETS      126
+## HALLMARK_MYC_TARGETS_V2    50
+```
+
+---
+## Gene ontology and functional testing
+
+We learned about the **goseq** package during the RNAseq course, which is another functional annotation package similar to clusterProfiler,
+
+Here we perform the same enrichment test for the MSigDB Hallmark gene sets. 
+
+For goseq, we need a named vector of all genes (the universe) with 1s or 0s representing whether a gene had peak in TSS or not. 
+We can turn a logical vector into 1 for TRUE and 0 for FALSE simply using the **as.integer** function.
 
 
 ```r
@@ -292,16 +439,14 @@ allGenesForGOseq[1:3]
 ##         1         0         0
 ```
 
-
 ---
-
 ## Gene ontology and functional testing
 
 Now we have the the input for GOseq we can test against KEGG (or GO if we choose) using a standard hypergeometric test.
 
-First we must construct a **nullp** data.frame for use within **goseq** using the **nullp()** function and supplying our named vector, genome to be used and gene identifier used.
+First we must construct a **nullp** data.frame for use within **goseq** using the **nullp** function and supplying our named vector, genome to be used and gene identifier used.
 
-The **nullp()** function attempts to correct for gene length biases we may see in gene set testing. i.e. a longer gene may have more chance to have a peak within it.
+The **nullp** function attempts to correct for gene length biases we may see in gene set testing. i.e. a longer gene may have more chance to have a peak within it.
 
 
 
@@ -324,255 +469,30 @@ pwf = nullp(allGenesForGOseq, "mm10", "knownGene", plot.fit = FALSE)
 ## Trying to get the gene lengths from it.
 ```
 
----
-
-## Gene ontology and functional testing
-
-Now we have created our nullp data.frame, we can use this within the **goseq()** function to test for the enrichment of gene sets.
-
-We also select a database of gene sets to test, here "KEGG". We can choose additionally from "GO:CC", "GO:BP", "GO:MF" gene sets.
-
-As we are testing peaks in 1000bp windows around genes's TSSs we can simply use the **"Hypergeometric"** for the method parameter.
-
-
-```r
-Kegg_MycPeaks &lt;- goseq(pwf, "mm10", "knownGene", test.cats = c("KEGG"), method = "Hypergeometric")
-
-Kegg_MycPeaks[1:2, ]
-```
-
-
-
-
-```
-##    category over_represented_pvalue under_represented_pvalue numDEInCat
-## 89    03010            8.744084e-33                        1         76
-## 90    03013            5.729961e-27                        1        105
-##    numInCat
-## 89       88
-## 90      158
-```
----
-## Gene ontology and functional testing
-
-The dataframe of enrichment results contains KEGG IDs but no description of pathways and processes.
-
-We can use the **KEGG.db** package to extract a mapping of IDs to descriptive statistics.
-
-
-
-```r
-library(KEGG.db)
-xx &lt;- as.list(KEGGPATHID2NAME)
-idtoName &lt;- cbind(names(xx), unlist(xx))
-idtoName[1:5, ]
-```
-
-```
-##       [,1]    [,2]                                      
-## 00010 "00010" "Glycolysis / Gluconeogenesis"            
-## 00020 "00020" "Citrate cycle (TCA cycle)"               
-## 00030 "00030" "Pentose phosphate pathway"               
-## 00040 "00040" "Pentose and glucuronate interconversions"
-## 00051 "00051" "Fructose and mannose metabolism"
-```
 
 ---
 ## Gene ontology and functional testing
 
-We can now merge our data.frame of ID to pathway name mappings to our data.frame of enrichment results.
+We can use the same term to gene mapping we used for clusterProfiler (though it must be converted from a tibble to data frame for goseq) to run the gene set enrichment test.
 
 
 ```r
-KeggN_MycPeaks &lt;- merge(idtoName, Kegg_MycPeaks, by = 1, all = TRUE)
-orderByP &lt;- order(KeggN_MycPeaks$over_represented_pvalue)
-KeggN_MycPeaks &lt;- KeggN_MycPeaks[orderByP, ]
-KeggN_MycPeaks[1:5, ]
+Myc_hallMarks &lt;- goseq(pwf, "mm10", "knownGene", gene2cat = data.frame(msig_t2g), 
+    method = "Wallenius")
+
+Myc_hallMarks[1:3, ]
 ```
 
 ```
-##        V1                                V2 over_represented_pvalue
-## 187 03010                          Ribosome            8.744084e-33
-## 188 03013                     RNA transport            5.729961e-27
-## 194 03040                       Spliceosome            3.424264e-22
-## 186 03008 Ribosome biogenesis in eukaryotes            2.183456e-16
-## 145 00970       Aminoacyl-tRNA biosynthesis            1.458264e-11
-##     under_represented_pvalue numDEInCat numInCat
-## 187                        1         76       88
-## 188                        1        105      158
-## 194                        1         83      123
-## 186                        1         54       76
-## 145                        1         32       42
+##                   category over_represented_pvalue under_represented_pvalue
+## 32 HALLMARK_MYC_TARGETS_V1            3.905784e-40                        1
+## 13    HALLMARK_E2F_TARGETS            7.212867e-20                        1
+## 33 HALLMARK_MYC_TARGETS_V2            1.540344e-17                        1
+##    numDEInCat numInCat
+## 32        153      199
+## 13        126      200
+## 33         50       58
 ```
-
----
-## Using other sources of gene sets
-
-We may wish to take advantage of other gene set annotation available to us from sources such as MSigDB. We could have generated our own sets of interesting genes which we want to test for association with our peaks. 
-
-We can use our own custom gene sets in **goseq** by specifying the **gene2cat** argument to a data.frame containing genes and their corresponding gene set membership.
-
-
-```r
-`?`(goseq)
-```
-
----
-
-## Custom gene sets from MsigDB
-
-We can use the GSEAbase package again to extract a list of gene sets from a MSigDB gmt file.
-
-
-```r
-require(GSEABase)
-hall &lt;- getGmt("data/mouse_Hallmarks.gmt")
-myIDs &lt;- geneIds(hall)
-myIDs[1]
-```
-
-```
-## $HALLMARK_TNFA_SIGNALING_VIA_NFKB
-##   [1] "11303"  "11304"  "27403"  "268379" "74591"  "11305"  "12778"  "11839" 
-##   [9] "11910"  "67972"  "11941"  "320707" "381290" "14595"  "56336"  "12044" 
-##  [17] "12047"  "12045"  "12046"  "12051"  "12053"  "20893"  "11797"  "11796" 
-##  [25] "17951"  "17952"  "17940"  "17948"  "12156"  "12226"  "194735" "436199"
-##  [33] "12227"  "12228"  "20293"  "20296"  "20292"  "20306"  "20297"  "20303" 
-##  [41] "20304"  "16007"  "14219"  "12443"  "12444"  "12445"  "56706"  "56036" 
-##  [49] "54199"  "12505"  "12515"  "12519"  "12522"  "12575"  "12608"  "12609" 
-##  [57] "12633"  "56708"  "12977"  "12981"  "14825"  "20310"  "330122" "20309" 
-##  [65] "15945"  "56066"  "20311"  "230073" "19347"  "320560" "67035"  "71712" 
-##  [73] "19252"  "319520" "13537"  "240672" "13614"  "13636"  "13653"  "13654" 
-##  [81] "13655"  "13660"  "57440"  "98878"  "259300" "20918"  "68969"  "23872" 
-##  [89] "14063"  "14066"  "14221"  "14281"  "14282"  "14283"  "14284"  "14345" 
-##  [97] "14373"  "13197"  "23882"  "17873"  "14528"  "14579"  "14584"  "321019"
-## [105] "15200"  "15205"  "15894"  "15898"  "50723"  "230623" "230613" "329918"
-## [113] "15902"  "15936"  "15937"  "15939"  "71586"  "15958"  "15959"  "667370"
-## [121] "15980"  "16160"  "16169"  "16173"  "16175"  "16176"  "83430"  "16193" 
-## [129] "16195"  "16197"  "16323"  "16324"  "16362"  "384783" "16369"  "16367" 
-## [137] "16449"  "16450"  "16476"  "16477"  "16478"  "216850" "22290"  "21847" 
-## [145] "16598"  "16600"  "16596"  "236537" "23849"  "16601"  "70789"  "16780" 
-## [153] "16835"  "22359"  "16878"  "56722"  "17133"  "26397"  "26399"  "26410" 
-## [161] "17118"  "17210"  "17681"  "17119"  "17869"  "107771" "59027"  "54446" 
-## [169] "18024"  "18030"  "18033"  "18034"  "18035"  "18037"  "18081"  "15370" 
-## [177] "18227"  "18124"  "108078" "381816" "55991"  "208098" "18578"  "238871"
-## [185] "110385" "18577"  "56376"  "67399"  "18626"  "18627"  "170768" "18640" 
-## [193] "18639"  "270198" "21664"  "22113"  "18792"  "18793"  "56193"  "20620" 
-## [201] "67916"  "65112"  "108767" "17872"  "19219"  "19225"  "19224"  "19267" 
-## [209] "19262"  "19288"  "54720"  "19696"  "19697"  "19698"  "11852"  "192656"
-## [217] "75234"  "30945"  "20229"  "20971"  "18788"  "20725"  "18787"  "20393" 
-## [225] "17691"  "235344" "104681" "20527"  "20525"  "227659" "17127"  "17126" 
-## [233] "20621"  "12702"  "20656"  "20698"  "74646"  "211949" "18412"  "20850" 
-## [241] "20851"  "21353"  "21354"  "21815"  "99929"  "24088"  "21923"  "21926" 
-## [249] "21928"  "21929"  "21930"  "106869" "21942"  "21950"  "57783"  "231130"
-## [257] "22029"  "211770" "106628" "21807"  "22151"  "227613" "73710"  "22154" 
-## [265] "22153"  "22152"  "545486" "67951"  "22339"  "230734" "229055" "230738"
-## [273] "22695"
-```
-
----
-
-## Custom gene sets from MsigDB
-
-And we can convert then this to a data.frame suitable for goseq.
-
-
-```r
-names(myIDs) &lt;- paste0(names(myIDs), ".")
-myID2Cat &lt;- data.frame(ID = unname(unlist(myIDs)), Cat = names(unlist(myIDs)))
-myID2Cat$Cat &lt;- gsub("\\..*", "", myID2Cat$Cat)
-myID2Cat[1:5, ]
-```
-
-```
-##       ID                              Cat
-## 1  11303 HALLMARK_TNFA_SIGNALING_VIA_NFKB
-## 2  11304 HALLMARK_TNFA_SIGNALING_VIA_NFKB
-## 3  27403 HALLMARK_TNFA_SIGNALING_VIA_NFKB
-## 4 268379 HALLMARK_TNFA_SIGNALING_VIA_NFKB
-## 5  74591 HALLMARK_TNFA_SIGNALING_VIA_NFKB
-```
-
-
----
-
-## Custom gene set testing
-
-We can then test this new gene set in the same way as before. We just need to supply the new categories as the data.frame to the **gene2cat** parameter. 
-
-
-```r
-library(goseq)
-pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
-```
-
-```
-## Can't find mm10/knownGene length data in genLenDataBase...
-```
-
-```
-## Found the annotation package, TxDb.Mmusculus.UCSC.mm10.knownGene
-```
-
-```
-## Trying to get the gene lengths from it.
-```
-
-```r
-Myc_hallMarks &lt;- goseq(pwf,"mm10","knownGene",
-                       gene2cat = myID2Cat,
-                       method="Hypergeometric")
-```
-
-```
-## Using manually entered categories.
-```
-
-```
-## For 18802 genes, we could not find any categories. These genes will be excluded.
-```
-
-```
-## To force their use, please run with use_genes_without_cat=TRUE (see documentation).
-```
-
-```
-## This was the default behavior for version 1.15.1 and earlier.
-```
-
-```
-## Calculating the p-values...
-```
-
----
-
-## Custom gene set results
-
-Finally we can review the results as we have with other goseq results. Here we can see Myc targets in our top hits from the hallmarks gene sets.
-
-
-
-```r
-Myc_hallMarks[1:5,]
-```
-
-```
-##                              category over_represented_pvalue
-## 32            HALLMARK_MYC_TARGETS_V1            8.708417e-39
-## 13               HALLMARK_E2F_TARGETS            6.875178e-20
-## 33            HALLMARK_MYC_TARGETS_V2            1.012052e-18
-## 46 HALLMARK_UNFOLDED_PROTEIN_RESPONSE            3.000432e-13
-## 18            HALLMARK_G2M_CHECKPOINT            3.982043e-13
-##    under_represented_pvalue numDEInCat numInCat
-## 32                        1        165      245
-## 13                        1        142      261
-## 33                        1         52       64
-## 46                        1         92      169
-## 18                        1        140      295
-```
-
-
-
 
 ---
 
@@ -583,7 +503,7 @@ In addition to a standard enrichment tests, methods have been implemented specif
 
 Incorporating distal peaks by rules such as nearest gene results in some genes having a higher chance of being selected and hence some gene sets as a whole having a higher chance of having its members selected.
 
-[GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) defines regulatory regions for each, individual gene and compares the proportion of peaks mapping to a gene set's regulatory regions to the proportion of the genome occupied by gene set's regulatory regions.
+[GREAT](http://bejerano.stanford.edu/great/public/html/splash.php) defines regulatory regions for each individual gene and compares the proportion of peaks mapping to a gene set's regulatory regions to the proportion of the genome occupied by gene set's regulatory regions.
 
 i.e. If a gene set's regulatory regions account for 1% of the genome then one might expect 1% of peaks to overlap these regions by chance.
 
@@ -754,7 +674,7 @@ BSgenome.Mmusculus.UCSC.mm10
 ## Extracting sequences under regions
 
 
-The motif for the ChIP-ed transcription factor should in the centre of a peak. MEME-ChIP will trim our peaks to a common length internally if sequences are of different length.
+The motif for the ChIP-ed transcription factor should near the summit of a peak. MEME-ChIP will trim our peaks to a common length internally if sequences are of different length.
 
 It is best therefore to provide a peak set resized to a common length.
 
@@ -856,7 +776,7 @@ Sadly, this GFF file's naming conventions cause only a fraction of motifs to be 
 ---
 ## FIMO to R
 
-Fortunately we can parse our motif's GFF file into R and address this using the **import()** function in  the **rtracklayer** package.
+Fortunately we can parse our motif's GFF file into R and address this using the **import** function in  the **rtracklayer** package.
 
 
 ```r

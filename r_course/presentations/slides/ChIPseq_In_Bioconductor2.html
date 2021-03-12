@@ -29,7 +29,6 @@ class: center, middle, inverse, title-slide
 
 
 
-
 ## Data
 
 In todays session we will continue to review the Myc ChIPseq we were working on in our last session.
@@ -122,7 +121,7 @@ We download the blacklist for mm10 from [Encode ](https://www.encodeproject.org/
 
 We can then provide an initial analysis of our ChIPseq samples quality using the **ChIPQCsample()** function from the [**ChIPQC** package.](http://bioconductor.org/packages/stats/bioc/ChIPQC/)
 
-Here we evaluate the quality of samples we aligned in the prior sessionwith Rsubread. The returned object is a **ChIPQCsample** object.
+Here we evaluate the quality of samples we aligned in the prior session with Rsubread. The returned object is a **ChIPQCsample** object.
 
 
 ```r
@@ -304,7 +303,7 @@ The use of cross-correlation or cross-coverage allows for an assessment of reads
 + 5' of fragment will be sequenced on "+" strand
 + 3' of fragment end will be on "-" strand.
 
-* **Although we only have partial sequence of strand, with predicted fragment length we can predicted the whole fragment**
+* **Although we only have partial sequence of strand, with predicted fragment length we can predict the whole fragment**
 + "+" reads should extend only in positive direction 
 + "-" reads only in negative
 
@@ -361,9 +360,7 @@ plotCC(myQC, facetBy = "Sample")
 
 ## Cross-coverage plot
 
-We can include additional metadata to allow us to group our plot in different ways.
-
-We can include metadata as a data.frame where the first column is our sample names.
+We can include metadata as a data.frame where the first column is our sample names to allow us to group our plot in different ways.
 
 
 
@@ -622,9 +619,11 @@ MACS peaks come as a tab seperated file thinly disguised as a ".xls".
 In addition to the genomic coordinates of peaks, these files contain useful information on the samples, parameters and version used for peak calling at the top.
 
 
+```r
+macsPeaks &lt;- "data/Mel1_peaks.xls"
 
-
-```
+macsPeaks_DF &lt;- read.delim(macsPeaks)
+macsPeaks_DF[1:8, ]
 ## [1] "# Command line: callpeak -t Sorted_Myc_MEL_1.bam -n Mel1 -c Sorted_Input_MEL.bam"
 ## [2] "# ARGUMENTS LIST:"                                                               
 ## [3] "# name = Mel1"                                                                   
@@ -636,22 +635,17 @@ In addition to the genomic coordinates of peaks, these files contain useful info
 ```
 
 ---
+
 ## Importing MACS peaks
 
-We can import peak files therefore using read.delim function. Note we have set *comment.char* argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
+We can import peak files therefore using read.delim function. Note we have set comment.char argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
 
 
 ```r
 macsPeaks &lt;- "data/Mel1_peaks.xls"
-```
 
-
-```r
 macsPeaks_DF &lt;- read.delim(macsPeaks, comment.char = "#")
 macsPeaks_DF[1:2, ]
-```
-
-```
 ##    chr   start     end length abs_summit pileup X.log10.pvalue. fold_enrichment
 ## 1 chr1 4785371 4785642    272    4785563  20.89        10.66553         5.33590
 ## 2 chr1 5082993 5083247    255    5083123  33.42        12.68072         4.30257
@@ -661,6 +655,7 @@ macsPeaks_DF[1:2, ]
 ```
 
 ---
+
 ## Converting MACS peaks
 
 Now we have the information in a table we can create a GRanges object.
@@ -673,9 +668,6 @@ library(GenomicRanges)
 macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, 
     "start"], macsPeaks_DF[, "end"]))
 macsPeaks_GR
-```
-
-```
 ## GRanges object with 16757 ranges and 0 metadata columns:
 ##           seqnames            ranges strand
 ##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt;
@@ -693,6 +685,8 @@ macsPeaks_GR
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
+
+
 
 ---
 ## Peaks as GRanges
@@ -763,7 +757,17 @@ macsPeaks_GR
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
+---
 
+## Importing MACS peaks - rtrackalyer
+
+Also included in the MACS2 output directory is a '.narrowPeak' file. This is a type of interval/bed file and as we have done before, we can import these with the **rtracklayer** package. The 'format' argument must be set to 'narrowPeak'. 
+
+
+```r
+library(rtracklayer)
+macsPeaks_GR &lt;- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+```
 
 ---
 ## Filter peaks in blacklisted regions
@@ -795,7 +799,7 @@ class: inverse, center, middle
 
 So far we have been working with ChIPseq peaks corresponding to transcription factor binding. Transcription factors, as implied in the name, can affect the expression of their target genes.
 
-The target of transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:
+The target of a transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:
 
 Peaks are typically annotated to a gene if
 * They overlap the gene.
@@ -839,13 +843,13 @@ peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2021-03-12 12:22:30 AM 
-## &gt;&gt; identifying nearest features...		 2021-03-12 12:22:31 AM 
-## &gt;&gt; calculating distance from peak to TSS...	 2021-03-12 12:22:32 AM 
-## &gt;&gt; assigning genomic annotation...		 2021-03-12 12:22:32 AM 
-## &gt;&gt; adding gene annotation...			 2021-03-12 12:22:50 AM 
-## &gt;&gt; assigning chromosome lengths			 2021-03-12 12:22:50 AM 
-## &gt;&gt; done...					 2021-03-12 12:22:50 AM
+## &gt;&gt; preparing features information...		 2021-03-12 10:04:35 PM 
+## &gt;&gt; identifying nearest features...		 2021-03-12 10:04:36 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2021-03-12 10:04:36 PM 
+## &gt;&gt; assigning genomic annotation...		 2021-03-12 10:04:36 PM 
+## &gt;&gt; adding gene annotation...			 2021-03-12 10:04:53 PM 
+## &gt;&gt; assigning chromosome lengths			 2021-03-12 10:04:53 PM 
+## &gt;&gt; done...					 2021-03-12 10:04:53 PM
 ```
 
 ```r
@@ -901,23 +905,23 @@ peakAnno_DF &lt;- as.data.frame(peakAnno)
 ## Peak annotation
 
 ```r
-peakAnno_GR[1, ]
+peakAnno_GR[2, ]
 ```
 
 ```
 ## GRanges object with 1 range and 14 metadata columns:
 ##       seqnames          ranges strand | abs_summit fold_enrichment  annotation
 ##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt; &lt;character&gt;
-##   [1]     chr1 4785371-4785642      * |    4785563          5.3359    Promoter
+##   [1]     chr1 5082993-5083247      * |    5083123         4.30257    Promoter
 ##         geneChr geneStart   geneEnd geneLength geneStrand      geneId
 ##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;  &lt;integer&gt;  &lt;integer&gt; &lt;character&gt;
-##   [1]         1   4783572   4785692       2121          2       27395
-##               transcriptId distanceToTSS            ENSEMBL      SYMBOL
-##                &lt;character&gt;     &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;
-##   [1] ENSMUST00000132625.1            50 ENSMUSG00000033845      Mrpl15
+##   [1]         1   5083080   5162529      79450          1      108664
+##                transcriptId distanceToTSS            ENSEMBL      SYMBOL
+##                 &lt;character&gt;     &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;
+##   [1] ENSMUST00000044369.12             0 ENSMUSG00000033793     Atp6v1h
 ##                     GENENAME
 ##                  &lt;character&gt;
-##   [1] mitochondrial riboso..
+##   [1] ATPase, H+ transport..
 ##   -------
 ##   seqinfo: 21 sequences from mm10 genome
 ```
@@ -933,7 +937,7 @@ Now we have the annotated peaks from ChIPseeker we can use some of ChIPseeker's 
 plotAnnoBar(peakAnno)
 ```
 
-![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
 
 ---
 ## Vizualising peak annotation
@@ -959,7 +963,7 @@ ChIPseeker can also offer a succinct plot to describe the overlap between annota
 upsetplot(peakAnno, vennpie = F)
 ```
 
-![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-34-1.png)&lt;!-- --&gt;
+![](ChIPseq_In_Bioconductor2_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
 
 
 ---

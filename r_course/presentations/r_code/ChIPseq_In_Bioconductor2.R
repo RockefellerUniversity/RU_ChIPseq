@@ -6,6 +6,8 @@ suppressPackageStartupMessages(require(knitr))
 knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 
+
+
 ## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
 if(params$isSlides != "yes"){
   cat("# ChIPseq (part 2)
@@ -290,32 +292,23 @@ if(params$isSlides == "yes"){
 ## system(macsCommand)
 
 
-## ----eval=T,echo=F,  warning=FALSE,collapse=T---------------------------------
+## ----eval=T,echo=T,  warning=FALSE,collapse=T---------------------------------
 macsPeaks <- "data/Mel1_peaks.xls"
 
-
-## ----eval=T,echo=F,  warning=FALSE,collapse=T---------------------------------
 macsPeaks_DF <- read.delim(macsPeaks)
 macsPeaks_DF[1:8,]
 
 
-## ----eval=F,echo=T,  warning=FALSE,collapse=T---------------------------------
-## macsPeaks <- "data/Mel1_peaks.xls"
+## ----eval=T,echo=T,  warning=FALSE,collapse=T---------------------------------
+macsPeaks <- "data/Mel1_peaks.xls"
+
+macsPeaks_DF <- read.delim(macsPeaks, comment.char = "#")
+macsPeaks_DF[1:2, ]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
-macsPeaks_DF <- read.delim(macsPeaks, comment.char="#")
-macsPeaks_DF[1:2,]
-
-
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
+## ----eval=T,echo=T,  warning=FALSE,collapse=T---------------------------------
 library(GenomicRanges)
-macsPeaks_GR <- GRanges(
- seqnames=macsPeaks_DF[,"chr"],
- IRanges(macsPeaks_DF[,"start"],
-         macsPeaks_DF[,"end"]
- )
-)
+macsPeaks_GR <- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, "start"], macsPeaks_DF[, "end"]))
 macsPeaks_GR
 
 
@@ -325,8 +318,13 @@ ranges(macsPeaks_GR)
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
-mcols(macsPeaks_GR) <- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
+mcols(macsPeaks_GR) <- macsPeaks_DF[, c("abs_summit", "fold_enrichment")]
 macsPeaks_GR
+
+
+## ----eval=F,echo=T,  warning=FALSE,collapse=T---------------------------------
+## library(rtracklayer)
+## macsPeaks_GR <- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
@@ -390,7 +388,7 @@ peakAnno_DF <- as.data.frame(peakAnno)
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
-peakAnno_GR[1,]
+peakAnno_GR[2,]
 
 
 ## ---- eval=T, echo=T, fig.height=5, fig.width=15, warning=FALSE, tidy=T-------

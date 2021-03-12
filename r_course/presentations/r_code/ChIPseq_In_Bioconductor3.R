@@ -5,7 +5,8 @@ list(isSlides = "no")
 suppressPackageStartupMessages(require(knitr))
 library(TFBSTools)
 library(GSEABase)
-knitr::opts_chunk$set(echo = TRUE, tidy = T)
+knitr::opts_chunk$set(echo = TRUE, tidy = T) 
+
 
 
 ## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
@@ -77,13 +78,56 @@ genesWithPeakInTSS <- unique(annotatedPeaksGR_TSS$geneId)
 genesWithPeakInTSS[1:2]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T, message = F---------
 allGeneGR <- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
-allGeneGR[1:3,]
+allGeneGR[1:2,]
 allGeneIDs <- allGeneGR$gene_id
 
 
+## ----eval=T,echo=T, message=F, warning=FALSE,tidy=T---------------------------
+library(clusterProfiler)
+library(org.Mm.eg.db)
+GO_result <- enrichGO(gene = genesWithPeakInTSS, 
+                      universe = allGeneIDs,
+                      OrgDb = org.Mm.eg.db,
+                      ont = "BP")
+
+
+
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+GO_result_df <- data.frame(GO_result)
+GO_result_df[1:5, ]
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T, fig.height=4, fig.width=8----
+library(enrichplot)
+GO_result_plot <- pairwise_termsim(GO_result)
+emapplot(GO_result_plot, showCategory = 20)
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+library(msigdbr)
+msigdbr_collections()
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+library(msigdbr)
+msig_t2g <- msigdbr(species = "Mus musculus", 
+                    category = "H", 
+                    subcategory = NULL)
+msig_t2g <- msig_t2g[ , colnames(msig_t2g) %in% c("gs_name", "entrez_gene")]
+msig_t2g[1:3, ]
+
+
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+hallmark <- enricher(gene = genesWithPeakInTSS, 
+                     universe = allGeneIDs,
+                     TERM2GENE = msig_t2g)
+hallmark_df <- data.frame(hallmark)
+hallmark_df[1:3, ]
+
+
+## ----eval=T,echo=T, warning=FALSE,tidy=T--------------------------------------
 allGenesForGOseq <- as.integer(allGeneIDs %in% genesWithPeakInTSS)
 names(allGenesForGOseq) <- allGeneIDs
 allGenesForGOseq[1:3]
@@ -98,79 +142,13 @@ library(goseq)
 pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 
 
-## ----echo=T, eval=F, echo=T, warning=FALSE------------------------------------
-## 
-## Kegg_MycPeaks <- goseq(pwf,"mm10","knownGene",
-##                        test.cats=c("KEGG"),
-##                        method="Hypergeometric")
-## 
-## Kegg_MycPeaks[1:2,]
-## 
 
-
-## ----include=FALSE------------------------------------------------------------
-
-Kegg_MycPeaks <- goseq(pwf,"mm10","knownGene",
-                       test.cats=c("KEGG"),
-                       method="Hypergeometric")
-
-Kegg_MycPeaks[1:2,]
-
-
-
-## ----eval=T,echo=F, eval=T,warning=FALSE--------------------------------------
-Kegg_MycPeaks[1:2,]
-
-
-
-## ----include=FALSE------------------------------------------------------------
-library(KEGG.db)
-
-
-## -----------------------------------------------------------------------------
-library(KEGG.db)
-xx <- as.list(KEGGPATHID2NAME)
-idtoName <- cbind(names(xx),unlist(xx))
-idtoName[1:5,]
-
-
-
-## -----------------------------------------------------------------------------
-KeggN_MycPeaks <- merge(idtoName,Kegg_MycPeaks,by=1,all=TRUE)
-orderByP <- order(KeggN_MycPeaks$over_represented_pvalue)
-KeggN_MycPeaks <- KeggN_MycPeaks[orderByP,]
-KeggN_MycPeaks[1:5,]
-
-
-
-## ----eval=FALSE, echo=T-------------------------------------------------------
-## ?goseq
-
-
-## -----------------------------------------------------------------------------
-require(GSEABase)
-hall <- getGmt("data/mouse_Hallmarks.gmt")
-myIDs <- geneIds(hall)
-myIDs[1]
-
-
-## -----------------------------------------------------------------------------
-names(myIDs) <- paste0(names(myIDs),".")
-myID2Cat <- data.frame(ID=unname(unlist(myIDs)),Cat=names(unlist(myIDs)))
-myID2Cat$Cat <- gsub("\\..*","",myID2Cat$Cat)
-myID2Cat[1:5,]
-
-
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE------------------
-library(goseq)
-pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message = F, tidy=T--------
 Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
-                       gene2cat = myID2Cat,
-                       method="Hypergeometric")
+                       gene2cat = data.frame(msig_t2g),
+                       method="Wallenius")
 
-
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=FALSE------------------
-Myc_hallMarks[1:5,]
+Myc_hallMarks[1:3, ]
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------

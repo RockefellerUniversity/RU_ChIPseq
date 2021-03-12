@@ -3,7 +3,8 @@ list(isSlides = "no")
 
 ## ----include=FALSE------------------------------------------------------------
 suppressPackageStartupMessages(require(knitr))
-knitr::opts_chunk$set(echo = TRUE, tidy = T)
+knitr::opts_chunk$set(echo = TRUE, tidy = T) # delete cache before any merging 
+
 
 
 ## ---- results='asis',include=TRUE,echo=FALSE----------------------------------

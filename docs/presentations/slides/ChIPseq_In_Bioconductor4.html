@@ -74,7 +74,7 @@ Peak calls for Myc in MEL and Ch12 cellines can be found in
 
 A common goal in ChIPseq is characterise genome wide transcription factor binding sites or epigenetic states. 
 
-The presence of transciption factor binding sites and epigenetics events is often further analyzed in the context of their putative targets genes to characterize the transcription factor's and epigenetic event's function and/or biological role.
+The presence of transcription factor binding sites and epigenetics events is often further analyzed in the context of their putative targets genes to characterize the transcription factor's and epigenetic event's function and/or biological role.
 
 &lt;div align="center"&gt;
 &lt;img src="imgs/singleMap.png" alt="offset" height="300" width="600"&gt;
@@ -157,6 +157,8 @@ length(macsPeaks_DF)
 ## Reading in a set of peaks
 
 Now with our list of data.frames of peak calls, we loop through the list and create a **GRanges** for each of our peak calls.
+
+Remember you can also do this with the [import function from rtracklayer](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/slides/ChIPseq_In_Bioconductor2.html#46). 
 
 
 
@@ -597,7 +599,7 @@ allPeaksSet_nR[1:2, ]
 ---
 ## Complex overlaps
 
-The **limma** package is commonly used in the analysis of RNAseq and microarray data and contains many useful helpfull functions.
+The **limma** package is commonly used in the analysis of RNAseq and microarray data and contains many useful helpful functions.
 
 One very useful function is the **vennDiagram** function which allows us to plot overlaps from a logical matrix, just like the one we created.
 
@@ -922,7 +924,7 @@ We can extract our information of differential regions using the **results()** f
 
 We provide to the **results()** function the **DESeq2** object, the comparison of interest to the **contrast** parameter and the type of output to return to the **format** parameter.
 
-The comparison to **contrast** parameter is provided as a vector of length3 including the metadata column of interest and groups to test.
+The comparison to **contrast** parameter is provided as a vector of length 3 including the metadata column of interest and groups to test.
 
 We can sort the results by pvalue using the **order()** function to rank by the most significant changes.
 
@@ -995,7 +997,7 @@ Finally we can make our reviewing of sites in IGV a little easier using the **tr
 
 The **tracktables** package's **makebedtable()** function accepts a **GRanges** object and writes an HTML report contains links to IGV.
 
-An example can be found [here](data/MelMinusCh12.html)
+An example can be found [here](../../data/MelMinusCh12.html)
 
 
 ```r

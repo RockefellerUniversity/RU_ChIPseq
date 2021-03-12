@@ -567,22 +567,45 @@ MACS2 calls peaks in a few simple steps.
 * Scan across genome and identify regions enriched compare to control samples using count based statistic.
 
 ---
-## Installing MACS2
+## Installing programs that aren't in R
 
-Though this software is not directly available in R we can use the tools we used to install Salmon to get MACS2. 
+There is no R package for MACS2 (well it just got [released](https://github.com/macs3-project/MACS) but we haven't tested it yet). It is possible to install it on Mac and Linux using the [Anaconda](https://anaconda.org/bioconda/salmon) package repository (unfortunately there is not a Windows implementation). Anaconda is a huge collection of version controlled packages that can be installed through the conda package management system. With conda it is easy to create and manage environments that have a variety of different packages in them. 
 
-* Install conda with **[Anaconda](https://anaconda.org/)** or **[Miniconda](https://conda.io/miniconda.html)**
+Though there is no MACS2 R package, we can interact with the anaconda package system using the R package [Herper](https://bioconductor.org/packages/release/bioc/html/Herper.html). This was created by us here at the BRC and is part of Bioconductor.
 
-![testing](imgs/bioconda.jpg)
+```{r, eval=F}
+BiocManager::install("Herper")
+library(Herper)
+
+```
+
 
 ---
-## Installing MACS2
+## Install MACS2 with Herper
 
-Once you have a conda installation you just need to:
+First, we will use Herper to install Salmon with the *install_CondaTools* function. We just need to tell *install_CondaTools* what tool/s you want and the name of the environment you want to build. 
 
-* Set bioconda channels according to the *[construction](https://bioconda.github.io/index.html#set-up-channels)*
+```{r, echo=T, eval=F}
+salmon_paths <- install_CondaTools(tools="macs2", env="ChIPseq_analysis")
+salmon_paths
+```
 
-* Install packages e.g. *[MACS2](https://bioconda.github.io/recipes/macs2/README.html)*
+```{r, eval=F, echo=F}
+tempdir2 <- function() {
+    tempDir <- tempdir()
+    if(dir.exists(tempDir)){
+      tempDir <- file.path(tempDir,"rr")
+    }
+    tempDir <- gsub("\\", "/", tempDir, fixed = TRUE)
+    tempDir
+}
+
+myMiniconda <- file.path(tempdir2(), "Test")
+install_CondaTools(tools="macs2", env="ChIPseq_analysis", pathToMiniConda = myMiniconda)
+
+```
+
+Behind the scenes, Herper will install the most minimal version of conda (called miniconda), and then will create a new environment into which MACS2 will be installed. When you run the function it prints out where MACS2 is installed. There are additional arguments to control where miniconda is installed using *pathToMiniConda* and also update an existing environment with *updateEnv*. 
 
 ---
 ## Running MACS2
@@ -601,22 +624,26 @@ macs2 callpeak -t Sorted_Myc_MEL_1.bam
                -c Sorted_Input_MEL.bam 
 
 ```
+
 ---
 ## Running MACS2 in R
 
-We can still run our MACS2 from the comfort of R using the **system()** function.
+Herper allows us to run conda packages from within R. MACS2 has been installed into *ChIPseq_analysis*. So we can use this environment from R using *with_CondaEnv()*.
 
-We simply need to build our MACS2 peak call command in R and pass to the **system()** function. 
+```{r salI_1,echo=TRUE,eval=F, warning=F}
 
-```{r fig.height=5, fig.width=15,eval=FALSE}
 myChIP <- "Sorted_Myc_MEL_1.bam"
 myControl <- "Sorted_Input_MEL.bam"
 
-macsCommand <- paste0("macs2 callpeak -t ", myChIP,
-                      " -n ", "Mel_Rep1",
-                      " –-outdir ","PeakDirectory",
-                      " -c ", myControl)
-system(macsCommand)
+with_CondaEnv("ChIPseq_analysis",
+                      system2(command="macs2",args =c("callpeak", 
+                      "-t", myChIP,
+                      "-n", "Mel_Rep1",
+                      "–-outdir","PeakDirectory",
+                      "-c", myControl)),
+                        
+                        stdout = TRUE))
+
 ```
 
 

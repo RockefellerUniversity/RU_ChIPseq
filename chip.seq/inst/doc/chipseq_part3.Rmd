@@ -95,7 +95,7 @@ ggplot(forPlot,aes(x=Annotation,fill=Annotation))+geom_bar()+coord_flip()+theme_
 ```{r instacxxsscsllBSdwced,echo=toMessage}
 myAnnotation_TSS <- myAnnotation[
   myAnnotation$annotation == "Promoter",]
-genesWithPeakInTSS <- unique(myAnnotation$geneId)
+genesWithPeakInTSS <- unique(myAnnotation_TSS$geneId)
 allGeneGR <- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
 allGeneIDs <- allGeneGR$gene_id
 allGenesForGOseq <- as.integer(allGeneIDs %in% genesWithPeakInTSS)

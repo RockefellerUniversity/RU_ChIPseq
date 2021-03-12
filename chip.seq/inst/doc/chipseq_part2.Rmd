@@ -31,7 +31,9 @@ We will also perform some of our own QC on some human data of Pancreas CTCF data
 
 We can also retrieve the relevant peak calls from [here](https://www.encodeproject.org/files/ENCFF627LTJ/@@download/ENCFF627LTJ.bed.gz)
 
-1. Load the CTCFQC.RData into R
+
+
+1. Load the CTCF QC .RData into R
 
 ```{r instalcscldeBSded,include=FALSE,eval=FALSE}
 suppressPackageStartupMessages(library(ChIPQC))
@@ -128,7 +130,7 @@ peakAnno <- annotatePeak(myPeakGR, tssRegion=c(-500, 500),
 plotAnnoPie(peakAnno)
 ```
 
-0. Export annotated peaks to a tab separated file.
+9. Export annotated peaks to a tab separated file.
 
 ```{r instalsscsccdfsqlBSsls2wa,eval=TRUE,echo=toMessage}
 toWrite <- as.data.frame(peakAnno)
@@ -138,19 +140,30 @@ write.table(toWrite,file="annotatedPeaks",row.names = FALSE,sep="\t")
 
 10. Download the blacklist for [hg38](https://www.encodeproject.org/annotations/ENCSR636HFF/) and QC our newly downloaded BAM file in ChIPQC. To save time only run ChIPQC on chromosomes (chr10, chr11,chr12). Create cross-coverage plot using ChIPQC.
 
-```{r instalssdfsqlBSdwdwss2waa,warning=FALSE,eval=TRUE,echo=toMessage}
-library(rtracklayer)
+```{r, eval=F, echo=F}
 if(!file.exists("ENCFF789ZHS.bam")){
   download.file("https://www.encodeproject.org/files/ENCFF789ZHS/@@download/ENCFF789ZHS.bam","ENCFF789ZHS.bam")
 }
 download.file("https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz","ENCFF356LFX.bed.gz")
 blkList <- import.bed("ENCFF356LFX.bed.gz")
+```
+
+```{r instalssdfsqlBSdwdwss2waa, warning=FALSE, eval=F, echo=toMessage}
+
+library(rtracklayer)
 library(Rsamtools)
 # Always check or index 
 indexBam("ENCFF789ZHS.bam")
-myQCCTCF <- ChIPQCsample("ENCFF789ZHS.bam",blacklist = blkList,annotation = "hg38",
-       chromosomes = c("chr10","chr11","chr12"),verboseT = FALSE)
+myQCCTCF <- ChIPQCsample("ENCFF789ZHS.bam",blacklist = blkList, annotation = "hg38",
+       chromosomes = c("chr10","chr11","chr12"), verboseT = FALSE)
+```
 
+```{r, eval=T, echo=F}
+#save(myQCCTCF, file = "data/ex2_chipqc.RData")
+load("data/ex2_chipqc.RData")
+```
+
+```{r instalssdfsqlBSdwdwss2waa2, warning=FALSE, eval=TRUE, echo=toMessage}
 QCmetrics(myQCCTCF)
 plotCC(myQCCTCF)
 ```

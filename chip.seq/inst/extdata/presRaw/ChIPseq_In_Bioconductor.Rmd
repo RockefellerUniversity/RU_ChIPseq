@@ -18,12 +18,13 @@ output:
     theme: united  # many options for theme, this one is my favorite.
     highlight: tango  # specifies the syntax highlighting style
 params:
-  isSlides: "no"
+  isSlides: "no" 
 ---
 
 ```{r,include=FALSE}
 suppressPackageStartupMessages(require(knitr))
-knitr::opts_chunk$set(echo = TRUE, tidy = T)
+knitr::opts_chunk$set(echo = TRUE, tidy = T) # delete cache before any merging 
+
 ```
 
 ```{r, results='asis',include=TRUE,echo=FALSE}
@@ -424,7 +425,7 @@ if(params$isSlides == "yes"){
 
 Following assessment of read quality and any read filtering we applied, we will want to align our reads to the genome so as to identify any genomic locations showing enrichment for aligned reads above background.
 
-Since ChIPseq reads will align continously against our reference genome we can use [our genomic aligners we have seen in previous sessions.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignmentInBioconductor.html#7) The resulting BAM file will contain aligned sequence reads for use in further analysis.
+Since ChIPseq reads will align continously against our reference genome we can use [our genomic aligners we have seen in previous sessions.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignmentInBioconductor.html#7) The resulting BAM file will contain aligned sequence reads for use in further analysis.
 
 <div align="center">
 <img src="imgs/sam2.png" alt="igv" height="200" width="600">
@@ -452,7 +453,7 @@ BSgenome.Mmusculus.UCSC.mm10
 ## Creating a reference genome
 
 We will only use the major chromosomes for our analysis so we may exclude random and unplaced contigs.
-Here we cycle through the major chromosomes and create a [**DNAStringSet** object from the retrieved sequences](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/SequencesInBioconductor.html#17).
+Here we cycle through the major chromosomes and create a [**DNAStringSet** object from the retrieved sequences](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/SequencesInBioconductor.html#17).
 
 ```{r fa2,cache=FALSE,echo=TRUE}
 mainChromosomes <- paste0("chr",c(1:19,"X","Y","M"))
@@ -479,7 +480,7 @@ writeXStringSet(mainChrSeqSet,
 
 We will be aligning using the **subjunc** algorithm from the folks behind subread. We can therefore use the **Rsubread** package. Before we attempt to align our FASTQ files, we will need to first build an index from our reference genome using the **buildindex()** function.
 
-The [**buildindex()** function simply takes the parameters of our desired index name and the FASTA file to build index from.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignmentInBioconductor.html#14)
+The [**buildindex()** function simply takes the parameters of our desired index name and the FASTA file to build index from.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignmentInBioconductor.html#14)
 
 REMEMBER: Building an index is memory intensive and by default is set to 8GB. This may be too large for your laptop or Desktop. 
 
@@ -592,7 +593,7 @@ unlink("ENCFF001NQP.sam")
 
 ## Sort and index reads
 
-As before, we sort and index our files using the [**Rsamtools** packages **sortBam()** and **indexBam()** functions respectively.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/r_course/presentations/slides/AlignedDataInBioconductor.html#10)
+As before, we sort and index our files using the [**Rsamtools** packages **sortBam()** and **indexBam()** functions respectively.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignedDataInBioconductor.html#10)
 
 The resulting sorted and indexed BAM file is now ready for use in external programs such as IGV as well as for further downstream analysis in R.
 

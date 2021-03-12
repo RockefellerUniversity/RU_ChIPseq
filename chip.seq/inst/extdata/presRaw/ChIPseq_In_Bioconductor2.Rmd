@@ -18,13 +18,14 @@ output:
     theme: united  # many options for theme, this one is my favorite.
     highlight: tango  # specifies the syntax highlighting style
 params:
-  isSlides: "no"
+  isSlides: "no"  
 ---
-
 
 ```{r,include=FALSE}
 suppressPackageStartupMessages(require(knitr))
 knitr::opts_chunk$set(echo = TRUE, tidy = T)
+
+
 ```
 
 ```{r, results='asis',include=TRUE,echo=FALSE}
@@ -148,7 +149,7 @@ We download the blacklist for mm10 from [Encode ](https://www.encodeproject.org/
 
 We can then provide an initial analysis of our ChIPseq samples quality using the **ChIPQCsample()** function from the [**ChIPQC** package.](http://bioconductor.org/packages/stats/bioc/ChIPQC/)
 
-Here we evaluate the quality of samples we aligned in the prior sessionwith Rsubread. The returned object is a **ChIPQCsample** object.
+Here we evaluate the quality of samples we aligned in the prior session with Rsubread. The returned object is a **ChIPQCsample** object.
 
 ```{r mycQC,cache=TRUE,eval=FALSE}
 library(ChIPQC)
@@ -307,7 +308,7 @@ The use of cross-correlation or cross-coverage allows for an assessment of reads
 + 5' of fragment will be sequenced on "+" strand
 + 3' of fragment end will be on "-" strand.
 
-* **Although we only have partial sequence of strand, with predicted fragment length we can predicted the whole fragment**
+* **Although we only have partial sequence of strand, with predicted fragment length we can predict the whole fragment**
 + "+" reads should extend only in positive direction 
 + "-" reads only in negative
 
@@ -361,9 +362,7 @@ plotCC(myQC,facetBy = "Sample")
 
 ## Cross-coverage plot
 
-We can include additional metadata to allow us to group our plot in different ways.
-
-We can include metadata as a data.frame where the first column is our sample names.
+We can include metadata as a data.frame where the first column is our sample names to allow us to group our plot in different ways.
 
 
 ```{r qcmetridecs,cache=FALSE,eval=TRUE}
@@ -631,46 +630,41 @@ MACS peaks come as a tab seperated file thinly disguised as a ".xls".
 
 In addition to the genomic coordinates of peaks, these files contain useful information on the samples, parameters and version used for peak calling at the top.
 
-```{r,eval=T,echo=F,  warning=FALSE,collapse=T}
+```{r,eval=T,echo=T,  warning=FALSE,collapse=T}
 macsPeaks <- "data/Mel1_peaks.xls"
-```
 
-```{r,eval=T,echo=F,  warning=FALSE,collapse=T}
 macsPeaks_DF <- read.delim(macsPeaks)
 macsPeaks_DF[1:8,]
 ```
 
 ---
+
 ## Importing MACS peaks
 
-We can import peak files therefore using read.delim function. Note we have set *comment.char* argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
+We can import peak files therefore using read.delim function. Note we have set comment.char argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
 
-```{r,eval=F,echo=T,  warning=FALSE,collapse=T}
+```{r,eval=T,echo=T,  warning=FALSE,collapse=T}
 macsPeaks <- "data/Mel1_peaks.xls"
-```
 
-```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
-macsPeaks_DF <- read.delim(macsPeaks, comment.char="#")
-macsPeaks_DF[1:2,]
+macsPeaks_DF <- read.delim(macsPeaks, comment.char = "#")
+macsPeaks_DF[1:2, ]
 ```
 
 ---
+
 ## Converting MACS peaks
 
 Now we have the information in a table we can create a GRanges object.
 
 GRanges objects are made of chromosome names and intervals stored as IRanges.
 
-```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
+```{r,eval=T,echo=T,  warning=FALSE,collapse=T}
 library(GenomicRanges)
-macsPeaks_GR <- GRanges(
- seqnames=macsPeaks_DF[,"chr"],
- IRanges(macsPeaks_DF[,"start"],
-         macsPeaks_DF[,"end"]
- )
-)
+macsPeaks_GR <- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, "start"], macsPeaks_DF[, "end"]))
 macsPeaks_GR
 ```
+
+
 
 ---
 ## Peaks as GRanges
@@ -690,10 +684,19 @@ ranges(macsPeaks_GR)
 GRanges objects may have metadata attached. Here we attach some useful information on our peaks including the summit position and the fold enrichment over input.
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE}
-mcols(macsPeaks_GR) <- macsPeaks_DF[,c("abs_summit", "fold_enrichment")]
+mcols(macsPeaks_GR) <- macsPeaks_DF[, c("abs_summit", "fold_enrichment")]
 macsPeaks_GR
 ```
+---
 
+## Importing MACS peaks - rtrackalyer
+
+Also included in the MACS2 output directory is a '.narrowPeak' file. This is a type of interval/bed file and as we have done before, we can import these with the **rtracklayer** package. The 'format' argument must be set to 'narrowPeak'. 
+
+```{r,eval=F,echo=T,  warning=FALSE,collapse=T}
+library(rtracklayer)
+macsPeaks_GR <- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+```
 
 ---
 ## Filter peaks in blacklisted regions
@@ -738,7 +741,7 @@ if(params$isSlides == "yes"){
 
 So far we have been working with ChIPseq peaks corresponding to transcription factor binding. Transcription factors, as implied in the name, can affect the expression of their target genes.
 
-The target of transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:
+The target of a transcription factor is hard to assertain from ChIPseq data alone and so often we will annotate peaks to genes by a simple set of rules:
 
 Peaks are typically annotated to a gene if
 * They overlap the gene.
@@ -812,7 +815,7 @@ peakAnno_DF <- as.data.frame(peakAnno)
 ---
 ## Peak annotation
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T}
-peakAnno_GR[1,]
+peakAnno_GR[2,]
 ```
 
 ---

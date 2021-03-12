@@ -271,6 +271,32 @@ if(params$isSlides == "yes"){
 
 
 
+## ---- eval=F------------------------------------------------------------------
+## BiocManager::install("Herper")
+## library(Herper)
+## 
+
+
+## ---- echo=T, eval=F----------------------------------------------------------
+## salmon_paths <- install_CondaTools(tools="macs2", env="ChIPseq_analysis")
+## salmon_paths
+
+
+## ---- eval=F, echo=F----------------------------------------------------------
+## tempdir2 <- function() {
+##     tempDir <- tempdir()
+##     if(dir.exists(tempDir)){
+##       tempDir <- file.path(tempDir,"rr")
+##     }
+##     tempDir <- gsub("\\", "/", tempDir, fixed = TRUE)
+##     tempDir
+## }
+## 
+## myMiniconda <- file.path(tempdir2(), "Test")
+## install_CondaTools(tools="macs2", env="ChIPseq_analysis", pathToMiniConda = myMiniconda)
+## 
+
+
 ## macs2 callpeak -t Sorted_Myc_MEL_1.bam
 
 ##                –name Mel_Rep1
@@ -281,15 +307,20 @@ if(params$isSlides == "yes"){
 
 ## 
 
-## ----fig.height=5, fig.width=15,eval=FALSE------------------------------------
+## ----salI_1,echo=TRUE,eval=F, warning=F---------------------------------------
+## 
 ## myChIP <- "Sorted_Myc_MEL_1.bam"
 ## myControl <- "Sorted_Input_MEL.bam"
 ## 
-## macsCommand <- paste0("macs2 callpeak -t ", myChIP,
-##                       " -n ", "Mel_Rep1",
-##                       " –-outdir ","PeakDirectory",
-##                       " -c ", myControl)
-## system(macsCommand)
+## with_CondaEnv("ChIPseq_analysis",
+##                       system2(command="macs2",args =c("callpeak",
+##                       "-t", myChIP,
+##                       "-n", "Mel_Rep1",
+##                       "–-outdir","PeakDirectory",
+##                       "-c", myControl)),
+## 
+##                         stdout = TRUE))
+## 
 
 
 ## ----eval=T,echo=T,  warning=FALSE,collapse=T---------------------------------

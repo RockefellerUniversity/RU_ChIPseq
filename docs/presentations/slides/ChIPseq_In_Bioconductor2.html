@@ -557,7 +557,7 @@ MACS2 calls peaks in a few simple steps.
 ---
 ## Installing programs that aren't in R
 
-There is no R package for MACS2 (well it just got [released](https://github.com/macs3-project/MACS) but we haven't tested it yet). It is possible to install it on Mac and Linux using the [Anaconda](https://anaconda.org/bioconda/salmon) package repository (unfortunately there is not a Windows implementation). Anaconda is a huge collection of version controlled packages that can be installed through the conda package management system. With conda it is easy to create and manage environments that have a variety of different packages in them. 
+There is no R package for MACS2 (well it just got [released](https://github.com/macs3-project/MACS) but we haven't tested it yet). It is possible to install it on Mac and Linux using the [Anaconda](https://anaconda.org/bioconda/macs2) package repository (unfortunately there is not a Windows implementation). Anaconda is a huge collection of version controlled packages that can be installed through the conda package management system. With conda it is easy to create and manage environments that have a variety of different packages in them. 
 
 Though there is no MACS2 R package, we can interact with the anaconda package system using the R package [Herper](https://bioconductor.org/packages/release/bioc/html/Herper.html). This was created by us here at the BRC and is part of Bioconductor.
 
@@ -571,7 +571,7 @@ library(Herper)
 ---
 ## Install MACS2 with Herper
 
-First, we will use Herper to install Salmon with the *install_CondaTools* function. We just need to tell *install_CondaTools* what tool/s you want and the name of the environment you want to build. 
+First, we will use Herper to install MACS2 with the *install_CondaTools* function. We just need to tell *install_CondaTools* what tool/s you want and the name of the environment you want to build. 
 
 
 ```r
@@ -781,7 +781,37 @@ Also included in the MACS2 output directory is a '.narrowPeak' file. This is a t
 
 ```r
 library(rtracklayer)
-macsPeaks_GR &lt;- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+macsPeaks_GR_np &lt;- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+macsPeaks_GR_np
+## GRanges object with 16757 ranges and 6 metadata columns:
+##           seqnames            ranges strand |            name     score
+##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt; &lt;numeric&gt;
+##       [1]     chr1   4785371-4785642      * |     Mel1_peak_1        73
+##       [2]     chr1   5082993-5083247      * |     Mel1_peak_2        92
+##       [3]     chr1   7397544-7398115      * |     Mel1_peak_3       222
+##       [4]     chr1   7616290-7616433      * |     Mel1_peak_4        73
+##       [5]     chr1   8134747-8134893      * |     Mel1_peak_5        29
+##       ...      ...               ...    ... .             ...       ...
+##   [16753]     chrY   2657144-2657294      * | Mel1_peak_16753        21
+##   [16754]     chrY 90784142-90784289      * | Mel1_peak_16754       160
+##   [16755]     chrY 90818471-90818771      * | Mel1_peak_16755        74
+##   [16756]     chrY 90824549-90824905      * | Mel1_peak_16756        92
+##   [16757]     chrY 90825407-90825575      * | Mel1_peak_16757        24
+##           signalValue    pValue    qValue      peak
+##             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;integer&gt;
+##       [1]     5.33590  10.66553   7.37727       192
+##       [2]     4.30257  12.68072   9.27344       130
+##       [3]     9.58306  26.16516  22.20383       293
+##       [4]     7.65860  10.68563   7.39636        90
+##       [5]     2.94486   5.86828   2.96627       126
+##       ...         ...       ...       ...       ...
+##   [16753]     4.25981   4.98931   2.19466        52
+##   [16754]     6.91704  19.76291  16.02769        85
+##   [16755]     5.63525  10.73033   7.44072       124
+##   [16756]     5.21309  12.62006   9.21552       222
+##   [16757]     3.09097   5.26630   2.43505        78
+##   -------
+##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
 
 ---
@@ -858,13 +888,13 @@ peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2021-03-12 10:59:10 PM 
-## &gt;&gt; identifying nearest features...		 2021-03-12 10:59:10 PM 
-## &gt;&gt; calculating distance from peak to TSS...	 2021-03-12 10:59:11 PM 
-## &gt;&gt; assigning genomic annotation...		 2021-03-12 10:59:11 PM 
-## &gt;&gt; adding gene annotation...			 2021-03-12 10:59:26 PM 
-## &gt;&gt; assigning chromosome lengths			 2021-03-12 10:59:26 PM 
-## &gt;&gt; done...					 2021-03-12 10:59:26 PM
+## &gt;&gt; preparing features information...		 2021-03-15 01:34:44 PM 
+## &gt;&gt; identifying nearest features...		 2021-03-15 01:34:45 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2021-03-15 01:34:46 PM 
+## &gt;&gt; assigning genomic annotation...		 2021-03-15 01:34:46 PM 
+## &gt;&gt; adding gene annotation...			 2021-03-15 01:35:04 PM 
+## &gt;&gt; assigning chromosome lengths			 2021-03-15 01:35:05 PM 
+## &gt;&gt; done...					 2021-03-15 01:35:05 PM
 ```
 
 ```r

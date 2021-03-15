@@ -569,7 +569,7 @@ MACS2 calls peaks in a few simple steps.
 ---
 ## Installing programs that aren't in R
 
-There is no R package for MACS2 (well it just got [released](https://github.com/macs3-project/MACS) but we haven't tested it yet). It is possible to install it on Mac and Linux using the [Anaconda](https://anaconda.org/bioconda/salmon) package repository (unfortunately there is not a Windows implementation). Anaconda is a huge collection of version controlled packages that can be installed through the conda package management system. With conda it is easy to create and manage environments that have a variety of different packages in them. 
+There is no R package for MACS2 (well it just got [released](https://github.com/macs3-project/MACS) but we haven't tested it yet). It is possible to install it on Mac and Linux using the [Anaconda](https://anaconda.org/bioconda/macs2) package repository (unfortunately there is not a Windows implementation). Anaconda is a huge collection of version controlled packages that can be installed through the conda package management system. With conda it is easy to create and manage environments that have a variety of different packages in them. 
 
 Though there is no MACS2 R package, we can interact with the anaconda package system using the R package [Herper](https://bioconductor.org/packages/release/bioc/html/Herper.html). This was created by us here at the BRC and is part of Bioconductor.
 
@@ -583,7 +583,7 @@ library(Herper)
 ---
 ## Install MACS2 with Herper
 
-First, we will use Herper to install Salmon with the *install_CondaTools* function. We just need to tell *install_CondaTools* what tool/s you want and the name of the environment you want to build. 
+First, we will use Herper to install MACS2 with the *install_CondaTools* function. We just need to tell *install_CondaTools* what tool/s you want and the name of the environment you want to build. 
 
 ```{r, echo=T, eval=F}
 salmon_paths <- install_CondaTools(tools="macs2", env="ChIPseq_analysis")
@@ -720,9 +720,10 @@ macsPeaks_GR
 
 Also included in the MACS2 output directory is a '.narrowPeak' file. This is a type of interval/bed file and as we have done before, we can import these with the **rtracklayer** package. The 'format' argument must be set to 'narrowPeak'. 
 
-```{r,eval=F,echo=T,  warning=FALSE,collapse=T}
+```{r,eval=T,echo=T,  warning=FALSE,collapse=T}
 library(rtracklayer)
-macsPeaks_GR <- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+macsPeaks_GR_np <- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+macsPeaks_GR_np
 ```
 
 ---

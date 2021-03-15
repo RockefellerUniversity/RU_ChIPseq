@@ -353,9 +353,10 @@ mcols(macsPeaks_GR) <- macsPeaks_DF[, c("abs_summit", "fold_enrichment")]
 macsPeaks_GR
 
 
-## ----eval=F,echo=T,  warning=FALSE,collapse=T---------------------------------
-## library(rtracklayer)
-## macsPeaks_GR <- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+## ----eval=T,echo=T,  warning=FALSE,collapse=T---------------------------------
+library(rtracklayer)
+macsPeaks_GR_np <- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
+macsPeaks_GR_np
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------

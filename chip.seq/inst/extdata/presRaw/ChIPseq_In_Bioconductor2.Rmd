@@ -843,7 +843,7 @@ peakAnno_DF <- as.data.frame(peakAnno)
 ---
 ## Peak annotation
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T}
-peakAnno_GR[2,]
+peakAnno_GR[1:2,]
 ```
 
 ---

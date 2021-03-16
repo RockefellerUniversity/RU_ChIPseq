@@ -374,7 +374,7 @@ rGREAT for GO and functional testing
 
 The results table can be retrieved using the getEnrichmentTables function and specifying which tables we wish to review.
 
-Here we retrieve the results tables for the "Regulatory Motifs" gene sets which contains 2 seperate database results.
+Here we retrieve the results tables for the "Regulatory Motifs" gene sets which contains 2 separate database results.
 
 ```{r,eval=T,echo=T, eval=T, echo=T, warning=FALSE, message =F}
 great_ResultTable = getEnrichmentTables(great_Job,

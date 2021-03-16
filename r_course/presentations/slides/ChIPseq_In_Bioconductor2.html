@@ -888,13 +888,13 @@ peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2021-03-15 01:34:44 PM 
-## &gt;&gt; identifying nearest features...		 2021-03-15 01:34:45 PM 
-## &gt;&gt; calculating distance from peak to TSS...	 2021-03-15 01:34:46 PM 
-## &gt;&gt; assigning genomic annotation...		 2021-03-15 01:34:46 PM 
-## &gt;&gt; adding gene annotation...			 2021-03-15 01:35:04 PM 
-## &gt;&gt; assigning chromosome lengths			 2021-03-15 01:35:05 PM 
-## &gt;&gt; done...					 2021-03-15 01:35:05 PM
+## &gt;&gt; preparing features information...		 2021-03-16 01:24:24 AM 
+## &gt;&gt; identifying nearest features...		 2021-03-16 01:24:25 AM 
+## &gt;&gt; calculating distance from peak to TSS...	 2021-03-16 01:24:26 AM 
+## &gt;&gt; assigning genomic annotation...		 2021-03-16 01:24:26 AM 
+## &gt;&gt; adding gene annotation...			 2021-03-16 01:24:45 AM 
+## &gt;&gt; assigning chromosome lengths			 2021-03-16 01:24:46 AM 
+## &gt;&gt; done...					 2021-03-16 01:24:46 AM
 ```
 
 ```r
@@ -950,23 +950,27 @@ peakAnno_DF &lt;- as.data.frame(peakAnno)
 ## Peak annotation
 
 ```r
-peakAnno_GR[2, ]
+peakAnno_GR[1:2, ]
 ```
 
 ```
-## GRanges object with 1 range and 14 metadata columns:
+## GRanges object with 2 ranges and 14 metadata columns:
 ##       seqnames          ranges strand | abs_summit fold_enrichment  annotation
 ##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt; &lt;character&gt;
-##   [1]     chr1 5082993-5083247      * |    5083123         4.30257    Promoter
+##   [1]     chr1 4785371-4785642      * |    4785563         5.33590    Promoter
+##   [2]     chr1 5082993-5083247      * |    5083123         4.30257    Promoter
 ##         geneChr geneStart   geneEnd geneLength geneStrand      geneId
 ##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;  &lt;integer&gt;  &lt;integer&gt; &lt;character&gt;
-##   [1]         1   5083080   5162529      79450          1      108664
+##   [1]         1   4783572   4785692       2121          2       27395
+##   [2]         1   5083080   5162529      79450          1      108664
 ##                transcriptId distanceToTSS            ENSEMBL      SYMBOL
 ##                 &lt;character&gt;     &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;
-##   [1] ENSMUST00000044369.12             0 ENSMUSG00000033793     Atp6v1h
+##   [1]  ENSMUST00000132625.1            50 ENSMUSG00000033845      Mrpl15
+##   [2] ENSMUST00000044369.12             0 ENSMUSG00000033793     Atp6v1h
 ##                     GENENAME
 ##                  &lt;character&gt;
-##   [1] ATPase, H+ transport..
+##   [1] mitochondrial riboso..
+##   [2] ATPase, H+ transport..
 ##   -------
 ##   seqinfo: 21 sequences from mm10 genome
 ```

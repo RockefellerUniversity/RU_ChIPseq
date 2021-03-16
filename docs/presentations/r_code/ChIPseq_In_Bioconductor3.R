@@ -145,8 +145,7 @@ pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message = F, tidy=T--------
 Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
-                       gene2cat = data.frame(msig_t2g),
-                       method="Wallenius")
+                       gene2cat = data.frame(msig_t2g))
 
 Myc_hallMarks[1:3, ]
 

@@ -420,7 +420,7 @@ peakAnno_DF <- as.data.frame(peakAnno)
 
 
 ## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
-peakAnno_GR[2,]
+peakAnno_GR[1:2,]
 
 
 ## ---- eval=T, echo=T, fig.height=5, fig.width=15, warning=FALSE, tidy=T-------

@@ -91,7 +91,7 @@ ggplot(forPlot,aes(x=Annotation,fill=Annotation))+geom_bar()+coord_flip()+theme_
 ```
 
 6. Perform a geneset enrichment test of genes with peaks in promoter against KEGG using goseq.
-
+*KEGG.db IS DEPRECATED IN THE MOST RECENT VERSIONS OF R*
 ```{r instacxxsscsllBSdwced,echo=toMessage}
 myAnnotation_TSS <- myAnnotation[
   myAnnotation$annotation == "Promoter",]
@@ -106,6 +106,8 @@ pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 Kegg_Ebf1Peaks <- goseq(pwf,"mm10","knownGene",
                        test.cats=c("KEGG"),
                        method="Hypergeometric")
+```
+```{r,echo=toMessage, eval=F}
 library(KEGG.db)
 xx <- as.list(KEGGPATHID2NAME)
 idtoName <- cbind(names(xx),unlist(xx))
@@ -116,7 +118,7 @@ KeggN_Ebf1Peaks <- KeggN_Ebf1Peaks[orderByP,]
 KeggN_Ebf1Peaks[1:5,]
 ```
 
-7. Identify Ebf1 peaks  only in Bcells and Ebf1 peaks only in proB cells.
+7. Identify Ebf1 peaks only in Bcells and Ebf1 peaks only in proB cells.
 
 
 ```{r instascxsxslldeBSccded,echo=toMessage}

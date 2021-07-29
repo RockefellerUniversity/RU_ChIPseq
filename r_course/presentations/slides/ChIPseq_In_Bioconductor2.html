@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>ChIPseq_In_Bioconductor2.utf8</title>
+    <title>ChIPseq_In_Bioconductor2.knit</title>
     <meta charset="utf-8" />
     <meta name="author" content="Rockefeller University, Bioinformatics Resource Center" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
@@ -127,7 +128,7 @@ Here we evaluate the quality of samples we aligned in the prior session with Rsu
 ```r
 library(ChIPQC)
 toBlkList &lt;- "~/Downloads/ENCFF547MET.bed.gz"
-chipqc_MycMel_rep1 &lt;- ChIPQCsample("SR_Myc_Mel_rep1.bam", annotation = "mm10", blacklist = toBlkList, 
+chipqc_MycMel_rep1 &lt;- ChIPQCsample("SR_Myc_Mel_rep1.bam", annotation = "mm10", blacklist = toBlkList,
     chromosomes = paste0("chr", 1:10))
 class(chipqc_MycMel_rep1)
 ```
@@ -233,9 +234,9 @@ We can run **ChIPQCsample()** on all our samples of interest using an **lapply**
 
 
 ```r
-bamsToQC &lt;- c("Sorted_Myc_Ch12_1.bam", "Sorted_Myc_Ch12_2.bam", "Sorted_Myc_MEL_1.bam", 
+bamsToQC &lt;- c("Sorted_Myc_Ch12_1.bam", "Sorted_Myc_Ch12_2.bam", "Sorted_Myc_MEL_1.bam",
     "Sorted_Myc_MEL_2.bam", "Sorted_Input_MEL.bam", "Sorted_Input_Ch12.bam")
-myQC &lt;- bplapply(bamsToQC, ChIPQCsample, annotation = "mm10", blacklist = toBlkList, 
+myQC &lt;- bplapply(bamsToQC, ChIPQCsample, annotation = "mm10", blacklist = toBlkList,
     chromosomes = paste0("chr", 1:10))
 names(myQC) &lt;- bamsToQC
 ```
@@ -365,7 +366,7 @@ We can include metadata as a data.frame where the first column is our sample nam
 
 
 ```r
-myMeta &lt;- data.frame(Sample = names(myQC), Tissue = c("Ch12", "Ch12", "MEL", "MEL", 
+myMeta &lt;- data.frame(Sample = names(myQC), Tissue = c("Ch12", "Ch12", "MEL", "MEL",
     "MEL", "Ch12"), Antibody = c(rep("Myc", 4), rep("Input", 2)))
 myMeta
 ```
@@ -401,7 +402,7 @@ All plots in ChIPQC are in fact built in ggplot2 so we can edit and update our p
 
 
 ```r
-plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody") + theme_bw() + 
+plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody") + theme_bw() +
     ggtitle("ChIPQC results")
 ```
 
@@ -680,7 +681,7 @@ GRanges objects are made of chromosome names and intervals stored as IRanges.
 
 ```r
 library(GenomicRanges)
-macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, 
+macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[,
     "start"], macsPeaks_DF[, "end"]))
 macsPeaks_GR
 ## GRanges object with 16757 ranges and 0 metadata columns:
@@ -883,18 +884,18 @@ The annotatePeak function accepts a GRanges object of the regions to annotate, a
 
 
 ```r
-peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene, 
+peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene,
     annoDb = "org.Mm.eg.db")
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2021-03-16 01:24:24 AM 
-## &gt;&gt; identifying nearest features...		 2021-03-16 01:24:25 AM 
-## &gt;&gt; calculating distance from peak to TSS...	 2021-03-16 01:24:26 AM 
-## &gt;&gt; assigning genomic annotation...		 2021-03-16 01:24:26 AM 
-## &gt;&gt; adding gene annotation...			 2021-03-16 01:24:45 AM 
-## &gt;&gt; assigning chromosome lengths			 2021-03-16 01:24:46 AM 
-## &gt;&gt; done...					 2021-03-16 01:24:46 AM
+## &gt;&gt; preparing features information...		 2021-07-29 06:22:47 PM 
+## &gt;&gt; identifying nearest features...		 2021-07-29 06:22:48 PM 
+## &gt;&gt; calculating distance from peak to TSS...	 2021-07-29 06:22:48 PM 
+## &gt;&gt; assigning genomic annotation...		 2021-07-29 06:22:48 PM 
+## &gt;&gt; adding gene annotation...			 2021-07-29 06:23:05 PM 
+## &gt;&gt; assigning chromosome lengths			 2021-07-29 06:23:06 PM 
+## &gt;&gt; done...					 2021-07-29 06:23:06 PM
 ```
 
 ```r
@@ -928,8 +929,8 @@ peakAnno
 ## 7         Other Exon  2.4891064
 ## 2         1st Intron 13.1319764
 ## 8       Other Intron 16.1284546
-## 6 Downstream (&lt;=300)  1.4803319
-## 5  Distal Intergenic 21.1842655
+## 6 Downstream (&lt;=300)  0.1969796
+## 5  Distal Intergenic 22.4676177
 ```
 
 ---
@@ -1026,6 +1027,9 @@ Exercise on ChIP-seq data can be found [here](../../exercises/exercises/chipseq_
 Answers can be found [here](../../exercises/answers/chipseq_part2_answers.html)
 
 R code for solutions can be found [here](../../exercises/answers/chipseq_part2_answers.R)
+
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

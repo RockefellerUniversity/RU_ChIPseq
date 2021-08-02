@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>ChIPseq_In_Bioconductor4.utf8</title>
+    <title>ChIPseq_In_Bioconductor4.knit</title>
     <meta charset="utf-8" />
     <meta name="author" content="Rockefeller University, Bioinformatics Resource Center" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
@@ -168,7 +169,7 @@ library(GenomicRanges)
 macsPeaks_GR &lt;- list()
 for (i in 1:length(macsPeaks_DF)) {
     peakDFtemp &lt;- macsPeaks_DF[[i]]
-    macsPeaks_GR[[i]] &lt;- GRanges(seqnames = peakDFtemp[, "chr"], IRanges(peakDFtemp[, 
+    macsPeaks_GR[[i]] &lt;- GRanges(seqnames = peakDFtemp[, "chr"], IRanges(peakDFtemp[,
         "start"], peakDFtemp[, "end"]))
 }
 macsPeaks_GR[[1]]
@@ -468,7 +469,7 @@ With our newly defined nonredundant peak set we can now identify from this set w
 
 
 ```r
-commonPeaks &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over% 
+commonPeaks &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over%
     Mel_2_Peaks]
 commonPeaks
 ```
@@ -507,9 +508,9 @@ Similarly we can identify which peaks are present only in one replicate.
 
 
 ```r
-mel1_Only &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; !allPeaksSet_nR %over% 
+mel1_Only &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; !allPeaksSet_nR %over%
     Mel_2_Peaks]
-mel2_Only &lt;- allPeaksSet_nR[!allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over% 
+mel2_Only &lt;- allPeaksSet_nR[!allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over%
     Mel_2_Peaks]
 length(mel1_Only)
 ```
@@ -656,7 +657,7 @@ Since logical matrix is equivalent to a 1 or 0  matrix (1 = TRUE and 0 = FALSE),
 
 
 ```r
-ch12_HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1", 
+ch12_HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1",
     "ch12_2")])) &gt;= 2]
 
 export.bed(ch12_HC_Peaks, "ch12_HC_Peaks.bed")
@@ -685,8 +686,8 @@ Similarly we can define peaks which are replicated in Ch12 but absent in Mel sam
 
 
 ```r
-ch12_HC_UniquePeaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, 
-    c("ch12_1", "ch12_2")])) &gt;= 2 &amp; rowSums(as.data.frame(mcols(allPeaksSet_nR)[, 
+ch12_HC_UniquePeaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[,
+    c("ch12_1", "ch12_2")])) &gt;= 2 &amp; rowSums(as.data.frame(mcols(allPeaksSet_nR)[,
     c("Mel_1", "Mel_2")])) == 0]
 export.bed(ch12_HC_UniquePeaks, "ch12_HC_UniquePeaks.bed")
 ch12_HC_UniquePeaks[1, ]
@@ -734,8 +735,8 @@ Here we identify peaks which occurred in both replicates in either Mel or Ch12 c
 
 
 ```r
-HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1", 
-    "ch12_2")])) &gt;= 2 | rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("Mel_1", 
+HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1",
+    "ch12_2")])) &gt;= 2 | rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("Mel_1",
     "Mel_2")])) &gt;= 2]
 HC_Peaks
 ```
@@ -791,7 +792,7 @@ As we have seen previously we can use the **BamFileList()** function to specify 
 ```r
 library(Rsamtools)
 
-bams &lt;- c("~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_1.bam", "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_2.bam", 
+bams &lt;- c("~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_1.bam", "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_2.bam",
     "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Mel_1.bam", "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Mel_2.bam")
 bamFL &lt;- BamFileList(bams, yieldSize = 5e+06)
 bamFL
@@ -858,7 +859,7 @@ Finally we provide the name of the column in our metadata data.frame within whic
 
 ```r
 library(DESeq2)
-deseqMyc &lt;- DESeqDataSetFromMatrix(countData = assay(myMycCounts), colData = metaDataFrame, 
+deseqMyc &lt;- DESeqDataSetFromMatrix(countData = assay(myMycCounts), colData = metaDataFrame,
     design = ~CellLine, rowRanges = HC_Peaks)
 ```
 
@@ -976,9 +977,9 @@ We can now filter our nonredundant peaks to those with significantly more signal
 
 ```r
 MelMinusCh12Filt &lt;- MelMinusCh12[!is.na(MelMinusCh12$pvalue) | !is.na(MelMinusCh12$padj)]
-UpinMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &gt; 
+UpinMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &gt;
     0]
-DowninMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &lt; 
+DowninMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &lt;
     0]
 export.bed(UpinMel, "UpinMel.bed")
 export.bed(DowninMel, "DowninMel.bed")
@@ -1028,6 +1029,7 @@ Answers can be found [here](../../exercises/answers/chipseq_part4_answers.html)
 &lt;!-- allPeaksSet_nR &lt;- reduce(allPeaksSet_Overlapping,with.revmap=TRUE) --&gt;
 &lt;!-- allPeaksSet_nR --&gt;
 &lt;!-- ``` --&gt;
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

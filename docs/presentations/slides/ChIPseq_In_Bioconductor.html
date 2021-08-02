@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>ChIPseq_In_Bioconductor.utf8</title>
+    <title>ChIPseq_In_Bioconductor.knit</title>
     <meta charset="utf-8" />
     <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre" />
+    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
@@ -296,7 +297,7 @@ AFreq &lt;- readSequences_AlpbyCycle["A", ]
 CFreq &lt;- readSequences_AlpbyCycle["C", ]
 GFreq &lt;- readSequences_AlpbyCycle["G", ]
 TFreq &lt;- readSequences_AlpbyCycle["T", ]
-toPlot &lt;- data.frame(Count = c(AFreq, CFreq, GFreq, TFreq), Cycle = rep(1:36, 4), 
+toPlot &lt;- data.frame(Count = c(AFreq, CFreq, GFreq, TFreq), Cycle = rep(1:36, 4),
     Base = rep(c("A", "C", "G", "T"), each = 36))
 ```
 
@@ -534,7 +535,7 @@ Luckily we did this for RNAseq, so hopefully you will already have a built index
 
 ```r
 library(Rsubread)
-buildindex("mm10_mainchrs", "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa", memory = 8000, 
+buildindex("mm10_mainchrs", "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa", memory = 8000,
     indexSplit = TRUE)
 ```
 
@@ -553,7 +554,7 @@ Note that here we set the phredOffset to be 64. Rsubread may get upset if we set
 
 
 ```r
-myMapped &lt;- align("mm10_mainchrs", "filtered_ENCFF001NQP.fastq.gz", output_format = "BAM", 
+myMapped &lt;- align("mm10_mainchrs", "filtered_ENCFF001NQP.fastq.gz", output_format = "BAM",
     output_file = "Myc_Mel_1.bam", type = "dna", phredOffset = 64, nthreads = 4)
 ```
 
@@ -593,7 +594,7 @@ We will need to uncompress our FASTQ then first. Here we use the **remove** is F
 library(R.utils)
 gunzip("filtered_ENCFF001NQP.fastq.gz", remove = FALSE)
 
-bowtie2(bt2Index = "BSgenome.Mmusculus.UCSC.mm10.mainChrs", samOutput = "ENCFF001NQP.sam", 
+bowtie2(bt2Index = "BSgenome.Mmusculus.UCSC.mm10.mainChrs", samOutput = "ENCFF001NQP.sam",
     seq1 = "filtered_ENCFF001NQP.fastq")
 ```
 
@@ -659,7 +660,7 @@ Now we have the index for the BAM file, we can retrieve and plot the number of m
 ```r
 mappedReads &lt;- idxstatsBam("SR_Myc_Mel_rep1.bam")
 TotalMapped &lt;- sum(mappedReads[, "mapped"])
-ggplot(mappedReads, aes(x = seqnames, y = mapped)) + geom_bar(stat = "identity") + 
+ggplot(mappedReads, aes(x = seqnames, y = mapped)) + geom_bar(stat = "identity") +
     coord_flip()
 ```
 
@@ -721,6 +722,8 @@ Exercise on ChIPseq data can be found [here](../../exercises/exercises/chipseq_p
 Answers can be found [here](../../exercises/answers/chipseq_part1_answers.html)
 
 R code for solutions can be found [here](../../exercises/answers/chipseq_part1_answers.R)
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

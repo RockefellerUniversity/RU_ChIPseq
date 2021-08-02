@@ -1,5 +1,5 @@
 ---
-title: "ChIPseq in Bioconductor exercises (part 2)"
+title: "ChIPseq in Bioconductor exercises (part 3)"
 author: "Rockefeller University, Bioinformatics Resource Centre"
 date: "https://rockefelleruniversity.github.io/RU_ChIPseq/"
 output: 
@@ -19,7 +19,7 @@ message(toMessage)
 
 ## ChIPseq functional annotation and motif identification.
 
-In this practical we will investigate the motifs and pathways associated with the Ebf1 transcription factor in proB-cells  and B-cells.
+In this practical we will investigate the motifs and pathways associated with the Ebf1 transcription factor in proB-cells and B-cells.
 
 * Pro-B-Cell Ebf1 data has been extracted from **GSM499030**.
 * B-Cell Ebf1 data has been extracted from **GSE35857**.
@@ -90,32 +90,32 @@ library(ggplot2)
 ggplot(forPlot,aes(x=Annotation,fill=Annotation))+geom_bar()+coord_flip()+theme_bw()+ggtitle("Simple distribution of B-cell Ebf1 binding sites")
 ```
 
-6. Perform a geneset enrichment test of genes with peaks in promoter against KEGG using goseq.
-*KEGG.db IS DEPRECATED IN THE MOST RECENT VERSIONS OF R*
+6. Perform a geneset enrichment test of genes with peaks in promoter against BP GO terms using clusterProfiler. Make a dotplot and an enrichment map of the results. Finally export the result. 
 ```{r instacxxsscsllBSdwced,echo=toMessage}
+library(clusterProfiler)
+library(org.Mm.eg.db)
+
 myAnnotation_TSS <- myAnnotation[
   myAnnotation$annotation == "Promoter",]
 genesWithPeakInTSS <- unique(myAnnotation_TSS$geneId)
+
 allGeneGR <- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
 allGeneIDs <- allGeneGR$gene_id
-allGenesForGOseq <- as.integer(allGeneIDs %in% genesWithPeakInTSS)
-names(allGenesForGOseq) <- allGeneIDs
-library(goseq)
-pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 
-Kegg_Ebf1Peaks <- goseq(pwf,"mm10","knownGene",
-                       test.cats=c("KEGG"),
-                       method="Hypergeometric")
-```
-```{r,echo=toMessage, eval=F}
-library(KEGG.db)
-xx <- as.list(KEGGPATHID2NAME)
-idtoName <- cbind(names(xx),unlist(xx))
-idtoName[1:5,]
-KeggN_Ebf1Peaks <- merge(idtoName,Kegg_Ebf1Peaks,by=1,all=TRUE)
-orderByP <- order(KeggN_Ebf1Peaks$over_represented_pvalue)
-KeggN_Ebf1Peaks <- KeggN_Ebf1Peaks[orderByP,]
-KeggN_Ebf1Peaks[1:5,]
+GO_result <- enrichGO(gene = genesWithPeakInTSS, 
+                      universe = allGeneIDs,
+                      OrgDb = org.Mm.eg.db,
+                      ont = "BP")
+
+dotplot(GO_result)
+
+library(enrichplot)
+GO_result_plot <- pairwise_termsim(GO_result)
+emapplot(GO_result_plot, showCategory = 20, cex_label_category=0.5 )+ theme(text = element_text(size = 10)) 
+
+
+write.csv(as.data.frame(GO_result), "ebf1_B_vs_ebf1_proB_diff_promoter_peaks_GOterm.csv")
+
 ```
 
 7. Identify Ebf1 peaks only in Bcells and Ebf1 peaks only in proB cells.

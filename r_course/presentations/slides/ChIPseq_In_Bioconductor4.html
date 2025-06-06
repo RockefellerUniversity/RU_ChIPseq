@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>ChIPseq_In_Bioconductor4.knit</title>
+    <title>ChIPseq In Bioconductor (part4)    </title>
     <meta charset="utf-8" />
     <meta name="author" content="Rockefeller University, Bioinformatics Resource Center" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
@@ -13,15 +13,19 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# ChIPseq In Bioconductor (part4)
-<html>
-<div style="float:left">
-
-</div>
-<hr color='#EB811B' size=1px width=796px>
+.title[
+# ChIPseq In Bioconductor (part4)<br />
+<html><br />
+<br />
+<hr color='#EB811B' size=1px width=796px><br />
 </html>
+]
+.author[
 ### Rockefeller University, Bioinformatics Resource Center
+]
+.date[
 ### <a href="http://rockefelleruniversity.github.io/RU_ChIPseq/" class="uri">http://rockefelleruniversity.github.io/RU_ChIPseq/</a>
+]
 
 ---
 
@@ -124,7 +128,7 @@ First we need to read our peak calls from MACS2 into R.
 The Myc peak calls we will review are within the peaks directory, so here we list all files matching our expected file pattern using the **dir() function.**
 
 
-```r
+``` r
 peakFiles &lt;- dir("data/peaks/", pattern = "*.peaks", full.names = TRUE)
 peakFiles
 ```
@@ -142,7 +146,7 @@ We can loop through our tab separated files (disguised as *.xls* functions) and 
 
 
 
-```r
+``` r
 macsPeaks_DF &lt;- list()
 for (i in 1:length(peakFiles)) {
     macsPeaks_DF[[i]] &lt;- read.delim(peakFiles[i], comment.char = "#")
@@ -164,13 +168,13 @@ Remember you can also do this with the [import function from rtracklayer](https:
 
 
 
-```r
+``` r
 library(GenomicRanges)
 macsPeaks_GR &lt;- list()
 for (i in 1:length(macsPeaks_DF)) {
     peakDFtemp &lt;- macsPeaks_DF[[i]]
-    macsPeaks_GR[[i]] &lt;- GRanges(seqnames = peakDFtemp[, "chr"], IRanges(peakDFtemp[,
-        "start"], peakDFtemp[, "end"]))
+    macsPeaks_GR[[i]] &lt;- GRanges(seqnames = peakDFtemp[, "chr"], IRanges(peakDFtemp[, "start"],
+        peakDFtemp[, "end"]))
 }
 macsPeaks_GR[[1]]
 ```
@@ -208,7 +212,7 @@ The **gsub()** function accepts the text to replace, the replacement text and a 
 
 
 
-```r
+``` r
 fileNames &lt;- basename(peakFiles)
 fileNames
 ```
@@ -217,7 +221,7 @@ fileNames
 ## [1] "ch12_1_peaks.xls" "ch12_2_peaks.xls" "Mel_1_peaks.xls"  "Mel_2_peaks.xls"
 ```
 
-```r
+``` r
 sampleNames &lt;- gsub("_peaks.xls", "", fileNames)
 sampleNames
 ```
@@ -234,7 +238,7 @@ Now we have a named list of our peak calls as **GRanges** objects.
 We can convert our list of **GRanges** objects to a **GRangesList** using the **GRangesList()** function.
 
 
-```r
+``` r
 macsPeaks_GRL &lt;- GRangesList(macsPeaks_GR)
 names(macsPeaks_GRL) &lt;- sampleNames
 class(macsPeaks_GRL)
@@ -246,7 +250,7 @@ class(macsPeaks_GRL)
 ## [1] "GenomicRanges"
 ```
 
-```r
+``` r
 names(macsPeaks_GRL)
 ```
 
@@ -260,7 +264,7 @@ names(macsPeaks_GRL)
 The GRangesList object can behave just as our standard lists. Here we use the **lengths()** function to a get the number of peaks in each replicate.
 
 
-```r
+``` r
 lengths(macsPeaks_GRL)
 ```
 
@@ -278,7 +282,7 @@ A major advantage of **GRangesList** objects is that we can apply many of the **
 This means there is no need to lapply and convert back to **GRangesList** if we wish to alter our **GRanges** by a common method.
 
 
-```r
+``` r
 library(rtracklayer)
 macsPeaks_GRLCentred &lt;- resize(macsPeaks_GRL, 10, fix = "center")
 width(macsPeaks_GRLCentred)
@@ -286,10 +290,10 @@ width(macsPeaks_GRLCentred)
 
 ```
 ## IntegerList of length 4
-## [["ch12_1"]] 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10
-## [["ch12_2"]] 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10
-## [["Mel_1"]] 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10
-## [["Mel_2"]] 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10
+## [["ch12_1"]] 10 10 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10 10 10
+## [["ch12_2"]] 10 10 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10 10 10
+## [["Mel_1"]] 10 10 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10 10 10
+## [["Mel_2"]] 10 10 10 10 10 10 10 10 10 10 10 10 10 ... 10 10 10 10 10 10 10 10 10 10 10 10
 ```
 
 ---
@@ -298,7 +302,7 @@ width(macsPeaks_GRLCentred)
 Now we have our GRangesList we can extract the peak calls for the Mel replicates.
 
 
-```r
+``` r
 Mel_1_Peaks &lt;- macsPeaks_GRL$Mel_1
 Mel_2_Peaks &lt;- macsPeaks_GRL$Mel_2
 length(Mel_1_Peaks)
@@ -308,7 +312,7 @@ length(Mel_1_Peaks)
 ## [1] 13777
 ```
 
-```r
+``` r
 length(Mel_2_Peaks)
 ```
 
@@ -323,7 +327,7 @@ length(Mel_2_Peaks)
 We can extract peak calls unique to replicate 1 or 2 using the **%over%** operator.
 
 
-```r
+``` r
 Mel_1_Unique &lt;- Mel_1_Peaks[!Mel_1_Peaks %over% Mel_2_Peaks]
 Mel_2_Unique &lt;- Mel_2_Peaks[!Mel_2_Peaks %over% Mel_1_Peaks]
 length(Mel_1_Unique)
@@ -333,7 +337,7 @@ length(Mel_1_Unique)
 ## [1] 4668
 ```
 
-```r
+``` r
 length(Mel_2_Unique)
 ```
 
@@ -341,7 +345,7 @@ length(Mel_2_Unique)
 ## [1] 4263
 ```
 
-```r
+``` r
 export.bed(Mel_1_Unique, "Mel_1_Unique.bed")
 export.bed(Mel_2_Unique, "Mel_2_Unique.bed")
 ```
@@ -360,7 +364,7 @@ Similarly we can extract peak calls common to replicate 1 or 2.
 The numbers in common however differ. This is because 2 peak calls in one sample can overlap 1 peak call in the other replicate.
 
 
-```r
+``` r
 Mel_1_Common &lt;- Mel_1_Peaks[Mel_1_Peaks %over% Mel_2_Peaks]
 Mel_2_Common &lt;- Mel_2_Peaks[Mel_2_Peaks %over% Mel_1_Peaks]
 length(Mel_1_Common)
@@ -370,7 +374,7 @@ length(Mel_1_Common)
 ## [1] 9109
 ```
 
-```r
+``` r
 length(Mel_2_Common)
 ```
 
@@ -378,7 +382,7 @@ length(Mel_2_Common)
 ## [1] 9249
 ```
 
-```r
+``` r
 export.bed(Mel_1_Common, "Mel_1_Common.bed")
 export.bed(Mel_2_Common, "Mel_2_Common.bed")
 ```
@@ -400,7 +404,7 @@ To address this problem, a common operation in ChIPseq is to define a nonredunda
 To do this we first pool all our peaks across all replicates, here Mel and Ch12, into one set of redundant, overlapping peaks.
 
 
-```r
+``` r
 allPeaksSet_Overlapping &lt;- unlist(macsPeaks_GRL)
 allPeaksSet_Overlapping
 ```
@@ -430,7 +434,7 @@ allPeaksSet_Overlapping
 We can then use the **reduce()** function to collapse our peaks into nonredundant, distinct peaks representing peaks present in any sample.
 
 
-```r
+``` r
 allPeaksSet_nR &lt;- reduce(allPeaksSet_Overlapping)
 allPeaksSet_nR
 ```
@@ -454,7 +458,7 @@ allPeaksSet_nR
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
 
-```r
+``` r
 export.bed(allPeaksSet_nR, "allPeaksSet_nR.bed")
 ```
 
@@ -468,9 +472,8 @@ export.bed(allPeaksSet_nR, "allPeaksSet_nR.bed")
 With our newly defined nonredundant peak set we can now identify from this set which peaks were present in both our replicates using the **%over%** operator and a logical expression.
 
 
-```r
-commonPeaks &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over%
-    Mel_2_Peaks]
+``` r
+commonPeaks &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over% Mel_2_Peaks]
 commonPeaks
 ```
 
@@ -493,7 +496,7 @@ commonPeaks
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
 
-```r
+``` r
 export.bed(commonPeaks, "commonPeaks.bed")
 ```
 
@@ -507,11 +510,9 @@ export.bed(commonPeaks, "commonPeaks.bed")
 Similarly we can identify which peaks are present only in one replicate.
 
 
-```r
-mel1_Only &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; !allPeaksSet_nR %over%
-    Mel_2_Peaks]
-mel2_Only &lt;- allPeaksSet_nR[!allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over%
-    Mel_2_Peaks]
+``` r
+mel1_Only &lt;- allPeaksSet_nR[allPeaksSet_nR %over% Mel_1_Peaks &amp; !allPeaksSet_nR %over% Mel_2_Peaks]
+mel2_Only &lt;- allPeaksSet_nR[!allPeaksSet_nR %over% Mel_1_Peaks &amp; allPeaksSet_nR %over% Mel_2_Peaks]
 length(mel1_Only)
 ```
 
@@ -519,7 +520,7 @@ length(mel1_Only)
 ## [1] 4445
 ```
 
-```r
+``` r
 length(mel2_Only)
 ```
 
@@ -527,7 +528,7 @@ length(mel2_Only)
 ## [1] 4185
 ```
 
-```r
+``` r
 export.bed(mel1_Only, "mel1_Only.bed")
 export.bed(mel2_Only, "mel2_Only.bed")
 ```
@@ -544,7 +545,7 @@ When working with larger numbers of peaks we will often define a logical matrix 
 First then we use a loop to generate a logical vector for the occurence of nonredundant peaks in each sample.
 
 
-```r
+``` r
 overlap &lt;- list()
 for (i in 1:length(macsPeaks_GRL)) {
     overlap[[i]] &lt;- allPeaksSet_nR %over% macsPeaks_GRL[[i]]
@@ -562,7 +563,7 @@ overlap[[1]][1:2]
 We can now use to **do.call** and **cbind** function to column bind our list of overlaps into our matrix of peak occurrence.
 
 
-```r
+``` r
 overlapMatrix &lt;- do.call(cbind, overlap)
 colnames(overlapMatrix) &lt;- names(macsPeaks_GRL)
 overlapMatrix[1:2, ]
@@ -582,7 +583,7 @@ We can add the matrix back into the metadata columns of our **GRanges()** of non
 Now we have our nonredundant peaks and the occurence of these peaks in every sample we can easily identify peaks unique or common to replicates and conditions/cell lines.
 
 
-```r
+``` r
 mcols(allPeaksSet_nR) &lt;- overlapMatrix
 allPeaksSet_nR[1:2, ]
 ```
@@ -606,7 +607,7 @@ One very useful function is the **vennDiagram** function which allows us to plot
 
 
 
-```r
+``` r
 library(limma)
 vennDiagram(mcols(allPeaksSet_nR))
 ```
@@ -619,7 +620,7 @@ vennDiagram(mcols(allPeaksSet_nR))
 The **limma** package's **vennCounts** function allows us to retrieve the counts displayed in the Venn diagram as a data.frame.
 
 
-```r
+``` r
 vennCounts(mcols(allPeaksSet_nR))
 ```
 
@@ -656,9 +657,9 @@ Since logical matrix is equivalent to a 1 or 0  matrix (1 = TRUE and 0 = FALSE),
 
 
 
-```r
-ch12_HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1",
-    "ch12_2")])) &gt;= 2]
+``` r
+ch12_HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1", "ch12_2")])) &gt;=
+    2]
 
 export.bed(ch12_HC_Peaks, "ch12_HC_Peaks.bed")
 
@@ -685,10 +686,10 @@ ch12_HC_Peaks[1:2, ]
 Similarly we can define peaks which are replicated in Ch12 but absent in Mel samples.
 
 
-```r
-ch12_HC_UniquePeaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[,
-    c("ch12_1", "ch12_2")])) &gt;= 2 &amp; rowSums(as.data.frame(mcols(allPeaksSet_nR)[,
-    c("Mel_1", "Mel_2")])) == 0]
+``` r
+ch12_HC_UniquePeaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1",
+    "ch12_2")])) &gt;= 2 &amp; rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("Mel_1", "Mel_2")])) ==
+    0]
 export.bed(ch12_HC_UniquePeaks, "ch12_HC_UniquePeaks.bed")
 ch12_HC_UniquePeaks[1, ]
 ```
@@ -734,46 +735,32 @@ An established technique is to produce a set of nonredundant peaks which occur i
 Here we identify peaks which occurred in both replicates in either Mel or Ch12 cell lines.
 
 
-```r
-HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1",
-    "ch12_2")])) &gt;= 2 | rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("Mel_1",
-    "Mel_2")])) &gt;= 2]
+``` r
+HC_Peaks &lt;- allPeaksSet_nR[rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("ch12_1", "ch12_2")])) &gt;=
+    2 | rowSums(as.data.frame(mcols(allPeaksSet_nR)[, c("Mel_1", "Mel_2")])) &gt;= 2]
 HC_Peaks
 ```
 
 ```
 ## GRanges object with 16930 ranges and 4 metadata columns:
-##           seqnames            ranges strand |    ch12_1    ch12_2     Mel_1
-##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;logical&gt; &lt;logical&gt; &lt;logical&gt;
-##       [1]     chr1   4671488-4671836      * |      TRUE      TRUE     FALSE
-##       [2]     chr1   4785341-4785781      * |      TRUE      TRUE      TRUE
-##       [3]     chr1   5283217-5283439      * |      TRUE      TRUE     FALSE
-##       [4]     chr1   6262317-6262572      * |      TRUE      TRUE     FALSE
-##       [5]     chr1   6406474-6406849      * |      TRUE      TRUE     FALSE
-##       ...      ...               ...    ... .       ...       ...       ...
-##   [16926]     chrY 90739739-90740228      * |      TRUE      TRUE     FALSE
-##   [16927]     chrY 90740354-90740695      * |      TRUE      TRUE     FALSE
-##   [16928]     chrY 90741011-90741723      * |      TRUE      TRUE     FALSE
-##   [16929]     chrY 90741934-90743197      * |      TRUE      TRUE     FALSE
-##   [16930]     chrY 90825195-90825796      * |      TRUE      TRUE     FALSE
-##               Mel_2
-##           &lt;logical&gt;
-##       [1]     FALSE
-##       [2]      TRUE
-##       [3]     FALSE
-##       [4]     FALSE
-##       [5]     FALSE
-##       ...       ...
-##   [16926]     FALSE
-##   [16927]     FALSE
-##   [16928]     FALSE
-##   [16929]     FALSE
-##   [16930]     FALSE
+##           seqnames            ranges strand |    ch12_1    ch12_2     Mel_1     Mel_2
+##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;logical&gt; &lt;logical&gt; &lt;logical&gt; &lt;logical&gt;
+##       [1]     chr1   4671488-4671836      * |      TRUE      TRUE     FALSE     FALSE
+##       [2]     chr1   4785341-4785781      * |      TRUE      TRUE      TRUE      TRUE
+##       [3]     chr1   5283217-5283439      * |      TRUE      TRUE     FALSE     FALSE
+##       [4]     chr1   6262317-6262572      * |      TRUE      TRUE     FALSE     FALSE
+##       [5]     chr1   6406474-6406849      * |      TRUE      TRUE     FALSE     FALSE
+##       ...      ...               ...    ... .       ...       ...       ...       ...
+##   [16926]     chrY 90739739-90740228      * |      TRUE      TRUE     FALSE     FALSE
+##   [16927]     chrY 90740354-90740695      * |      TRUE      TRUE     FALSE     FALSE
+##   [16928]     chrY 90741011-90741723      * |      TRUE      TRUE     FALSE     FALSE
+##   [16929]     chrY 90741934-90743197      * |      TRUE      TRUE     FALSE     FALSE
+##   [16930]     chrY 90825195-90825796      * |      TRUE      TRUE     FALSE     FALSE
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
 
-```r
+``` r
 export.bed(HC_Peaks, "HC_Peaks.bed")
 ```
 
@@ -789,7 +776,7 @@ We will count from our aligned BAM files to quantify IP fragments.
 As we have seen previously we can use the **BamFileList()** function to specify which BAMs to count and importantly, to control memory we specify the number of reads to be held in memory at one time using the **yield()** parameter.
 
 
-```r
+``` r
 library(Rsamtools)
 
 bams &lt;- c("~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_1.bam", "~/Projects/Results/chipseq/testRun/BAMs/Sorted_Myc_Ch12_2.bam",
@@ -807,7 +794,7 @@ We can count the number of fragments overlapping our peaks using the **summarize
 The returned object is a familiar **RangedSummarizedExperiment** containing our GRanges of nonredundant peaks and the counts in these regions for our BAM files.
 
 
-```r
+``` r
 library(GenomicAlignments)
 myMycCounts &lt;- summarizeOverlaps(HC_Peaks, reads = bamFL, ignore.strand = TRUE)
 class(myMycCounts)
@@ -833,7 +820,7 @@ The DESeq2 package contains a workflow for assessing local changes in fragment/r
 To make use of DESeq2 workflow we must first create a data.frame of conditions of interest with rownames set as our BAM file names.
 
 
-```r
+``` r
 metaDataFrame &lt;- data.frame(CellLine = c("Ch12", "Ch12", "Mel", "Mel"))
 rownames(metaDataFrame) &lt;- colnames(myMycCounts)
 metaDataFrame
@@ -857,10 +844,10 @@ We must provide our matrix of counts to **countData** parameter, our metadata da
 Finally we provide the name of the column in our metadata data.frame within which we wish to test to the **design** parameter.
 
 
-```r
+``` r
 library(DESeq2)
-deseqMyc &lt;- DESeqDataSetFromMatrix(countData = assay(myMycCounts), colData = metaDataFrame,
-    design = ~CellLine, rowRanges = HC_Peaks)
+deseqMyc &lt;- DESeqDataSetFromMatrix(countData = assay(myMycCounts), colData = metaDataFrame, design = ~CellLine,
+    rowRanges = HC_Peaks)
 ```
 
 ---
@@ -869,7 +856,7 @@ deseqMyc &lt;- DESeqDataSetFromMatrix(countData = assay(myMycCounts), colData = 
 We can now run the DESeq2 workflow on our **DESeq2** object using the **DESeq()** function.
 
 
-```r
+``` r
 deseqMyc &lt;- DESeq(deseqMyc)
 ```
 
@@ -903,7 +890,7 @@ deseqMyc &lt;- DESeq(deseqMyc)
 Our **DESeq2** object is updated to include useful statistics such our normalised values and variance of signal within each nonredundant peak call.
 
 
-```r
+``` r
 deseqMyc
 ```
 
@@ -914,8 +901,8 @@ deseqMyc
 ## assays(4): counts mu H cooks
 ## rownames: NULL
 ## rowData names(26): ch12_1 ch12_2 ... deviance maxCooks
-## colnames(4): Sorted_Myc_Ch12_1.bam Sorted_Myc_Ch12_2.bam
-##   Sorted_Myc_Mel_1.bam Sorted_Myc_Mel_2.bam
+## colnames(4): Sorted_Myc_Ch12_1.bam Sorted_Myc_Ch12_2.bam Sorted_Myc_Mel_1.bam
+##   Sorted_Myc_Mel_2.bam
 ## colData names(2): CellLine sizeFactor
 ```
 ---
@@ -931,7 +918,7 @@ We can sort the results by pvalue using the **order()** function to rank by the 
 
 
 
-```r
+``` r
 MelMinusCh12 &lt;- results(deseqMyc, contrast = c("CellLine", "Mel", "Ch12"), format = "GRanges")
 MelMinusCh12 &lt;- MelMinusCh12[order(MelMinusCh12$pvalue), ]
 class(MelMinusCh12)
@@ -951,18 +938,18 @@ The GRanges object contains information on the comparison made in DESeq2.
 Most useful it contains the the difference in IP signal as log2 fold change in **log2FoldChange**, the significance of the change in the **pvalue** column and an adjusted p-value to address multiple correction in **padj** column.
 
 
-```r
+``` r
 MelMinusCh12[1, ]
 ```
 
 ```
 ## GRanges object with 1 range and 6 metadata columns:
-##       seqnames            ranges strand |  baseMean log2FoldChange     lfcSE
-##          &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt;
-##   [1]     chr4 45953273-45954170      * |   613.942        6.09357  0.297353
-##            stat      pvalue        padj
-##       &lt;numeric&gt;   &lt;numeric&gt;   &lt;numeric&gt;
-##   [1]   20.4927 2.50058e-93 4.23348e-89
+##       seqnames            ranges strand |  baseMean log2FoldChange     lfcSE      stat
+##          &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+##   [1]     chr4 45953273-45954170      * |   613.942        6.09357  0.297353   20.4927
+##            pvalue        padj
+##         &lt;numeric&gt;   &lt;numeric&gt;
+##   [1] 2.50058e-93 4.23348e-89
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
@@ -975,12 +962,10 @@ We can now filter our nonredundant peaks to those with significantly more signal
 
 
 
-```r
+``` r
 MelMinusCh12Filt &lt;- MelMinusCh12[!is.na(MelMinusCh12$pvalue) | !is.na(MelMinusCh12$padj)]
-UpinMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &gt;
-    0]
-DowninMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &lt;
-    0]
+UpinMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &gt; 0]
+DowninMel &lt;- MelMinusCh12[MelMinusCh12$padj &lt; 0.05 &amp; MelMinusCh12$log2FoldChange &lt; 0]
 export.bed(UpinMel, "UpinMel.bed")
 export.bed(DowninMel, "DowninMel.bed")
 ```
@@ -1001,7 +986,7 @@ The **tracktables** package's **makebedtable()** function accepts a **GRanges** 
 An example can be found [here](../../data/MelMinusCh12.html)
 
 
-```r
+``` r
 library(tracktables)
 myReport &lt;- makebedtable(MelMinusCh12Filt, "MelMinusCh12.html", basedirectory = getwd())
 
@@ -1077,6 +1062,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

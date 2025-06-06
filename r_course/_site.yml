@@ -38,6 +38,14 @@ navbar:
         href: presentations/singlepage/ChIPseq_In_Bioconductor4.html
       - text: Code
         href: presentations/r_code/ChIPseq_In_Bioconductor4.R
+    - text: Session5
+      menu:
+      - text: Slide
+        href: presentations/slides/CutAndRun_In_Bioconductor.html
+      - text: Single Page
+        href: presentations/singlepage/CutAndRun_In_Bioconductor.html
+      - text: Code
+        href: presentations/r_code/CutAndRun_In_Bioconductor.R
   - text: Exercises
     menu:
     - text: chipseq_part1
@@ -66,7 +74,7 @@ navbar:
         href: exercises/answers/chipseq_part4_answers.html
   right:
   - text: Getting help!
-    href: https://github.com//RockefellerUniversity/RU_ChIPseq/issues
+    href: []
   - href: https://twitter.com/Rockefeller_BRC
     icon: ion-social-twitter
 output:

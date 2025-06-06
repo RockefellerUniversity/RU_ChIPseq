@@ -42,7 +42,7 @@ if(params$isSlides == "yes"){
 
 ## ----setwd_introtoR,eval=F----------------------------------------------------------------
 ## setwd("/PathToMyDownload/RU_Course_template/r_course")
-## # e.g. setwd("~/Downloads/Intro_To_R_1Day/r_course")
+## # e.g. setwd("~/Downloads/RU_ChIPseq/r_course")
 
 
 ## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
@@ -130,18 +130,6 @@ readIDs <- id(fastq)
 readSequences
 
 
-## ----mycRep1ReadsQScores------------------------------------------------------------------
-readQuality <- quality(fastq)
-readQualities <- alphabetScore(readQuality)
-readQualities[1:10]
-
-
-## ----mycRep1ReadsQScoresPlot--------------------------------------------------------------
-library(ggplot2)
-toPlot <- data.frame(ReadQ=readQualities)
-ggplot(toPlot,aes(x=ReadQ))+geom_histogram()+theme_minimal()
-
-
 ## ----mycRep1ReadsAlpFreq------------------------------------------------------------------
 readSequences <- sread(fastq)
 readSequences_AlpFreq <- alphabetFrequency(readSequences)
@@ -179,6 +167,18 @@ toPlot <- data.frame(Count=c(AFreq,CFreq,GFreq,TFreq),
 
 ggplot(toPlot,aes(y=Count,x=Cycle,colour=Base)) + geom_line() + ylim(150000,400000) +
   theme_bw()
+
+
+## ----mycRep1ReadsQScores------------------------------------------------------------------
+readQuality <- quality(fastq)
+readQualities <- alphabetScore(readQuality)
+readQualities[1:10]
+
+
+## ----mycRep1ReadsQScoresPlot--------------------------------------------------------------
+library(ggplot2)
+toPlot <- data.frame(ReadQ=readQualities)
+ggplot(toPlot,aes(x=ReadQ))+geom_histogram()+theme_minimal()
 
 
 ## ----mycRep1ReadsQByCycle,cache=TRUE,dependson="mycRep1ReadsAlpFreq"----------------------

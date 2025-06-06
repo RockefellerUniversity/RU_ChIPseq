@@ -1,34 +1,30 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>Cut-And-Run</title>
+    <title>Cut and Run    </title>
     <meta charset="utf-8" />
-    <meta name="author" content="http://rockefelleruniversity.github.io/ATAC.Cut-Run.ChIP/" />
-    <meta name="author" content="brc@rockefeller.edu" />
+    <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre" />
     <script src="libs/header-attrs-2.27/header-attrs.js"></script>
-    <link rel="stylesheet" href="default.css" type="text/css" />
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
   </head>
   <body>
     <textarea id="source">
-class: middle, inverse, title-slide
+class: center, middle, inverse, title-slide
 
 .title[
-# Cut-And-Run
-]
-.subtitle[
-## <html><br />
+# Cut and Run<br />
+<html><br />
 <br />
 <hr color='#EB811B' size=1px width=796px><br />
-</html><br />
-Bioinformatics Resource Center - Rockefeller University
+</html>
 ]
 .author[
-### <a href="http://rockefelleruniversity.github.io/ATAC.Cut-Run.ChIP/" class="uri">http://rockefelleruniversity.github.io/ATAC.Cut-Run.ChIP/</a>
+### Rockefeller University, Bioinformatics Resource Centre
 ]
-.author[
-### <a href="mailto:brc@rockefeller.edu" class="email">brc@rockefeller.edu</a>
+.date[
+### <a href="http://rockefelleruniversity.github.io/RU_ChIPseq/" class="uri">http://rockefelleruniversity.github.io/RU_ChIPseq/</a>
 ]
 
 ---
@@ -40,12 +36,9 @@ Bioinformatics Resource Center - Rockefeller University
 
 ## Overview
 
-??We often put an overview slide that links to the various parts of the course content to make it easy to navigate i.e. this one for intro to r??
-
-- [Set up](https://rockefelleruniversity.github.io/Intro_To_R_1Day/r_course/presentations/singlepage/introToR_Session1.html#set-up)
-- [Background to R](https://rockefelleruniversity.github.io/Intro_To_R_1Day/r_course/presentations/singlepage/introToR_Session1.html#background-to-r)
-- [Data types in R](https://rockefelleruniversity.github.io/Intro_To_R_1Day/r_course/presentations/singlepage/introToR_Session1.html#data_types_in_r)
-- [Reading and writing in R](https://rockefelleruniversity.github.io/Intro_To_R_1Day/r_course/presentations/singlepage/introToR_Session1.html#reading-and-writing-data-in-r)
+- [Set up](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/singlepage/CutAndRun_In_Bioconductor.html#set-up)
+- [Epigenomic Approaches](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/singlepage/CutAndRun_In_Bioconductor.html#epigenomic-approaches)
+- [Fastq QC](https://rockefelleruniversity.github.io/RU_ChIPseq/presentations/singlepage/CutAndRun_In_Bioconductor.html#fastq-qc)
 
 ---
 class: inverse, center, middle
@@ -58,24 +51,19 @@ class: inverse, center, middle
 
 ## Materials
 
-??We try to denote each major section of content with these title slides (see above for set up). The hierarchy will help with the different versions of the teaching content i.e. slides and single page.??
-
-?? Materials just gives the links to download the package Just ensure links are up to date??
 
 All prerequisites, links to material and slides for this course can be found on github.
 
-* [CutAndRun](https://rockefelleruniversity.github.io/Intro_To_R_1Day/)
+* [CutAndRun](https://rockefelleruniversity.github.io/RU_ChIPseq/)
 
 Or can be downloaded as a zip archive from here.
 
-* [Download zip](https://github.com/rockefelleruniversity/Intro_To_R_1Day/zipball/master)
+* [Download zip](https://github.com/rockefelleruniversity/RU_ChIPseq/zipball/master)
 
 
 
 ---
 ## Course materials
-
-?? this slide just shows where thye can get the course content from the download. You do not need to populate these directories. It will be made during compilation??
 
 Once the zip file in unarchived. All presentations as HTML slides and pages, their R code and HTML practical sheets will be available in the directories underneath.
 
@@ -107,7 +95,7 @@ or in the console.
 
 ``` r
 setwd("/PathToMyDownload/RU_Course_template/r_course")
-# e.g. setwd('~/Downloads/Intro_To_R_1Day/r_course')
+# e.g. setwd('~/Downloads/RU_ChIPseq/r_course')
 ```
 
 
@@ -315,45 +303,7 @@ readSequences
 ```
 
 ---
-## Quality with raw CUTandRun data
 
-We can check some simple quality metrics for our subsampled FASTQ data.
-
-First, we can review the overall reads' quality scores.
-
-We use the [**alphabetScore()** function with our read's qualitys](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#28) to retrieve the sum quality for every read from our subsample.
-
-
-``` r
-readQuality &lt;- quality(fastq)
-readQualities &lt;- alphabetScore(readQuality)
-readQualities[1:10]
-```
-
-```
-##  [1] 1200 1200 1200 1200 1200 1200 1200 1200 1200 1200
-```
-
----
-## Quality with raw CUTandRun data
-
-We can then produce a histogram of quality scores to get a better understanding of the distribution of scores.
-
-
-``` r
-library(ggplot2)
-toPlot &lt;- data.frame(ReadQ = readQualities)
-ggplot(toPlot, aes(x = ReadQ)) + geom_histogram() + theme_minimal()
-```
-
-```
-## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
-```
-
-![](CutAndRun_In_Bioconductor_files/figure-html/mycRep1ReadsQScoresPlot-1.png)&lt;!-- --&gt;
-
-
----
 
 ## Base frequency with raw CUTandRun data
 
@@ -450,6 +400,45 @@ ggplot(toPlot, aes(y = Count, x = Cycle, colour = Base)) + geom_line() + ylim(15
 ![](CutAndRun_In_Bioconductor_files/figure-html/mycRep1ReadsAlpByCyclePlot3-1.png)&lt;!-- --&gt;
 
 ---
+
+## Quality with raw CUTandRun data
+
+We can check some simple quality metrics for our subsampled FASTQ data.
+
+First, we can review the overall reads' quality scores.
+
+We use the [**alphabetScore()** function with our read's qualitys](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#28) to retrieve the sum quality for every read from our subsample.
+
+
+``` r
+readQuality &lt;- quality(fastq)
+readQualities &lt;- alphabetScore(readQuality)
+readQualities[1:10]
+```
+
+```
+##  [1] 1200 1200 1200 1200 1200 1200 1200 1200 1200 1200
+```
+
+---
+## Quality with raw CUTandRun data
+
+We can then produce a histogram of quality scores to get a better understanding of the distribution of scores.
+
+
+``` r
+library(ggplot2)
+toPlot &lt;- data.frame(ReadQ = readQualities)
+ggplot(toPlot, aes(x = ReadQ)) + geom_histogram() + theme_minimal()
+```
+
+```
+## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+
+![](CutAndRun_In_Bioconductor_files/figure-html/mycRep1ReadsQScoresPlot-1.png)&lt;!-- --&gt;
+
+---
 ## Assess by cycle with raw CUTandRun data
 
 We can also assess mean read quality over cycles. This will allow us to identify whether there are any issues with quality dropping off over time.
@@ -488,12 +477,11 @@ boxplot(qualAsMatrix[1:1000, ])
 ![](CutAndRun_In_Bioconductor_files/figure-html/mycRep1ReadsQByCyclePlot-1.png)&lt;!-- --&gt;
 
 ---
+## Quality Assessment
 
-## Assess by cycle with raw CUTandRun data
+In this case the distribution of reads quality scores is a little strange. Normally we see a wider range of scores. This is likely due to some kind of loss of information during some transfer/conversion. 
 
-In this case the distribution of reads quality scores and read qualities over time look okay. We will often want to access FASTQ samples together to see if any samples stick out by these metrics.
-
-Here we observed a second population of low quality scores so will remove some reads with low quality scores and high unknown bases.
+For a more in-detail review of working with fastqs in R you can check [here](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/singlepage/FastQInBioconductor.html). This also includes how to run filters on the data based on quality. 
 
 
 
@@ -790,10 +778,12 @@ export.bw(forBigWig, con = "SOX9CNR_W6_rep1_weighted.bw")
 ---
 # BAM and bigWig
 
-![](imgs/chipBw.png)
-
+&lt;div align="center"&gt;
+&lt;img src="imgs/chipBw.png" alt="igv" height="400" width="600"&gt;
+&lt;/div&gt;
 
 ---
+
 class: inverse, center, middle
 
 # Post alignment processing - CUT&amp;RUN

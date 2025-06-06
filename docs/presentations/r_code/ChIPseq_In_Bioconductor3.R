@@ -1,7 +1,7 @@
 params <-
 list(isSlides = "no")
 
-## ----include=FALSE------------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------------------
 suppressPackageStartupMessages(require(knitr))
 library(TFBSTools)
 library(GSEABase)
@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE, tidy = T)
 
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides != "yes"){
   cat("# ChIPseq (part 3)
 
@@ -39,13 +39,13 @@ peakAnno <- annotatePeak(macsPeaks_GR, tssRegion=c(-1000, 1000),
                          annoDb="org.Mm.eg.db")
 
 
-## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE----
+## ----eval=T,echo=T, message=FALSE,messages=FALSE, eval=T, echo=T, warning=FALSE-----------
 annotatedPeaksGR <- as.GRanges(peakAnno)
 annotatedPeaksDF <- as.data.frame(peakAnno)
 annotatedPeaksDF[1:2,]
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
@@ -67,24 +67,24 @@ if(params$isSlides == "yes"){
 
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------------------
 annotatedPeaksGR[1,]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE-----------------------------------------
 annotatedPeaksGR_TSS <- annotatedPeaksGR[
   annotatedPeaksGR$annotation == "Promoter",]
 genesWithPeakInTSS <- unique(annotatedPeaksGR_TSS$geneId)
 genesWithPeakInTSS[1:2]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T, message = F---------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T, message = F---------------------
 allGeneGR <- genes(TxDb.Mmusculus.UCSC.mm10.knownGene)
 allGeneGR[1:2,]
 allGeneIDs <- allGeneGR$gene_id
 
 
-## ----eval=T,echo=T, message=F, warning=FALSE,tidy=T---------------------------
+## ----eval=T,echo=T, message=F, warning=FALSE,tidy=T---------------------------------------
 library(clusterProfiler)
 library(org.Mm.eg.db)
 GO_result <- enrichGO(gene = genesWithPeakInTSS, 
@@ -94,23 +94,23 @@ GO_result <- enrichGO(gene = genesWithPeakInTSS,
 
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 GO_result_df <- data.frame(GO_result)
 GO_result_df[1:5, ]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T, fig.height=4, fig.width=8----
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T, fig.height=4, fig.width=8-------
 library(enrichplot)
 GO_result_plot <- pairwise_termsim(GO_result)
 emapplot(GO_result_plot, showCategory = 20)
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 library(msigdbr)
 msigdbr_collections()
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 library(msigdbr)
 msig_t2g <- msigdbr(species = "Mus musculus", 
                     category = "H", 
@@ -119,7 +119,7 @@ msig_t2g <- msig_t2g[ , colnames(msig_t2g) %in% c("gs_name", "entrez_gene")]
 msig_t2g[1:3, ]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 hallmark <- enricher(gene = genesWithPeakInTSS, 
                      universe = allGeneIDs,
                      TERM2GENE = msig_t2g)
@@ -127,50 +127,50 @@ hallmark_df <- data.frame(hallmark)
 hallmark_df[1:3, ]
 
 
-## ----eval=T,echo=T, warning=FALSE,tidy=T--------------------------------------
+## ----eval=T,echo=T, warning=FALSE,tidy=T--------------------------------------------------
 allGenesForGOseq <- as.integer(allGeneIDs %in% genesWithPeakInTSS)
 names(allGenesForGOseq) <- allGeneIDs
 allGenesForGOseq[1:3]
 
 
-## ----include=FALSE------------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------------------
 library(goseq)
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 library(goseq)
 pwf=nullp(allGenesForGOseq,"mm10","knownGene",plot.fit=FALSE)
 
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message = F, tidy=T--------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message = F, tidy=T--------------------
 Myc_hallMarks <- goseq(pwf,"mm10","knownGene",
                        gene2cat = data.frame(msig_t2g))
 
 Myc_hallMarks[1:3, ]
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 library(rGREAT)
 
 
-## ----eval=T,echo=T, eval=T, echo=T,messages=F,message=F,warning=FALSE,tidy=T----
+## ----eval=T,echo=T, eval=T, echo=T,messages=F,message=F,warning=FALSE,tidy=T--------------
 great_Job <- submitGreatJob(macsPeaks_GR,species="mm10",version = "3.0.0",request_interval = 1)
 availableCategories(great_Job)
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message =F-----------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE, message =F-----------------------------
 great_ResultTable = getEnrichmentTables(great_Job,
                                         category="Regulatory Motifs")
 names(great_ResultTable)
 
 
-## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------
+## ----eval=T,echo=T, eval=T, echo=T, warning=FALSE,tidy=T----------------------------------
 msigProMotifs <- great_ResultTable[["MSigDB Predicted Promoter Motifs"]]
 msigProMotifs[1:4,]
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
@@ -192,21 +192,21 @@ if(params$isSlides == "yes"){
 
 
 
-## ---- echo=TRUE,include=FALSE-------------------------------------------------
+## ----echo=TRUE,include=FALSE--------------------------------------------------------------
 
 library(BSgenome)
 library(BSgenome.Mmusculus.UCSC.mm10)
 BSgenome.Mmusculus.UCSC.mm10
 
 
-## ---- echo=TRUE,collapse=F----------------------------------------------------
+## ----echo=TRUE,collapse=F-----------------------------------------------------------------
 
 library(BSgenome)
 library(BSgenome.Mmusculus.UCSC.mm10)
 BSgenome.Mmusculus.UCSC.mm10
 
 
-## ---- echo=TRUE,collapse=F----------------------------------------------------
+## ----echo=TRUE,collapse=F-----------------------------------------------------------------
 macsSummits_GR <- GRanges(seqnames(macsPeaks_GR),
                           IRanges(macsPeaks_GR$abs_summit,
                                   macsPeaks_GR$abs_summit),
@@ -215,11 +215,11 @@ macsSummits_GR <- resize(macsSummits_GR,100,fix="center")
 
 
 
-## ---- echo=TRUE,collapse=F----------------------------------------------------
+## ----echo=TRUE,collapse=F-----------------------------------------------------------------
 macsSummits_GR
 
 
-## ---- echo=TRUE,collapse=F----------------------------------------------------
+## ----echo=TRUE,collapse=F-----------------------------------------------------------------
 peaksSequences <- getSeq(BSgenome.Mmusculus.UCSC.mm10,
                          macsSummits_GR)
 names(peaksSequences) <- paste0(seqnames(macsSummits_GR),":",
@@ -230,17 +230,17 @@ names(peaksSequences) <- paste0(seqnames(macsSummits_GR),":",
 peaksSequences[1:2,]
 
 
-## ---- echo=TRUE,collapse=F----------------------------------------------------
+## ----echo=TRUE,collapse=F-----------------------------------------------------------------
 writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
 
 
 
-## ---- echo=TRUE,collapse=F,eval=FALSE-----------------------------------------
+## ----echo=TRUE,collapse=F,eval=FALSE------------------------------------------------------
 ## library(rtracklayer)
 ## motifGFF <- import("~/Downloads/fimo.gff")
 
 
-## ---- echo=TRUE,collapse=F,eval=FALSE-----------------------------------------
+## ----echo=TRUE,collapse=F,eval=FALSE------------------------------------------------------
 ## motifGFF$Name <- paste0(seqnames(motifGFF),":",
 ##                         start(motifGFF),"-",end(motifGFF))
 ## motifGFF$ID <- paste0(seqnames(motifGFF),":",
@@ -248,19 +248,19 @@ writeXStringSet(peaksSequences,file="mycMel_rep1.fa")
 ## export.gff3(motifGFF,con="~/Downloads/fimoUpdated.gff")
 
 
-## ---- echo=TRUE,collapse=F,eval=TRUE------------------------------------------
+## ----echo=TRUE,collapse=F,eval=TRUE-------------------------------------------------------
 library(JASPAR2020)
 JASPAR2020
 
 
-## ---- echo=TRUE,collapse=F,eval=TRUE------------------------------------------
+## ----echo=TRUE,collapse=F,eval=TRUE-------------------------------------------------------
 library(TFBSTools)
 pfm <- getMatrixByName(JASPAR2020, 
                        name="MYC")
 pfm
 
 
-## ---- echo=TRUE,collapse=F,eval=TRUE------------------------------------------
+## ----echo=TRUE,collapse=F,eval=TRUE-------------------------------------------------------
 library(motifmatchr)
 MycMotifs <- matchMotifs(pfm,
                          macsSummits_GR,BSgenome.Mmusculus.UCSC.mm10, 
@@ -268,6 +268,6 @@ MycMotifs <- matchMotifs(pfm,
 MycMotifs
 
 
-## -----------------------------------------------------------------------------
+## -----------------------------------------------------------------------------------------
 export.bed(MycMotifs[[1]],con = "MycMotifs.bed")
 

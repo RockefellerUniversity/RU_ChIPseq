@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>ChIPseq_In_Bioconductor2.knit</title>
+    <title>ChIPseq In Bioconductor (part2)    </title>
     <meta charset="utf-8" />
     <meta name="author" content="Rockefeller University, Bioinformatics Resource Center" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
@@ -13,15 +13,19 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# ChIPseq In Bioconductor (part2)
-<html>
-<div style="float:left">
-
-</div>
-<hr color='#EB811B' size=1px width=796px>
+.title[
+# ChIPseq In Bioconductor (part2)<br />
+<html><br />
+<br />
+<hr color='#EB811B' size=1px width=796px><br />
 </html>
+]
+.author[
 ### Rockefeller University, Bioinformatics Resource Center
+]
+.date[
 ### <a href="http://rockefelleruniversity.github.io/RU_ChIPseq/" class="uri">http://rockefelleruniversity.github.io/RU_ChIPseq/</a>
+]
 
 ---
 
@@ -111,7 +115,7 @@ You can find a Blacklist for most genomes at [Anshul Kundaje's site](https://sit
 
 
 
-```r
+``` r
 QCresult &lt;- ChIPQCsample(reads = "/pathTo/myChIPreads.bam", genome = "mm10", blacklist = "/pathTo/mm10_Blacklist.bed")
 ```
 
@@ -125,7 +129,7 @@ We can then provide an initial analysis of our ChIPseq samples quality using the
 Here we evaluate the quality of samples we aligned in the prior session with Rsubread. The returned object is a **ChIPQCsample** object.
 
 
-```r
+``` r
 library(ChIPQC)
 toBlkList &lt;- "~/Downloads/ENCFF547MET.bed.gz"
 chipqc_MycMel_rep1 &lt;- ChIPQCsample("SR_Myc_Mel_rep1.bam", annotation = "mm10", blacklist = toBlkList,
@@ -150,7 +154,7 @@ class(chipqc_MycMel_rep1)
 We can display our **ChIPQCsample** object which will show a basic summary of our ChIPseq quality.
 
 
-```r
+``` r
 chipqc_MycMel_rep1
 ```
 
@@ -233,11 +237,11 @@ We can run **ChIPQCsample()** on all our samples of interest using an **lapply**
 
 
 
-```r
-bamsToQC &lt;- c("Sorted_Myc_Ch12_1.bam", "Sorted_Myc_Ch12_2.bam", "Sorted_Myc_MEL_1.bam",
-    "Sorted_Myc_MEL_2.bam", "Sorted_Input_MEL.bam", "Sorted_Input_Ch12.bam")
-myQC &lt;- bplapply(bamsToQC, ChIPQCsample, annotation = "mm10", blacklist = toBlkList,
-    chromosomes = paste0("chr", 1:10))
+``` r
+bamsToQC &lt;- c("Sorted_Myc_Ch12_1.bam", "Sorted_Myc_Ch12_2.bam", "Sorted_Myc_MEL_1.bam", "Sorted_Myc_MEL_2.bam",
+    "Sorted_Input_MEL.bam", "Sorted_Input_Ch12.bam")
+myQC &lt;- bplapply(bamsToQC, ChIPQCsample, annotation = "mm10", blacklist = toBlkList, chromosomes = paste0("chr",
+    1:10))
 names(myQC) &lt;- bamsToQC
 ```
 
@@ -251,25 +255,18 @@ Here we use the **QCmetrics()** function to give an overview of quality metrics.
 
 
 
-```r
+``` r
 QCmetrics(myQC)
 ```
 
 ```
-##                          Reads Map% Filt% Dup% ReadL FragL RelCC  SSD RiP%
-## Sorted_Myc_Ch12_1.bam 10993821  100  21.9    0    35   186 1.070 3.82   NA
-## Sorted_Myc_Ch12_2.bam 10060460  100  18.4    0    35   146 1.310 2.84   NA
-## Sorted_Myc_MEL_1.bam  10111080  100  20.8    0    35   177 1.220 3.42   NA
-## Sorted_Myc_MEL_2.bam  10686984  100  23.4    0    35   177 1.050 4.20   NA
-## Sorted_Input_MEL.bam   8591703  100  23.6    0    36   184 0.620 4.51   NA
-## Sorted_Input_Ch12.bam 10429244  100  23.7    0    35   182 0.275 4.26   NA
-##                       RiBL%
-## Sorted_Myc_Ch12_1.bam  12.8
-## Sorted_Myc_Ch12_2.bam  10.1
-## Sorted_Myc_MEL_1.bam   11.9
-## Sorted_Myc_MEL_2.bam   14.0
-## Sorted_Input_MEL.bam   15.9
-## Sorted_Input_Ch12.bam  12.8
+##                          Reads Map% Filt% Dup% ReadL FragL RelCC  SSD RiP% RiBL%
+## Sorted_Myc_Ch12_1.bam 10993821  100  21.9    0    35   186 1.070 3.82   NA  12.8
+## Sorted_Myc_Ch12_2.bam 10060460  100  18.4    0    35   146 1.310 2.84   NA  10.1
+## Sorted_Myc_MEL_1.bam  10111080  100  20.8    0    35   177 1.220 3.42   NA  11.9
+## Sorted_Myc_MEL_2.bam  10686984  100  23.4    0    35   177 1.050 4.20   NA  14.0
+## Sorted_Input_MEL.bam   8591703  100  23.6    0    36   184 0.620 4.51   NA  15.9
+## Sorted_Input_Ch12.bam 10429244  100  23.7    0    35   182 0.275 4.26   NA  12.8
 ```
 
 ---
@@ -351,7 +348,7 @@ The **plotCC** function can be used to plot our cross-coverage profiles
 The **plotCC()** function accepts our list of ChIPQC sample objects and a **facetBy** argument to allow us to group our cross-coverage profiles.
 
 
-```r
+``` r
 plotCC(myQC, facetBy = "Sample")
 ```
 
@@ -365,9 +362,9 @@ We can include metadata as a data.frame where the first column is our sample nam
 
 
 
-```r
-myMeta &lt;- data.frame(Sample = names(myQC), Tissue = c("Ch12", "Ch12", "MEL", "MEL",
-    "MEL", "Ch12"), Antibody = c(rep("Myc", 4), rep("Input", 2)))
+``` r
+myMeta &lt;- data.frame(Sample = names(myQC), Tissue = c("Ch12", "Ch12", "MEL", "MEL", "MEL", "Ch12"),
+    Antibody = c(rep("Myc", 4), rep("Input", 2)))
 myMeta
 ```
 
@@ -389,7 +386,7 @@ We can now include our metadata to the **addMetaData** argument which will allow
 Additionally here we use the **colourBy** parameter to add colour to antibody groups.
 
 
-```r
+``` r
 plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody")
 ```
 
@@ -401,7 +398,7 @@ plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody")
 All plots in ChIPQC are in fact built in ggplot2 so we can edit and update our plot like all ggplot objects.
 
 
-```r
+``` r
 plotCC(myQC, facetBy = "Tissue", addMetaData = myMeta, colourBy = "Antibody") + theme_bw() +
     ggtitle("ChIPQC results")
 ```
@@ -452,7 +449,7 @@ The **plotSSD()** function plots samples's pre-blacklisting score in **red** and
 Higher scores for pre-blacklisted SSD can suggest a strong background signal in blacklisted regions for that sample.
 
 
-```r
+``` r
 plotSSD(myQC) + xlim(0, 5)
 ```
 
@@ -466,7 +463,7 @@ Since SSD score is strongly affected by blacklisting it may be necessary to chan
 Higher post-blacklisted SSD scores reflect samples with stronger peak signal.
 
 
-```r
+``` r
 plotSSD(myQC) + xlim(0.2, 0.8)
 ```
 
@@ -497,16 +494,16 @@ We should compare our duplication rate across samples to identify any sample exp
 The **flagtagcounts()** function reports can report the number of duplicates and total mapped reads and so from there we can calculate our duplication rate.
 
 
-```r
+``` r
 myFlags &lt;- flagtagcounts(myQC)
 myFlags["DuplicateByChIPQC", ]/myFlags["Mapped", ]
 ```
 
 ```
-## Sorted_Myc_Ch12_1.bam Sorted_Myc_Ch12_2.bam  Sorted_Myc_MEL_1.bam 
-##            0.07203883            0.08633293            0.15987076 
-##  Sorted_Myc_MEL_2.bam  Sorted_Input_MEL.bam Sorted_Input_Ch12.bam 
-##            0.06253850            0.14269010            0.13873057
+## Sorted_Myc_Ch12_1.bam Sorted_Myc_Ch12_2.bam  Sorted_Myc_MEL_1.bam  Sorted_Myc_MEL_2.bam 
+##            0.07203883            0.08633293            0.15987076            0.06253850 
+##  Sorted_Input_MEL.bam Sorted_Input_Ch12.bam 
+##            0.14269010            0.13873057
 ```
 
 
@@ -518,7 +515,7 @@ We can also use ChIPQC to review where our distribution of reads across gene fea
 Here we expect ChIPseq signal to be stronger in 5'UTRs and promoters when compared to input samples.
 
 
-```r
+``` r
 p &lt;- plotRegi(myQC)
 ```
 
@@ -526,7 +523,7 @@ p &lt;- plotRegi(myQC)
 ## Enrichment for reads across genes.
 
 
-```r
+``` r
 p
 ```
 
@@ -563,7 +560,7 @@ There is no R package for MACS2 (well it just got [released](https://github.com/
 Though there is no MACS2 R package, we can interact with the anaconda package system using the R package [Herper](https://bioconductor.org/packages/release/bioc/html/Herper.html). This was created by us here at the BRC and is part of Bioconductor.
 
 
-```r
+``` r
 BiocManager::install("Herper")
 library(Herper)
 ```
@@ -575,7 +572,7 @@ library(Herper)
 First, we will use Herper to install MACS2 with the *install_CondaTools* function. We just need to tell *install_CondaTools* what tool/s you want and the name of the environment you want to build. 
 
 
-```r
+``` r
 salmon_paths &lt;- install_CondaTools(tools = "macs2", env = "ChIPseq_analysis")
 salmon_paths
 ```
@@ -595,7 +592,7 @@ To run MACS2 to we simply need to supply.
 * Optionally, but highly recommended, we can identify a control to compare to (specified after **–c**).
 
 
-```bash
+``` bash
 macs2 callpeak -t Sorted_Myc_MEL_1.bam
                –name Mel_Rep1 
                –-outdir PeakDirectory
@@ -609,7 +606,7 @@ macs2 callpeak -t Sorted_Myc_MEL_1.bam
 Herper allows us to run conda packages from within R. MACS2 has been installed into *ChIPseq_analysis*. So we can use this environment from R using *with_CondaEnv()*.
 
 
-```r
+``` r
 myChIP &lt;- "Sorted_Myc_MEL_1.bam"
 myControl &lt;- "Sorted_Input_MEL.bam"
 
@@ -635,7 +632,7 @@ MACS peaks come as a tab seperated file thinly disguised as a ".xls".
 In addition to the genomic coordinates of peaks, these files contain useful information on the samples, parameters and version used for peak calling at the top.
 
 
-```r
+``` r
 macsPeaks &lt;- "data/Mel1_peaks.xls"
 
 macsPeaks_DF &lt;- read.delim(macsPeaks)
@@ -657,7 +654,7 @@ macsPeaks_DF[1:8, ]
 We can import peak files therefore using read.delim function. Note we have set comment.char argument to **#** to exclude additional information on peak calling parameters stored within the MACS peak file.
 
 
-```r
+``` r
 macsPeaks &lt;- "data/Mel1_peaks.xls"
 
 macsPeaks_DF &lt;- read.delim(macsPeaks, comment.char = "#")
@@ -679,10 +676,10 @@ Now we have the information in a table we can create a GRanges object.
 GRanges objects are made of chromosome names and intervals stored as IRanges.
 
 
-```r
+``` r
 library(GenomicRanges)
-macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[,
-    "start"], macsPeaks_DF[, "end"]))
+macsPeaks_GR &lt;- GRanges(seqnames = macsPeaks_DF[, "chr"], IRanges(macsPeaks_DF[, "start"], macsPeaks_DF[,
+    "end"]))
 macsPeaks_GR
 ## GRanges object with 16757 ranges and 0 metadata columns:
 ##           seqnames            ranges strand
@@ -712,18 +709,18 @@ As we have seen before elements in GRanges can accessed and set using various GR
 Here we can deconstruct our object back to contig names and interval ranges.
 
 
-```r
+``` r
 seqnames(macsPeaks_GR)
 ```
 
 ```
 ## factor-Rle of length 16757 with 21 runs
-##   Lengths:   916   822  1795   582   596 ...  1089   836   954   395     7
-##   Values : chr1  chr10 chr11 chr12 chr13 ... chr7  chr8  chr9  chrX  chrY 
-## Levels(21): chr1 chr10 chr11 chr12 chr13 chr14 ... chr7 chr8 chr9 chrX chrY
+##   Lengths:   916   822  1795   582   596   470 ...   787  1089   836   954   395     7
+##   Values : chr1  chr10 chr11 chr12 chr13 chr14 ... chr6  chr7  chr8  chr9  chrX  chrY 
+## Levels(21): chr1 chr10 chr11 chr12 chr13 chr14 chr15 ... chr5 chr6 chr7 chr8 chr9 chrX chrY
 ```
 
-```r
+``` r
 ranges(macsPeaks_GR)
 ```
 
@@ -750,7 +747,7 @@ ranges(macsPeaks_GR)
 GRanges objects may have metadata attached. Here we attach some useful information on our peaks including the summit position and the fold enrichment over input.
 
 
-```r
+``` r
 mcols(macsPeaks_GR) &lt;- macsPeaks_DF[, c("abs_summit", "fold_enrichment")]
 macsPeaks_GR
 ```
@@ -780,37 +777,37 @@ macsPeaks_GR
 Also included in the MACS2 output directory is a '.narrowPeak' file. This is a type of interval/bed file and as we have done before, we can import these with the **rtracklayer** package. The 'format' argument must be set to 'narrowPeak'. 
 
 
-```r
+``` r
 library(rtracklayer)
 macsPeaks_GR_np &lt;- import("data/Mel1_peaks.narrowPeak", format = "narrowPeak")
 macsPeaks_GR_np
 ## GRanges object with 16757 ranges and 6 metadata columns:
-##           seqnames            ranges strand |            name     score
-##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt; &lt;numeric&gt;
-##       [1]     chr1   4785371-4785642      * |     Mel1_peak_1        73
-##       [2]     chr1   5082993-5083247      * |     Mel1_peak_2        92
-##       [3]     chr1   7397544-7398115      * |     Mel1_peak_3       222
-##       [4]     chr1   7616290-7616433      * |     Mel1_peak_4        73
-##       [5]     chr1   8134747-8134893      * |     Mel1_peak_5        29
-##       ...      ...               ...    ... .             ...       ...
-##   [16753]     chrY   2657144-2657294      * | Mel1_peak_16753        21
-##   [16754]     chrY 90784142-90784289      * | Mel1_peak_16754       160
-##   [16755]     chrY 90818471-90818771      * | Mel1_peak_16755        74
-##   [16756]     chrY 90824549-90824905      * | Mel1_peak_16756        92
-##   [16757]     chrY 90825407-90825575      * | Mel1_peak_16757        24
-##           signalValue    pValue    qValue      peak
-##             &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;integer&gt;
-##       [1]     5.33590  10.66553   7.37727       192
-##       [2]     4.30257  12.68072   9.27344       130
-##       [3]     9.58306  26.16516  22.20383       293
-##       [4]     7.65860  10.68563   7.39636        90
-##       [5]     2.94486   5.86828   2.96627       126
-##       ...         ...       ...       ...       ...
-##   [16753]     4.25981   4.98931   2.19466        52
-##   [16754]     6.91704  19.76291  16.02769        85
-##   [16755]     5.63525  10.73033   7.44072       124
-##   [16756]     5.21309  12.62006   9.21552       222
-##   [16757]     3.09097   5.26630   2.43505        78
+##           seqnames            ranges strand |            name     score signalValue
+##              &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; |     &lt;character&gt; &lt;numeric&gt;   &lt;numeric&gt;
+##       [1]     chr1   4785371-4785642      * |     Mel1_peak_1        73     5.33590
+##       [2]     chr1   5082993-5083247      * |     Mel1_peak_2        92     4.30257
+##       [3]     chr1   7397544-7398115      * |     Mel1_peak_3       222     9.58306
+##       [4]     chr1   7616290-7616433      * |     Mel1_peak_4        73     7.65860
+##       [5]     chr1   8134747-8134893      * |     Mel1_peak_5        29     2.94486
+##       ...      ...               ...    ... .             ...       ...         ...
+##   [16753]     chrY   2657144-2657294      * | Mel1_peak_16753        21     4.25981
+##   [16754]     chrY 90784142-90784289      * | Mel1_peak_16754       160     6.91704
+##   [16755]     chrY 90818471-90818771      * | Mel1_peak_16755        74     5.63525
+##   [16756]     chrY 90824549-90824905      * | Mel1_peak_16756        92     5.21309
+##   [16757]     chrY 90825407-90825575      * | Mel1_peak_16757        24     3.09097
+##              pValue    qValue      peak
+##           &lt;numeric&gt; &lt;numeric&gt; &lt;integer&gt;
+##       [1]  10.66553   7.37727       192
+##       [2]  12.68072   9.27344       130
+##       [3]  26.16516  22.20383       293
+##       [4]  10.68563   7.39636        90
+##       [5]   5.86828   2.96627       126
+##       ...       ...       ...       ...
+##   [16753]   4.98931   2.19466        52
+##   [16754]  19.76291  16.02769        85
+##   [16755]  10.73033   7.44072       124
+##   [16756]  12.62006   9.21552       222
+##   [16757]   5.26630   2.43505        78
 ##   -------
 ##   seqinfo: 21 sequences from an unspecified genome; no seqlengths
 ```
@@ -823,7 +820,7 @@ We can do this using simple overlapping with GRanges objects.
 
 
 
-```r
+``` r
 library(rtracklayer)
 blkList &lt;- import.bed(toBlkList)
 macsPeaks_GR &lt;- macsPeaks_GR[!macsPeaks_GR %over% blkList]
@@ -867,7 +864,7 @@ First load the libraries we require for the next part.
 
 
 
-```r
+``` r
 library(TxDb.Mmusculus.UCSC.mm10.knownGene)
 library(org.Mm.eg.db)
 library(GenomeInfoDb)
@@ -883,22 +880,22 @@ The annotatePeak function accepts a GRanges object of the regions to annotate, a
 
 
 
-```r
+``` r
 peakAnno &lt;- annotatePeak(macsPeaks_GR, tssRegion = c(-500, 500), TxDb = TxDb.Mmusculus.UCSC.mm10.knownGene,
     annoDb = "org.Mm.eg.db")
 ```
 
 ```
-## &gt;&gt; preparing features information...		 2021-08-02 03:21:46 PM 
-## &gt;&gt; identifying nearest features...		 2021-08-02 03:21:47 PM 
-## &gt;&gt; calculating distance from peak to TSS...	 2021-08-02 03:21:48 PM 
-## &gt;&gt; assigning genomic annotation...		 2021-08-02 03:21:48 PM 
-## &gt;&gt; adding gene annotation...			 2021-08-02 03:22:08 PM 
-## &gt;&gt; assigning chromosome lengths			 2021-08-02 03:22:08 PM 
-## &gt;&gt; done...					 2021-08-02 03:22:08 PM
+## &gt;&gt; preparing features information...		 2025-06-05 20:00:25 
+## &gt;&gt; identifying nearest features...		 2025-06-05 20:00:25 
+## &gt;&gt; calculating distance from peak to TSS...	 2025-06-05 20:00:26 
+## &gt;&gt; assigning genomic annotation...		 2025-06-05 20:00:26 
+## &gt;&gt; adding gene annotation...			 2025-06-05 20:00:29 
+## &gt;&gt; assigning chromosome lengths			 2025-06-05 20:00:29 
+## &gt;&gt; done...					 2025-06-05 20:00:29
 ```
 
-```r
+``` r
 class(peakAnno)
 ```
 
@@ -913,7 +910,7 @@ class(peakAnno)
 The result is a csAnno object containing annotation for peaks and overall annotation statistics.
 
 
-```r
+``` r
 peakAnno
 ```
 
@@ -942,7 +939,7 @@ The csAnno object contains the information on annotation of individual peaks to 
 To extract this from the csAnno object the ChIPseeker functions *as.GRanges* or *as.data.frame* can be used to produce the respective object with peaks and their associated genes.
 
 
-```r
+``` r
 peakAnno_GR &lt;- as.GRanges(peakAnno)
 peakAnno_DF &lt;- as.data.frame(peakAnno)
 ```
@@ -950,28 +947,24 @@ peakAnno_DF &lt;- as.data.frame(peakAnno)
 ---
 ## Peak annotation
 
-```r
+``` r
 peakAnno_GR[1:2, ]
 ```
 
 ```
 ## GRanges object with 2 ranges and 14 metadata columns:
-##       seqnames          ranges strand | abs_summit fold_enrichment  annotation
-##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt; &lt;character&gt;
-##   [1]     chr1 4785371-4785642      * |    4785563         5.33590    Promoter
-##   [2]     chr1 5082993-5083247      * |    5083123         4.30257    Promoter
-##         geneChr geneStart   geneEnd geneLength geneStrand      geneId
-##       &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;  &lt;integer&gt;  &lt;integer&gt; &lt;character&gt;
-##   [1]         1   4783572   4785692       2121          2       27395
-##   [2]         1   5083080   5162529      79450          1      108664
-##                transcriptId distanceToTSS            ENSEMBL      SYMBOL
-##                 &lt;character&gt;     &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;
-##   [1]  ENSMUST00000132625.1            50 ENSMUSG00000033845      Mrpl15
-##   [2] ENSMUST00000044369.12             0 ENSMUSG00000033793     Atp6v1h
-##                     GENENAME
-##                  &lt;character&gt;
-##   [1] mitochondrial riboso..
-##   [2] ATPase, H+ transport..
+##       seqnames          ranges strand | abs_summit fold_enrichment  annotation   geneChr
+##          &lt;Rle&gt;       &lt;IRanges&gt;  &lt;Rle&gt; |  &lt;integer&gt;       &lt;numeric&gt; &lt;character&gt; &lt;integer&gt;
+##   [1]     chr1 4785371-4785642      * |    4785563         5.33590    Promoter         1
+##   [2]     chr1 5082993-5083247      * |    5083123         4.30257    Promoter         1
+##       geneStart   geneEnd geneLength geneStrand      geneId          transcriptId
+##       &lt;integer&gt; &lt;integer&gt;  &lt;integer&gt;  &lt;integer&gt; &lt;character&gt;           &lt;character&gt;
+##   [1]   4783572   4785692       2121          2       27395  ENSMUST00000132625.1
+##   [2]   5083080   5162529      79450          1      108664 ENSMUST00000044369.12
+##       distanceToTSS            ENSEMBL      SYMBOL               GENENAME
+##           &lt;numeric&gt;        &lt;character&gt; &lt;character&gt;            &lt;character&gt;
+##   [1]            50 ENSMUSG00000033845      Mrpl15 mitochondrial riboso..
+##   [2]             0 ENSMUSG00000033793     Atp6v1h ATPase, H+ transport..
 ##   -------
 ##   seqinfo: 21 sequences from mm10 genome
 ```
@@ -983,7 +976,7 @@ Now we have the annotated peaks from ChIPseeker we can use some of ChIPseeker's 
 
 
 
-```r
+``` r
 plotAnnoBar(peakAnno)
 ```
 
@@ -996,7 +989,7 @@ Similarly we can plot the distribution of peaks around TSS sites.
 
 
 
-```r
+``` r
 plotDistToTSS(peakAnno)
 ```
 
@@ -1009,7 +1002,7 @@ ChIPseeker can also offer a succinct plot to describe the overlap between annota
 
 
 
-```r
+``` r
 upsetplot(peakAnno, vennpie = F)
 ```
 
@@ -1077,6 +1070,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable

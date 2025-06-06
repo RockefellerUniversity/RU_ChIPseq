@@ -1,13 +1,13 @@
 params <-
 list(isSlides = "no")
 
-## ----include=FALSE------------------------------------------------------------
+## ----include=FALSE------------------------------------------------------------------------
 suppressPackageStartupMessages(require(knitr))
 knitr::opts_chunk$set(echo = TRUE, tidy = T) # delete cache before any merging 
 
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides != "yes"){
   cat("# ChIPseq (part 1)
 
@@ -19,7 +19,7 @@ if(params$isSlides != "yes"){
 
 
 
-## ----setup2, include=FALSE,eval=FALSE,echo=FALSE------------------------------
+## ----setup2, include=FALSE,eval=FALSE,echo=FALSE------------------------------------------
 ## library(ShortRead)
 ## 
 ## fqSample <- FastqSampler("~/Downloads/ENCFF001NQP.fastq.gz",n=10^6)
@@ -29,7 +29,7 @@ if(params$isSlides != "yes"){
 ## writeFastq(fastqSample,file = "~/Projects/Software/Github/RUBioconductor_Introduction/r_course/Data/sampled_ENCFF000CXH.fastq.gz",mode = "w")
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
@@ -51,16 +51,16 @@ if(params$isSlides == "yes"){
 
 
 
-## ----shortreada,include=FALSE-------------------------------------------------
+## ----shortreada,include=FALSE-------------------------------------------------------------
 library(ShortRead)
 
 
 
-## ----shortread, warning=F, message=F------------------------------------------
+## ----shortread, warning=F, message=F------------------------------------------------------
 library(ShortRead)
 
 
-## ---- echo=F,eval=F-----------------------------------------------------------
+## ----echo=F,eval=F------------------------------------------------------------------------
 ## fqSample <- FastqSampler("~/Downloads/ENCFF001NQP.fastq.gz",n=10^6)
 ## fastq <- yield(fqSample)
 ## 
@@ -68,27 +68,27 @@ library(ShortRead)
 ## 
 
 
-## ----eval=T, echo=F-----------------------------------------------------------
+## ----eval=T, echo=F-----------------------------------------------------------------------
 fastq <- readFastq(dirPath = "data/sampled_ENCFF001NQP.fastq.gz")
 
 
-## ----mycRep1Reads,echo=T,eval=F-----------------------------------------------
+## ----mycRep1Reads,echo=T,eval=F-----------------------------------------------------------
 ## fqSample <- FastqSampler("~/Downloads/ENCFF001NQP.fastq.gz",n=10^6)
 ## fastq <- yield(fqSample)
 
 
-## ----mycRep1ReadsShortReadQ,cache=TRUE,dependson="mycRep1Reads"---------------
+## ----mycRep1ReadsShortReadQ,cache=TRUE,dependson="mycRep1Reads"---------------------------
 fastq
 
 
-## ----mycRep1ReadsAccessor,cache=TRUE,dependson="mycRep1Reads"-----------------
+## ----mycRep1ReadsAccessor,cache=TRUE,dependson="mycRep1Reads"-----------------------------
 readSequences <- sread(fastq)
 readQuality <- quality(fastq)
 readIDs <- id(fastq)
 readSequences
 
 
-## ----mycRep1ReadsQScores,cache=TRUE,dependson="mycRep1Reads"------------------
+## ----mycRep1ReadsQScores,cache=TRUE,dependson="mycRep1Reads"------------------------------
 readQuality <- quality(fastq)
 readQualities <- alphabetScore(readQuality)
 readQualities[1:10]
@@ -100,23 +100,23 @@ toPlot <- data.frame(ReadQ=readQualities)
 ggplot(toPlot,aes(x=ReadQ))+geom_histogram()+theme_minimal()
 
 
-## ----mycRep1ReadsAlpFreq,cache=TRUE,dependson="mycRep1Reads"------------------
+## ----mycRep1ReadsAlpFreq,cache=TRUE,dependson="mycRep1Reads"------------------------------
 readSequences <- sread(fastq)
 readSequences_AlpFreq <- alphabetFrequency(readSequences)
 readSequences_AlpFreq[1:3,]
 
 
-## ----mycRep1ReadsAlpFreqSum,cache=TRUE,dependson="mycRep1ReadsAlpFreq"--------
+## ----mycRep1ReadsAlpFreqSum,cache=TRUE,dependson="mycRep1ReadsAlpFreq"--------------------
 summed__AlpFreq  <- colSums(readSequences_AlpFreq)
 summed__AlpFreq[c("A","C","G","T","N")]
 
 
-## ----mycRep1ReadsAlpByCycle,cache=TRUE,dependson="mycRep1ReadsAlpFreq"--------
+## ----mycRep1ReadsAlpByCycle,cache=TRUE,dependson="mycRep1ReadsAlpFreq"--------------------
 readSequences_AlpbyCycle <- alphabetByCycle(readSequences)
 readSequences_AlpbyCycle[1:4,1:10]
 
 
-## ----mycRep1ReadsAlpByCyclePlot,cache=TRUE,dependson="mycRep1ReadsAlpFreq"----
+## ----mycRep1ReadsAlpByCyclePlot,cache=TRUE,dependson="mycRep1ReadsAlpFreq"----------------
 AFreq <- readSequences_AlpbyCycle["A",]
 CFreq <- readSequences_AlpbyCycle["C",]
 GFreq <- readSequences_AlpbyCycle["G",]
@@ -139,7 +139,7 @@ ggplot(toPlot,aes(y=Count,x=Cycle,colour=Base))+geom_line()+ylim(150000,400000)+
   theme_bw()
 
 
-## ----mycRep1ReadsQByCycle,cache=TRUE,dependson="mycRep1ReadsAlpFreq"----------
+## ----mycRep1ReadsQByCycle,cache=TRUE,dependson="mycRep1ReadsAlpFreq"----------------------
 qualAsMatrix <- as(readQuality,"matrix")
 qualAsMatrix[1:2,]
 
@@ -148,7 +148,7 @@ qualAsMatrix[1:2,]
 boxplot(qualAsMatrix[1:1000,])
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
@@ -170,12 +170,12 @@ if(params$isSlides == "yes"){
 
 
 
-## ----out,eval=FALSE-----------------------------------------------------------
+## ----out,eval=FALSE-----------------------------------------------------------------------
 ## fqStreamer <- FastqStreamer("~/Downloads/ENCFF001NQP.fastq.gz",
 ##                             n=100000)
 
 
-## ----out1,eval=FALSE----------------------------------------------------------
+## ----out1,eval=FALSE----------------------------------------------------------------------
 ## TotalReads <- 0
 ## TotalReadsFilt <- 0
 ## while (length(fq <- yield(fqStreamer))>0) {
@@ -186,17 +186,17 @@ if(params$isSlides == "yes"){
 ##     writeFastq(filt2,"filtered_ENCFF001NQP.fastq.gz",mode="a")
 ## }
 
-## ----echo=F,eval=T------------------------------------------------------------
+## ----echo=F,eval=T------------------------------------------------------------------------
 TotalReads<-25555179
 TotalReadsFilt<-22864597
 
 
-## ----out11,eval=T,echo=T------------------------------------------------------
+## ----out11,eval=T,echo=T------------------------------------------------------------------
 TotalReads
 TotalReadsFilt
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
@@ -218,16 +218,16 @@ if(params$isSlides == "yes"){
 
 
 
-## ----fa1q, include=FALSE------------------------------------------------------
+## ----fa1q, include=FALSE------------------------------------------------------------------
 library(BSgenome.Mmusculus.UCSC.mm10)
 
 
-## ----fa1, echo=TRUE-----------------------------------------------------------
+## ----fa1, echo=TRUE-----------------------------------------------------------------------
 library(BSgenome.Mmusculus.UCSC.mm10)
 BSgenome.Mmusculus.UCSC.mm10
 
 
-## ----fa2,cache=FALSE,echo=TRUE------------------------------------------------
+## ----fa2,cache=FALSE,echo=TRUE------------------------------------------------------------
 mainChromosomes <- paste0("chr",c(1:19,"X","Y","M"))
 mainChrSeq <- lapply(mainChromosomes,
                      function(x)BSgenome.Mmusculus.UCSC.mm10[[x]])
@@ -236,12 +236,12 @@ mainChrSeqSet <- DNAStringSet(mainChrSeq)
 mainChrSeqSet
 
 
-## ----fa3, echo=TRUE,eval=FALSE------------------------------------------------
+## ----fa3, echo=TRUE,eval=FALSE------------------------------------------------------------
 ## writeXStringSet(mainChrSeqSet,
 ##                 "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa")
 
 
-## ---- echo=TRUE,eval=FALSE----------------------------------------------------
+## ----echo=TRUE,eval=FALSE-----------------------------------------------------------------
 ## library(Rsubread)
 ## buildindex("mm10_mainchrs","BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa",
 ##            memory=8000,
@@ -249,7 +249,7 @@ mainChrSeqSet
 ## 
 
 
-## ---- echo=F, eval=F----------------------------------------------------------
+## ----echo=F, eval=F-----------------------------------------------------------------------
 ## myMapped <- align("~/Documents/Box Sync/RU/Teaching/Compilation/Genomes_And_Datasets/mm10/mm10_mainchrs",
 ##                     "filtered_ENCFF001NQP.fastq.gz",
 ##                     output_format = "BAM",
@@ -258,7 +258,7 @@ mainChrSeqSet
 ## 
 
 
-## ---- echo=TRUE,eval=FALSE----------------------------------------------------
+## ----echo=TRUE,eval=FALSE-----------------------------------------------------------------
 ## 
 ## myMapped <- align("mm10_mainchrs",
 ##                     "filtered_ENCFF001NQP.fastq.gz",
@@ -270,16 +270,16 @@ mainChrSeqSet
 ## 
 
 
-## ----sampleTabless1, echo=TRUE,eval=FALSE-------------------------------------
+## ----sampleTabless1, echo=TRUE,eval=FALSE-------------------------------------------------
 ## library(Rbowtie2)
 
 
-## ----bsgecdnoaame, echo=TRUE,eval=FALSE---------------------------------------
+## ----bsgecdnoaame, echo=TRUE,eval=FALSE---------------------------------------------------
 ## bowtie2_build(references="BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa",
 ##                        bt2Index=file.path("BSgenome.Mmusculus.UCSC.mm10.mainChrs"))
 
 
-## ----bsgcdcenoaame, echo=TRUE,eval=FALSE--------------------------------------
+## ----bsgcdcenoaame, echo=TRUE,eval=FALSE--------------------------------------------------
 ## library(R.utils)
 ## gunzip("filtered_ENCFF001NQP.fastq.gz",
 ##        remove=FALSE)
@@ -289,22 +289,22 @@ mainChrSeqSet
 ##           seq1 = "filtered_ENCFF001NQP.fastq")
 
 
-## ----bsgenoaaxssme, echo=TRUE,eval=FALSE--------------------------------------
+## ----bsgenoaaxssme, echo=TRUE,eval=FALSE--------------------------------------------------
 ## bowtieBam <- asBam("ENCFF001NQP.sam")
 
 
-## ----bsgxxxnoaaxssme, echo=TRUE,eval=FALSE------------------------------------
+## ----bsgxxxnoaaxssme, echo=TRUE,eval=FALSE------------------------------------------------
 ## unlink("ENCFF001NQP.sam")
 ## 
 
 
-## ----sortindex, echo=TRUE,eval=FALSE------------------------------------------
+## ----sortindex, echo=TRUE,eval=FALSE------------------------------------------------------
 ## library(Rsamtools)
 ## sortBam("Myc_Mel_1.bam","SR_Myc_Mel_rep1")
 ## indexBam("SR_Myc_Mel_rep1.bam")
 
 
-## ---- results='asis',include=TRUE,echo=FALSE----------------------------------
+## ----results='asis',include=TRUE,echo=FALSE-----------------------------------------------
 if(params$isSlides == "yes"){
   cat("class: inverse, center, middle
 
@@ -326,36 +326,36 @@ if(params$isSlides == "yes"){
 
 
 
-## ---- eval=F, echo=F----------------------------------------------------------
+## ----eval=F, echo=F-----------------------------------------------------------------------
 ## mappedReads <- idxstatsBam("SR_Myc_Mel_1.bam")
 ## save(mappedReads, file="data/idxstatsBam_MycMel.RData")
 
 
-## ----mapped1, echo=TRUE,eval=FALSE--------------------------------------------
+## ----mapped1, echo=TRUE,eval=FALSE--------------------------------------------------------
 ## mappedReads <- idxstatsBam("SR_Myc_Mel_rep1.bam")
 ## TotalMapped <- sum(mappedReads[,"mapped"])
 ## ggplot(mappedReads,aes(x=seqnames,y=mapped))+
 ##   geom_bar(stat="identity")+coord_flip()
 
 
-## ----mapped, echo=FALSE,eval=TRUE,fig.width=4,fig.height=4--------------------
+## ----mapped, echo=FALSE,eval=TRUE,fig.width=4,fig.height=4--------------------------------
 load("data/idxstatsBam_MycMel.RData")
 TotalMapped <- sum(mappedReads[,"mapped"])
 suppressPackageStartupMessages(library(ggplot2))
 ggplot(mappedReads,aes(x=seqnames,y=mapped))+geom_bar(stat="identity")+coord_flip()
 
 
-## ----coverage, echo=TRUE,eval=FALSE-------------------------------------------
+## ----coverage, echo=TRUE,eval=FALSE-------------------------------------------------------
 ## forBigWig <- coverage("SR_Myc_Mel_rep1.bam")
 ## forBigWig
 
 
-## ----bw, echo=TRUE,eval=FALSE-------------------------------------------------
+## ----bw, echo=TRUE,eval=FALSE-------------------------------------------------------------
 ## library(rtracklayer)
 ## export.bw(forBigWig,con="SR_Myc_Mel_rep1.bw")
 
 
-## ----weightedCover, echo=TRUE,eval=FALSE--------------------------------------
+## ----weightedCover, echo=TRUE,eval=FALSE--------------------------------------------------
 ## forBigWig <- coverage("SR_Myc_Mel_rep1.bam",
 ##                       weight = (10^6)/TotalMapped)
 ## forBigWig

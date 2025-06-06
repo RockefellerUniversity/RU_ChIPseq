@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>ChIPseq_In_Bioconductor.knit</title>
+    <title>ChIPseq In Bioconductor (part1)    </title>
     <meta charset="utf-8" />
     <meta name="author" content="Rockefeller University, Bioinformatics Resource Centre" />
-    <script src="libs/header-attrs-2.9/header-attrs.js"></script>
+    <script src="libs/header-attrs-2.27/header-attrs.js"></script>
     <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link rel="stylesheet" href="metropolisCustom.css" type="text/css" />
     <link rel="stylesheet" href="metropolis-fontsCustom.css" type="text/css" />
@@ -13,15 +13,19 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# ChIPseq In Bioconductor (part1)
-<html>
-<div style="float:left">
-
-</div>
-<hr color='#EB811B' size=1px width=796px>
+.title[
+# ChIPseq In Bioconductor (part1)<br />
+<html><br />
+<br />
+<hr color='#EB811B' size=1px width=796px><br />
 </html>
+]
+.author[
 ### Rockefeller University, Bioinformatics Resource Centre
+]
+.date[
 ### <a href="http://rockefelleruniversity.github.io/RU_ChIPseq/" class="uri">http://rockefelleruniversity.github.io/RU_ChIPseq/</a>
+]
 
 ---
 
@@ -102,7 +106,7 @@ First we load the [ShortRead library.](https://bioconductor.org/packages/release
 
 
 
-```r
+``` r
 library(ShortRead)
 ```
 
@@ -127,7 +131,7 @@ Here we use the [**FastqSampler** and **yield** function](https://rockefelleruni
 
 
 
-```r
+``` r
 fqSample &lt;- FastqSampler("~/Downloads/ENCFF001NQP.fastq.gz", n = 10^6)
 fastq &lt;- yield(fqSample)
 ```
@@ -138,7 +142,7 @@ fastq &lt;- yield(fqSample)
 The resulting object is a [ShortReadQ object](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#10) showing information on the number of cycles, base pairs in reads, and number of reads in memory.
 
 
-```r
+``` r
 fastq
 ```
 
@@ -160,7 +164,7 @@ If we wished, we can assess information from the FASTQ file using our [familiar 
 
 
 
-```r
+``` r
 readSequences &lt;- sread(fastq)
 readQuality &lt;- quality(fastq)
 readIDs &lt;- id(fastq)
@@ -195,7 +199,7 @@ We use the [**alphabetScore()** function with our read's qualitys](https://rocke
 
 
 
-```r
+``` r
 readQuality &lt;- quality(fastq)
 readQualities &lt;- alphabetScore(readQuality)
 readQualities[1:10]
@@ -211,7 +215,7 @@ readQualities[1:10]
 We can then produce a histogram of quality scores to get a better understanding of the distribution of scores.
 
 
-```r
+``` r
 library(ggplot2)
 toPlot &lt;- data.frame(ReadQ = readQualities)
 ggplot(toPlot, aes(x = ReadQ)) + geom_histogram() + theme_minimal()
@@ -233,7 +237,7 @@ We can review the occurrence of DNA bases within reads and well as the occurrenc
 Here we check the overall frequency of **A, G, C, T and N (unknown bases)** in our sequence reads.
 
 
-```r
+``` r
 readSequences &lt;- sread(fastq)
 readSequences_AlpFreq &lt;- alphabetFrequency(readSequences)
 readSequences_AlpFreq[1:3, ]
@@ -253,7 +257,7 @@ readSequences_AlpFreq[1:3, ]
 Once we have the frequency of DNA bases in our sequence reads we can retrieve the sum across all reads.
 
 
-```r
+``` r
 summed__AlpFreq &lt;- colSums(readSequences_AlpFreq)
 summed__AlpFreq[c("A", "C", "G", "T", "N")]
 ```
@@ -270,7 +274,7 @@ summed__AlpFreq[c("A", "C", "G", "T", "N")]
 We can review DNA base occurrence by cycle using the [**alphabetByCycle()** function.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#30)
 
 
-```r
+``` r
 readSequences_AlpbyCycle &lt;- alphabetByCycle(readSequences)
 readSequences_AlpbyCycle[1:4, 1:10]
 ```
@@ -292,13 +296,13 @@ We often plot this to visualise the base occurrence over cycles to observe any b
 First we arrange the base frequency into a data frame.
 
 
-```r
+``` r
 AFreq &lt;- readSequences_AlpbyCycle["A", ]
 CFreq &lt;- readSequences_AlpbyCycle["C", ]
 GFreq &lt;- readSequences_AlpbyCycle["G", ]
 TFreq &lt;- readSequences_AlpbyCycle["T", ]
-toPlot &lt;- data.frame(Count = c(AFreq, CFreq, GFreq, TFreq), Cycle = rep(1:36, 4),
-    Base = rep(c("A", "C", "G", "T"), each = 36))
+toPlot &lt;- data.frame(Count = c(AFreq, CFreq, GFreq, TFreq), Cycle = rep(1:36, 4), Base = rep(c("A",
+    "C", "G", "T"), each = 36))
 ```
 
 ---
@@ -308,7 +312,7 @@ toPlot &lt;- data.frame(Count = c(AFreq, CFreq, GFreq, TFreq), Cycle = rep(1:36,
 Now we can plot the frequencies using ggplot2
 
 
-```r
+``` r
 ggplot(toPlot, aes(y = Count, x = Cycle, colour = Base)) + geom_line() + theme_bw()
 ```
 
@@ -322,21 +326,21 @@ We can also assess mean read quality over cycles. This will allow us to identify
 For this we use the [**as(*read_quality*,"matrix")**](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/FastQInBioconductor.html#29) function first to translate our ASCII quality scores to numeric quality scores.
 
 
-```r
+``` r
 qualAsMatrix &lt;- as(readQuality, "matrix")
 qualAsMatrix[1:2, ]
 ```
 
 ```
-##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14]
-## [1,]   33   33   32   33   33   26   26   16   27    29    32    33    30    22
-## [2,]   33   33   18   25   22    4   20   33   31    33    30    33    32    28
-##      [,15] [,16] [,17] [,18] [,19] [,20] [,21] [,22] [,23] [,24] [,25] [,26]
-## [1,]    30    33    33    31    25    32    33    34    33    33    33    33
-## [2,]    32    31    33    24    33    31    33    27    30    31    27    19
-##      [,27] [,28] [,29] [,30] [,31] [,32] [,33] [,34] [,35] [,36]
-## [1,]    25    33    33    34    34    32    33    33    32    32
-## [2,]    25    33    30    30    28    24    30    29    25    22
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11] [,12] [,13] [,14] [,15] [,16]
+## [1,]   33   33   32   33   33   26   26   16   27    29    32    33    30    22    30    33
+## [2,]   33   33   18   25   22    4   20   33   31    33    30    33    32    28    32    31
+##      [,17] [,18] [,19] [,20] [,21] [,22] [,23] [,24] [,25] [,26] [,27] [,28] [,29] [,30]
+## [1,]    33    31    25    32    33    34    33    33    33    33    25    33    33    34
+## [2,]    33    24    33    31    33    27    30    31    27    19    25    33    30    30
+##      [,31] [,32] [,33] [,34] [,35] [,36]
+## [1,]    34    32    33    33    32    32
+## [2,]    28    24    30    29    25    22
 ```
 
 ---
@@ -346,7 +350,7 @@ qualAsMatrix[1:2, ]
 We can now [visualise qualities across cycles using a boxplot.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/exercises/answers/fastq_answers.html)
 
 
-```r
+``` r
 boxplot(qualAsMatrix[1:1000, ])
 ```
 
@@ -379,7 +383,7 @@ We will want to conserve our memory usage to [allow us to deal with loading larg
 Here we set up a **FastqStreamer object** to read in 100000 reads at a time. 
 
 
-```r
+``` r
 fqStreamer &lt;- FastqStreamer("~/Downloads/ENCFF001NQP.fastq.gz", n = 1e+05)
 ```
 
@@ -392,7 +396,7 @@ Now we [loop through file](https://rockefelleruniversity.github.io/Bioconductor_
 We are filtering low quality reads and reads with many nonspecific (N) base calls. 
 
 
-```r
+``` r
 TotalReads &lt;- 0
 TotalReadsFilt &lt;- 0
 while (length(fq &lt;- yield(fqStreamer)) &gt; 0) {
@@ -405,7 +409,7 @@ while (length(fq &lt;- yield(fqStreamer)) &gt; 0) {
 ```
 
 
-```r
+``` r
 TotalReads
 ```
 
@@ -413,7 +417,7 @@ TotalReads
 ## [1] 25555179
 ```
 
-```r
+``` r
 TotalReadsFilt
 ```
 
@@ -453,31 +457,33 @@ For the mouse mm10 genome we load the package **BSgenome.Mmusculus.UCSC.mm10**.
 
 
 
-```r
+``` r
 library(BSgenome.Mmusculus.UCSC.mm10)
 BSgenome.Mmusculus.UCSC.mm10
 ```
 
 ```
-## Mouse genome:
-## # organism: Mus musculus (Mouse)
-## # genome: mm10
-## # provider: UCSC
-## # release date: Dec. 2011
-## # 66 sequences:
-## #   chr1                 chr2                 chr3                
-## #   chr4                 chr5                 chr6                
-## #   chr7                 chr8                 chr9                
-## #   chr10                chr11                chr12               
-## #   chr13                chr14                chr15               
-## #   ...                  ...                  ...                 
-## #   chrUn_GL456372       chrUn_GL456378       chrUn_GL456379      
-## #   chrUn_GL456381       chrUn_GL456382       chrUn_GL456383      
-## #   chrUn_GL456385       chrUn_GL456387       chrUn_GL456389      
-## #   chrUn_GL456390       chrUn_GL456392       chrUn_GL456393      
-## #   chrUn_GL456394       chrUn_GL456396       chrUn_JH584304      
-## # (use 'seqnames()' to see all the sequence names, use the '$' or '[[' operator
-## # to access a given sequence)
+## | BSgenome object for Mouse
+## | - organism: Mus musculus
+## | - provider: UCSC
+## | - genome: mm10
+## | - release date: Sep 2017
+## | - 239 sequence(s):
+## |     chr1                 chr2                 chr3                 chr4                
+## |     chr5                 chr6                 chr7                 chr8                
+## |     chr9                 chr10                chr11                chr12               
+## |     chr13                chr14                chr15                chr16               
+## |     chr17                chr18                chr19                chrX                
+## |     ...                  ...                  ...                  ...                 
+## |     chrX_KQ030495_fix    chrX_KQ030496_fix    chrX_KQ030497_fix    chrX_KZ289092_fix   
+## |     chrX_KZ289093_fix    chrX_KZ289094_fix    chrX_KZ289095_fix    chrY_JH792832_fix   
+## |     chrY_JH792833_fix    chrY_JH792834_fix    chr1_KK082441_alt    chr11_KZ289073_alt  
+## |     chr11_KZ289074_alt   chr11_KZ289075_alt   chr11_KZ289077_alt   chr11_KZ289078_alt  
+## |     chr11_KZ289079_alt   chr11_KZ289080_alt   chr11_KZ289081_alt                       
+## | 
+## | Tips: call 'seqnames()' on the object to get all the sequence names, call 'seqinfo()' to
+## | get the full sequence info, use the '$' or '[[' operator to access a given sequence, see
+## | '?BSgenome' for more information.
 ```
 
 ---
@@ -487,7 +493,7 @@ We will only use the major chromosomes for our analysis so we may exclude random
 Here we cycle through the major chromosomes and create a [**DNAStringSet** object from the retrieved sequences](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/SequencesInBioconductor.html#17).
 
 
-```r
+``` r
 mainChromosomes &lt;- paste0("chr", c(1:19, "X", "Y", "M"))
 mainChrSeq &lt;- lapply(mainChromosomes, function(x) BSgenome.Mmusculus.UCSC.mm10[[x]])
 names(mainChrSeq) &lt;- mainChromosomes
@@ -497,18 +503,18 @@ mainChrSeqSet
 
 ```
 ## DNAStringSet object of length 22:
-##          width seq                                          names               
-##  [1] 195471971 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr1
-##  [2] 182113224 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr2
-##  [3] 160039680 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr3
-##  [4] 156508116 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr4
-##  [5] 151834684 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr5
+##          width seq                                                      names               
+##  [1] 195471971 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr1
+##  [2] 182113224 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr2
+##  [3] 160039680 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr3
+##  [4] 156508116 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr4
+##  [5] 151834684 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr5
 ##  ...       ... ...
-## [18]  90702639 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr18
-## [19]  61431566 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chr19
-## [20] 171031299 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chrX
-## [21]  91744698 NNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNN chrY
-## [22]     16299 GTTAATGTAGCTTAATAACAA...TACGCAATAAACATTAACAA chrM
+## [18]  90702639 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr18
+## [19]  61431566 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chr19
+## [20] 171031299 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chrX
+## [21]  91744698 NNNNNNNNNNNNNNNNNNNNNNNNNNN...NNNNNNNNNNNNNNNNNNNNNNNNNN chrY
+## [22]     16299 GTTAATGTAGCTTAATAACAAAGCAAA...CTCTATTACGCAATAAACATTAACAA chrM
 ```
 
 ---
@@ -517,7 +523,7 @@ mainChrSeqSet
 Now we have a **DNAStringSet** object we can use the [**writeXStringSet** to create our FASTA file of sequences to align to.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/SequencesInBioconductor.html#22)
 
 
-```r
+``` r
 writeXStringSet(mainChrSeqSet, "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa")
 ```
 
@@ -533,10 +539,9 @@ REMEMBER: Building an index is memory intensive and by default is set to 8GB. Th
 
 Luckily we did this for RNAseq, so hopefully you will already have a built index. 
 
-```r
+``` r
 library(Rsubread)
-buildindex("mm10_mainchrs", "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa", memory = 8000,
-    indexSplit = TRUE)
+buildindex("mm10_mainchrs", "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa", memory = 8000, indexSplit = TRUE)
 ```
 
 
@@ -553,9 +558,9 @@ Note that here we set the phredOffset to be 64. Rsubread may get upset if we set
 
 
 
-```r
-myMapped &lt;- align("mm10_mainchrs", "filtered_ENCFF001NQP.fastq.gz", output_format = "BAM",
-    output_file = "Myc_Mel_1.bam", type = "dna", phredOffset = 64, nthreads = 4)
+``` r
+myMapped &lt;- align("mm10_mainchrs", "filtered_ENCFF001NQP.fastq.gz", output_format = "BAM", output_file = "Myc_Mel_1.bam",
+    type = "dna", phredOffset = 64, nthreads = 4)
 ```
 
 ---
@@ -566,7 +571,7 @@ One of the most well known group of alignment alogorthims are the Bowtie family.
 The **QuasR** package allows access to the original Bowtie aligner, but it is a little slow and memory hungry. [Check out our session dedicated to alignment for using QuasR](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/AlignmentInBioconductor.html#36).
 
 
-```r
+``` r
 library(Rbowtie2)
 ```
 
@@ -578,7 +583,7 @@ As with **Rsubread**, the **Rbowtie2** package requires us to first to create an
 We can do this using the **bowtie2_build()** function, specifying our FASTA file and desired name of index.
 
 
-```r
+``` r
 bowtie2_build(references = "BSgenome.Mmusculus.UCSC.mm10.mainChrs.fa", bt2Index = file.path("BSgenome.Mmusculus.UCSC.mm10.mainChrs"))
 ```
 
@@ -590,12 +595,11 @@ We can then align our FASTQ data using the **bowtie2()** function specifying our
 We will need to uncompress our FASTQ then first. Here we use the **remove** is FALSE setting to maintain the original compressed FASTQ.
 
 
-```r
+``` r
 library(R.utils)
 gunzip("filtered_ENCFF001NQP.fastq.gz", remove = FALSE)
 
-bowtie2(bt2Index = "BSgenome.Mmusculus.UCSC.mm10.mainChrs", samOutput = "ENCFF001NQP.sam",
-    seq1 = "filtered_ENCFF001NQP.fastq")
+bowtie2(bt2Index = "BSgenome.Mmusculus.UCSC.mm10.mainChrs", samOutput = "ENCFF001NQP.sam", seq1 = "filtered_ENCFF001NQP.fastq")
 ```
 
 ---
@@ -604,7 +608,7 @@ bowtie2(bt2Index = "BSgenome.Mmusculus.UCSC.mm10.mainChrs", samOutput = "ENCFF00
 Since Rbowtie2 also outputs a SAM file, we would need to need to convert to a BAM file. We can do this with the **RSamtools** **asBam()** function.
 
 
-```r
+``` r
 bowtieBam &lt;- asBam("ENCFF001NQP.sam")
 ```
 
@@ -619,7 +623,7 @@ On the command line we may *stream* inputs to Rbowtie2, but in R this isnt an op
 We would need to make sure we delete any temporary files created (SAM and/or uncompressed FASTQ) to avoid filling up our hard drives. We can delete files in R using the **unlink()** function.
 
 
-```r
+``` r
 unlink("ENCFF001NQP.sam")
 ```
 
@@ -632,7 +636,7 @@ As before, we sort and index our files using the [**Rsamtools** packages **sortB
 The resulting sorted and indexed BAM file is now ready for use in external programs such as IGV as well as for further downstream analysis in R.
 
 
-```r
+``` r
 library(Rsamtools)
 sortBam("Myc_Mel_1.bam", "SR_Myc_Mel_rep1")
 indexBam("SR_Myc_Mel_rep1.bam")
@@ -657,11 +661,10 @@ Now we have the index for the BAM file, we can retrieve and plot the number of m
 
 
 
-```r
+``` r
 mappedReads &lt;- idxstatsBam("SR_Myc_Mel_rep1.bam")
 TotalMapped &lt;- sum(mappedReads[, "mapped"])
-ggplot(mappedReads, aes(x = seqnames, y = mapped)) + geom_bar(stat = "identity") +
-    coord_flip()
+ggplot(mappedReads, aes(x = seqnames, y = mapped)) + geom_bar(stat = "identity") + coord_flip()
 ```
 
 ![](ChIPseq_In_Bioconductor_files/figure-html/mapped-1.png)&lt;!-- --&gt;
@@ -674,7 +677,7 @@ We can also create a bigWig from our sorted, indexed BAM file to allow us to qui
 First we use the [**coverage()** function to create an **RLElist object** containing our coverage scores.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/Summarising_Scores_In_Bioconductor.html#13)
 
 
-```r
+``` r
 forBigWig &lt;- coverage("SR_Myc_Mel_rep1.bam")
 forBigWig
 ```
@@ -686,7 +689,7 @@ forBigWig
 We can now export our [**RLElist object** as a bigWig using the **rtracklayer** package's **export.bw()** function.](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/GenomicScores_In_Bioconductor.html#40)
 
 
-```r
+``` r
 library(rtracklayer)
 export.bw(forBigWig, con = "SR_Myc_Mel_rep1.bw")
 ```
@@ -700,7 +703,7 @@ We may wish to normalize our coverage to allow us to compare enrichment across s
 We can use the [**weight** parameter in the **coverage()**](https://rockefelleruniversity.github.io/Bioconductor_Introduction/presentations/slides/Summarising_Scores_In_Bioconductor.html#20) to scale our reads to the number of mapped reads multiplied by a million (reads per million).
 
 
-```r
+``` r
 forBigWig &lt;- coverage("SR_Myc_Mel_rep1.bam", weight = (10^6)/TotalMapped)
 forBigWig
 export.bw(forBigWig, con = "SR_Myc_Mel_rep1_weighted.bw")
@@ -771,6 +774,19 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
 (function() {
   "use strict"
   // Replace <script> tags in slides area to make them executable
